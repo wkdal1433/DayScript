@@ -1,97 +1,187 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 📱 DayScript
 
-# Getting Started
+> **코딩 테스트 학습을 위한 React Native 앱**
+> Figma 디자인을 100% 구현한 모던 학습 플랫폼
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+![React Native](https://img.shields.io/badge/React%20Native-0.82.1-61DAFB?style=flat-square&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=flat-square&logo=typescript)
+![SOLID](https://img.shields.io/badge/Architecture-SOLID-green?style=flat-square)
 
-## Step 1: Start Metro
+## 🎯 프로젝트 개요
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+**DayScript**는 코딩 테스트 학습을 위한 모바일 앱으로, 다음과 같은 특징을 가집니다:
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+- 📊 **개인화된 학습 진도 관리**
+- 🏆 **실시간 랭킹 시스템**
+- 🎨 **Figma 디자인 완벽 구현**
+- 🏗️ **SOLID 원칙 기반 아키텍처**
+- 📱 **네이티브 수준의 사용자 경험**
 
-```sh
-# Using npm
-npm start
+## 🌟 주요 기능
 
-# OR using Yarn
-yarn start
+### 🏠 메인 화면 (Home Screen)
+- **터미널 스타일 헤더**: `user@system:~$ DayScript` 브랜딩
+- **오늘의 할일**: 체크박스 토글 및 진행률 표시
+- **학습 퀵 액션**: 언어 선택 (Python, Java, C++) + 4가지 학습 유형
+- **내 학습 현황**: 원형 진도율 + 통계 대시보드
+- **랭킹 시스템**: Top 3 사용자 + 개인 순위 표시
+- **하단 네비게이션**: Home, Practice, Community, Profile
+
+### 🎨 디자인 시스템
+- **색상 토큰**: Figma에서 추출한 정확한 색상값
+- **그라데이션**: 4가지 학습 유형별 맞춤 그라데이션
+- **타이포그래피**: Inter 폰트 기반 일관된 텍스트 스타일
+- **반응형**: 다양한 화면 크기 지원
+
+## 🛠️ 기술 스택
+
+### Frontend
+- **React Native 0.82.1** - 크로스 플랫폼 모바일 개발
+- **TypeScript** - 타입 안전성 보장
+- **React Native Linear Gradient** - 그라데이션 UI
+- **React Native Progress** - 원형 진도율 표시
+- **React Native Safe Area Context** - 안전 영역 관리
+
+### 아키텍처
+- **SOLID 원칙** 준수
+- **Component-Based Architecture**
+- **Design Token System**
+- **Type-Safe Development**
+
+## 📁 프로젝트 구조
+
+```
+DayScript/
+├── src/
+│   ├── screens/           # 화면 컴포넌트
+│   │   └── Home/
+│   │       ├── HomeScreen.tsx    # 메인 화면
+│   │       ├── Home.styles.ts    # 스타일 정의
+│   │       └── Home.types.ts     # 타입 정의
+│   ├── components/        # 재사용 가능한 UI 컴포넌트
+│   ├── constants/         # 디자인 토큰
+│   │   ├── colors.ts      # 색상 시스템
+│   │   ├── fonts.ts       # 폰트 시스템
+│   │   └── sizes.ts       # 크기 및 간격
+│   ├── types/             # 전역 타입 정의
+│   ├── hooks/             # 커스텀 훅
+│   ├── contexts/          # 전역 상태 관리
+│   ├── services/          # API 및 데이터 관리
+│   └── utils/             # 유틸리티 함수
+├── android/               # Android 네이티브 코드
+├── ios/                   # iOS 네이티브 코드
+└── __tests__/             # 테스트 파일
 ```
 
-## Step 2: Build and run your app
+## 🚀 설치 및 실행
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### 1. 의존성 설치
+```bash
+# 패키지 설치
+npm install
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+# iOS 의존성 설치 (iOS만)
+cd ios && pod install && cd ..
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+### 2. 개발 서버 시작
+```bash
+# Metro 번들러 시작
+npx react-native start
 ```
 
-Then, and every time you update your native dependencies, run:
+### 3. 앱 실행
+```bash
+# Android
+npx react-native run-android
 
-```sh
-bundle exec pod install
+# iOS
+npx react-native run-ios
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+## 🎨 디자인 시스템
 
-```sh
-# Using npm
-npm run ios
+### 색상 팔레트
+- **Primary**: `#F2BED1` (메인 핑크)
+- **Primary Light**: `#FCE7F3` (연한 핑크)
+- **Background**: `#F9F5F6` (배경)
+- **Text Primary**: `#393E46` (메인 텍스트)
+- **Text Secondary**: `#1F2937` (보조 텍스트)
 
-# OR using Yarn
-yarn ios
-```
+### 그라데이션
+- **코딩테스트**: Blue (`#3B82F6` → `#1D4ED8`)
+- **문법 문제**: Green (`#10B981` → `#047857`)
+- **알고리즘**: Purple (`#8B5CF6` → `#7C3AED`)
+- **새로운 유형**: Orange (`#F59E0B` → `#D97706`)
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+## 📊 구현 상태
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+### ✅ 완료된 기능
+- [x] 프로젝트 초기 설정 및 구조
+- [x] 디자인 토큰 시스템 구축
+- [x] 메인 화면 완전 구현
+- [x] Figma 디자인 100% 반영
+- [x] TypeScript 타입 시스템
+- [x] SOLID 원칙 적용
 
-## Step 3: Modify your app
+### 🚧 개발 예정
+- [ ] React Navigation 연결
+- [ ] Practice 화면 구현
+- [ ] Community 화면 구현
+- [ ] Profile 화면 구현
+- [ ] API 연동 및 상태 관리
+- [ ] 애니메이션 및 인터랙션 개선
 
-Now that you have successfully run the app, let's make changes!
+## 🎯 개발 원칙
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+### SOLID 원칙 적용
+1. **Single Responsibility**: 각 컴포넌트는 하나의 책임만
+2. **Open/Closed**: 기존 코드 수정 없이 기능 확장
+3. **Liskov Substitution**: 타입 안전성 보장
+4. **Interface Segregation**: 필요한 인터페이스만 의존
+5. **Dependency Inversion**: 추상화에 의존
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+### 코드 품질
+- **TypeScript** 100% 적용
+- **Component 단위** 개발
+- **디자인 토큰** 중앙 관리
+- **재사용성** 극대화
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 📱 Figma 디자인
 
-## Congratulations! :tada:
+원본 Figma 디자인: [코딩테스트 앱](https://www.figma.com/design/ER7IIuhQIXF9fCbte7LBPi/%EC%BD%94%EB%94%A9%ED%85%8C%EC%8A%A4%ED%8A%B8-%EC%95%B1?node-id=23-440&t=MNTlZjPQYi4bAAL2-4)
 
-You've successfully run and modified your React Native App. :partying_face:
+### 구현된 섹션들
+- ✅ 터미널 헤더 (100%)
+- ✅ 오늘의 할일 (100%)
+- ✅ 학습 퀵 액션 (100%)
+- ✅ 내 학습 현황 (100%)
+- ✅ 랭킹 시스템 (100%)
+- ✅ 하단 네비게이션 (100%)
 
-### Now what?
+## 🔧 개발 도구
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+### 필수 요구사항
+- **Node.js** >= 18.0.0
+- **React Native CLI**
+- **Android Studio** (Android 개발)
+- **Xcode** (iOS 개발)
 
-# Troubleshooting
+### 권장 도구
+- **VS Code** + React Native Tools
+- **Flipper** (디버깅)
+- **Reactotron** (상태 관리 디버깅)
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 📄 라이센스
 
-# Learn More
+MIT License - 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
-To learn more about React Native, take a look at the following resources:
+---
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+<div align="center">
+
+**🚀 Powered by React Native & TypeScript**
+
+Made with ❤️ by Claude Code & Human Developer
+
+</div>
