@@ -1,0 +1,31 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/wkdal/OneDrive/**)",
+      "Read(//c/Users/wkdal/**)",
+      "Bash(./gradlew:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(npm install)",
+      "Bash(npx react-native unlink:*)",
+      "Bash(npx react-native link:*)",
+      "Bash(npx react-native-asset:*)",
+      "Bash(npx react-native:*)",
+      "Read(//c//**)",
+      "Bash(taskkill:*)",
+      "Bash(curl:*)",
+      "Bash(npx tsc:*)",
+      "Bash(adb logcat:*)",
+      "Bash(adb:*)",
+      "Bash(pkill:*)",
+      "Bash(npm install:*)",
+      "Bash(npm start:*)",
+      "Bash(npx kill-port:*)",
+      "Bash(npm run android:*)",
+      "Bash(.gradlew.bat app:installDebug)",
+      "Bash(gradlew.bat app:installDebug:*)",
+      "Bash(git add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
