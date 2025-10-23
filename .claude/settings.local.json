@@ -23,7 +23,9 @@
       "Bash(npm run android:*)",
       "Bash(.gradlew.bat app:installDebug)",
       "Bash(gradlew.bat app:installDebug:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git push:*)",
+      "mcp__framelink-figma-mcp__get_figma_data"
     ],
     "deny": [],
     "ask": []

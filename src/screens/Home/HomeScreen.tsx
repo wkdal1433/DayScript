@@ -75,18 +75,30 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const renderTodayQuests = () => (
     <View style={[styles.card, styles.todayQuestCard]}>
       <Text style={styles.sectionTitle}>오늘의 할일</Text>
-      {quests.map((quest) => (
+      {quests.map((quest, index) => (
         <TouchableOpacity
           key={quest.id}
-          style={styles.questItem}
+          style={[
+            styles.questItem,
+            { marginBottom: index === quests.length - 1 ? 0 : 10 } // Figma 정확 간격
+          ]}
           onPress={() => handleQuestToggle(quest.id)}
+          activeOpacity={0.7}
         >
           <View style={[styles.checkbox, quest.completed && styles.checkboxCompleted]}>
             {quest.completed && <Text style={styles.checkmark}>✓</Text>}
           </View>
-          <Text style={styles.questText}>{quest.title}</Text>
+          <Text style={[styles.questText, { flex: 1 }]}>{quest.title}</Text>
           <View style={styles.progressContainer}>
-            <View style={[styles.progressBar, { width: quest.progress ? `${quest.progress}%` : '0%' }]} />
+            <View
+              style={[
+                styles.progressBar,
+                {
+                  width: quest.progress ? `${quest.progress}%` : '0%',
+                  backgroundColor: quest.completed ? '#F2BED1' : '#8B5CF6' // Figma gradient colors
+                }
+              ]}
+            />
           </View>
         </TouchableOpacity>
       ))}
@@ -125,7 +137,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: '코딩테스트',
         subtitle: '문제',
         description: '실전 문제 풀이',
-        colors: ['#3B82F6', '#1D4ED8'],
+        colors: ['#3B82F6', '#1D4ED8'], // Figma blue gradient
         borderColor: '#3B82F6',
       },
       {
@@ -134,7 +146,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: '문법 문제',
         subtitle: '',
         description: '기초 문법 학습',
-        colors: ['#10B981', '#047857'],
+        colors: ['#10B981', '#047857'], // Figma green gradient
         borderColor: '#10B981',
       },
       {
@@ -143,7 +155,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: '알고리즘',
         subtitle: '퀴즈',
         description: '개념 정리',
-        colors: ['#8B5CF6', '#7C3AED'],
+        colors: ['#8B5CF6', '#7C3AED'], // Figma purple gradient
         borderColor: '#8B5CF6',
       },
       {
@@ -152,32 +164,51 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         title: '새로운 유형',
         subtitle: '',
         description: '최신 트렌드',
-        colors: ['#F59E0B', '#D97706'],
+        colors: ['#F59E0B', '#D97706'], // Figma orange gradient
         borderColor: '#F59E0B',
       },
     ];
 
     return (
       <View style={styles.actionButtonsContainer}>
-        {actionButtons.map((button) => (
+        {actionButtons.map((button, index) => (
           <TouchableOpacity
             key={button.id}
-            style={[styles.actionButton, { borderColor: button.borderColor }]}
+            style={[
+              styles.actionButton,
+              { borderColor: button.borderColor },
+              // Figma 2x2 그리드 레이아웃
+              {
+                marginRight: index % 2 === 0 ? 10 : 0,
+                marginBottom: index < 2 ? 10 : 0,
+              }
+            ]}
             onPress={() => handleActionPress(button.id)}
+            activeOpacity={0.8}
           >
             <LinearGradient
               colors={button.colors}
-              style={[styles.actionButton, { borderWidth: 0, margin: 0 }]}
+              style={[
+                styles.actionButton,
+                {
+                  borderWidth: 0,
+                  margin: 0,
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                }
+              ]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-            >
-              <Text style={styles.actionButtonEmoji}>{button.emoji}</Text>
-              <View style={{ alignItems: 'center' }}>
-                <Text style={styles.actionButtonTitle}>{button.title}</Text>
-                {button.subtitle && <Text style={styles.actionButtonTitle}>{button.subtitle}</Text>}
-              </View>
-              <Text style={styles.actionButtonSubtitle}>{button.description}</Text>
-            </LinearGradient>
+            />
+            <Text style={styles.actionButtonEmoji}>{button.emoji}</Text>
+            <View style={{ alignItems: 'center', zIndex: 1 }}>
+              <Text style={styles.actionButtonTitle}>{button.title}</Text>
+              {button.subtitle && <Text style={styles.actionButtonTitle}>{button.subtitle}</Text>}
+            </View>
+            <Text style={styles.actionButtonSubtitle}>{button.description}</Text>
           </TouchableOpacity>
         ))}
       </View>
@@ -220,17 +251,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             size={64}
             progress={mockLearningStats.todayProgress / 100}
             thickness={6}
-            color={COLORS.primary}
-            unfilledColor="rgba(229, 231, 235, 0.3)"
+            color="#F2BED1" // Figma progress color
+            unfilledColor="rgba(229, 231, 235, 0.3)" // Figma unfilled color
             borderWidth={0}
             showsText={false}
+            strokeCap="round" // Figma 스타일 매칭
           />
           <View style={{ position: 'absolute' }}>
             <Text style={styles.progressPercentage}>{mockLearningStats.todayProgress}%</Text>
           </View>
         </View>
-        <Text style={styles.progressLabel}>오늘 학습 진도</Text>
-        <Text style={styles.progressDescription}>목표의 75% 완료! 👏</Text>
+        <View style={styles.progressTextContainer}>
+          <Text style={styles.progressLabel}>오늘 학습 진도</Text>
+          <Text style={styles.progressDescription}>목표의 75% 완료! 👏</Text>
+        </View>
       </View>
       <View style={styles.statsContainer}>
         <View style={styles.statBox}>
@@ -286,7 +320,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.scrollContainer}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        bounces={true}
+      >
         {renderTerminalHeader()}
         {renderTodayQuests()}
         {renderQuickActions()}

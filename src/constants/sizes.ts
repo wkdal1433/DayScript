@@ -1,56 +1,67 @@
 export const SIZES = {
-  // Spacing (패딩, 마진)
+  // Figma Auto Layout Spacing 정확 매칭
   spacing: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 20,
-    xxl: 24,
-    xxxl: 32,
+    xs: 4,   // 4px
+    sm: 8,   // 8px
+    md: 10,  // 10px (Figma gap)
+    lg: 16,  // 16px
+    xl: 20,  // 20px
+    xxl: 24, // 24px
+    xxxl: 32, // 32px
   },
 
-  // Figma에서 추출한 실제 크기들
+  // Figma 디자인 시스템 정확 측정값
   figma: {
-    // 메인 화면 크기
+    // 메인 화면 크기 (Figma Frame)
     screenWidth: 390,
     screenHeight: 1024,
 
-    // 카드 크기들
-    todoCardWidth: 338,
-    todoCardHeight: 160,
+    // 카드 시스템 (정확한 Auto Layout 크기)
+    cardMargin: 26,        // 좌우 마진
+    cardPadding: 20,       // 내부 패딩
+    cardBorderRadius: 12,  // 모든 카드 동일
 
-    learningCardWidth: 338,
-    learningCardHeight: 243,
+    // 각 섹션별 정확한 높이 (간격 조정된 버전)
+    todoCardHeight: 180,
+    learningCardHeight: 280,
+    rankingCardHeight: 280,
+    quickActionCardHeight: 500, // 더 충분한 공간 확보
 
-    rankingCardWidth: 338,
-    rankingCardHeight: 170,
-
-    quickActionCardWidth: 338,
-    quickActionCardHeight: 420,
-
-    // 버튼 크기들
+    // 액션 버튼 정확 크기
     actionButtonWidth: 145,
     actionButtonHeight: 84,
+    actionButtonSpacing: 10, // 버튼 간 간격
 
-    smallActionButtonWidth: 135,
-    smallActionButtonHeight: 84,
+    // 언어 토글 정확 크기
+    languageToggleHeight: 36,
+    languageButtonMargin: 4,
 
-    // 프로그레스바
-    progressBarWidth: 64,
-    progressBarHeight: 64,
+    // 프로그레스 원형 차트
+    progressCircleSize: 64,
+    progressStrokeWidth: 6,
 
-    // 네비게이션
+    // 하단 네비게이션
     bottomNavHeight: 71,
+    bottomNavPadding: 30,
 
-    // 아이콘 크기들
+    // 아이콘 크기 시스템
     iconSmall: 18,
     iconMedium: 20,
     iconLarge: 24,
     iconXLarge: 40,
 
-    // 터미널 헤더
+    // 터미널 헤더 정확 크기
     terminalHeight: 45,
+    terminalMargin: 28,
+    terminalTopMargin: 44,
+
+    // 체크박스 및 프로그레스바
+    checkboxSize: 18,
+    questProgressWidth: 60,
+    questProgressHeight: 8,
+
+    // 랭킹 뱃지
+    rankBadgeSize: 40,
   },
 
   // Border Radius

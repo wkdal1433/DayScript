@@ -1,33 +1,45 @@
 import { StyleSheet, Dimensions } from 'react-native';
 import { COLORS, FONTS, SIZES } from '../../constants';
 
-const { width: screenWidth } = Dimensions.get('window');
-const cardMargin = 26; // Figma의 좌우 마진
+// Figma 디자인 시스템 기반 반응형 계산
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const isSmallScreen = screenWidth < 390;
+const scaleFactor = isSmallScreen ? screenWidth / 390 : 1;
+
+// Figma Auto Layout 마진 시스템
+const cardMargin = SIZES.figma.cardMargin;
 const cardWidth = screenWidth - (cardMargin * 2);
 
+// 반응형 크기 계산 헬퍼
+const scaleSize = (size: number) => Math.round(size * scaleFactor);
+
 export const styles = StyleSheet.create({
-  // 메인 컨테이너
+  // 메인 컨테이너 (Figma Frame 기준)
   container: {
     flex: 1,
-    backgroundColor: COLORS.primaryLight,
+    backgroundColor: '#FCE7F3', // Figma background color
+    minHeight: screenHeight,
   },
   scrollContainer: {
-    paddingBottom: SIZES.figma.bottomNavHeight + SIZES.spacing.lg,
+    paddingBottom: SIZES.figma.bottomNavHeight + SIZES.spacing.xl,
+    flexGrow: 1,
   },
 
-  // 터미널 헤더
+  // 터미널 헤더 (왼쪽 정렬, 오른쪽 공간 확보)
   terminalHeader: {
-    marginHorizontal: cardMargin + 2, // 28px (Figma 위치)
-    marginTop: 44, // 상단 마진
-    height: SIZES.figma.terminalHeight,
+    marginLeft: SIZES.figma.terminalMargin,
+    marginRight: 86 + SIZES.figma.terminalMargin, // 오른쪽 86px(헤더 영역) + 마진
+    marginTop: SIZES.figma.terminalTopMargin,
+    height: scaleSize(SIZES.figma.terminalHeight),
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
-    borderColor: COLORS.primaryBorder,
+    borderColor: '#FDCEDF',
     borderRadius: SIZES.borderRadius.md,
-    paddingHorizontal: SIZES.spacing.lg + 1, // 17px
-    justifyContent: 'center',
+    paddingHorizontal: 17,
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'flex-start',
+    maxWidth: 220, // Figma에서 측정된 터미널 헤더 최대 너비
   },
   terminalText: {
     fontFamily: FONTS.primary,
@@ -49,41 +61,47 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.terminal,
   },
 
-  // 카드 공통 스타일
+  // 카드 공통 스타일 (Figma Auto Layout)
   card: {
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F9F5F6', // Figma card background
     borderWidth: SIZES.borderWidth.thin,
-    borderColor: COLORS.primaryBorder,
-    borderRadius: SIZES.borderRadius.lg,
+    borderColor: '#FDCEDF', // Figma border color
+    borderRadius: SIZES.figma.cardBorderRadius,
     marginHorizontal: cardMargin,
-    padding: SIZES.spacing.xl,
-    marginBottom: SIZES.spacing.lg,
+    paddingHorizontal: SIZES.figma.cardPadding,
+    paddingTop: 0, // sectionTitle의 marginTop으로 대체
+    paddingBottom: SIZES.spacing.xl, // 마지막 요소 하단 마진
+    marginBottom: SIZES.spacing.xl,
+    width: cardWidth,
+    alignSelf: 'center',
   },
 
-  // 오늘의 할일 섹션
+  // 오늘의 할일 섹션 (Figma 정확 위치)
   todayQuestCard: {
-    marginTop: SIZES.spacing.xl + 4, // 110px에서 헤더 끝 위치 계산
-    height: 160,
+    marginTop: 20, // Figma gap between terminal and first card
+    height: scaleSize(SIZES.figma.todoCardHeight),
   },
   sectionTitle: {
     fontFamily: FONTS.primary,
     fontSize: FONTS.sizes.heading,
     fontWeight: '700',
     color: COLORS.textPrimary,
+    marginTop: SIZES.spacing.xl, // 상단 마진 적용
     marginBottom: SIZES.spacing.lg,
   },
   questItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: SIZES.spacing.sm + 2, // 10px
+    marginBottom: SIZES.spacing.md, // Figma consistent spacing
+    paddingVertical: 2,
   },
   checkbox: {
-    width: SIZES.figma.iconSmall,
-    height: SIZES.figma.iconSmall,
+    width: scaleSize(SIZES.figma.checkboxSize),
+    height: scaleSize(SIZES.figma.checkboxSize),
     borderWidth: 2,
-    borderColor: COLORS.primary,
+    borderColor: '#F2BED1', // Figma checkbox border
     borderRadius: 4,
-    marginRight: SIZES.spacing.md,
+    marginRight: 10, // Figma 28px from left - 18px checkbox = 10px gap
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -104,39 +122,40 @@ export const styles = StyleSheet.create({
     marginRight: SIZES.spacing.md,
   },
   progressContainer: {
-    width: 60,
-    height: 8,
-    backgroundColor: COLORS.primaryLight,
+    width: scaleSize(SIZES.figma.questProgressWidth),
+    height: scaleSize(SIZES.figma.questProgressHeight),
+    backgroundColor: '#F8E8EE', // Figma progress background
     borderRadius: 4,
     overflow: 'hidden',
+    marginLeft: 'auto', // Push to right
   },
   progressBar: {
     height: '100%',
     backgroundColor: COLORS.primary,
   },
 
-  // 학습 퀵 액션 섹션
+  // 학습 퀵 액션 섹션 (Figma 정확 높이)
   quickActionCard: {
-    height: 420,
+    height: scaleSize(SIZES.figma.quickActionCardHeight),
   },
   languageToggle: {
     flexDirection: 'row',
     marginBottom: SIZES.spacing.xl,
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
-    borderColor: COLORS.border,
+    borderColor: '#E5E7EB', // Figma border color
     borderRadius: SIZES.borderRadius.lg,
-    height: 36,
+    height: scaleSize(SIZES.figma.languageToggleHeight),
   },
   languageButton: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: SIZES.borderRadius.lg,
-    margin: 4,
+    margin: SIZES.figma.languageButtonMargin,
   },
   languageButtonActive: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#F2BED1', // Figma active state gradient simplified
   },
   languageButtonText: {
     fontFamily: FONTS.primary,
@@ -151,15 +170,18 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: SIZES.spacing.xl,
+    marginBottom: SIZES.spacing.lg, // 줄인 마진으로 잠림 방지
+    marginTop: SIZES.spacing.sm, // 상단 마진 추가
+    gap: SIZES.figma.actionButtonSpacing,
   },
   actionButton: {
-    width: 145,
-    height: 84,
+    width: scaleSize(SIZES.figma.actionButtonWidth),
+    height: scaleSize(SIZES.figma.actionButtonHeight),
     borderRadius: SIZES.borderRadius.lg,
-    padding: SIZES.spacing.lg,
+    padding: 12, // 줄인 패딩으로 잠림 방지
     alignItems: 'center',
-    marginBottom: SIZES.spacing.md,
+    justifyContent: 'space-around',
+    marginBottom: SIZES.spacing.sm, // 줄인 하단 마진
     borderWidth: SIZES.borderWidth.thin,
   },
   actionButtonEmoji: {
@@ -184,10 +206,11 @@ export const styles = StyleSheet.create({
   weeklyStatsContainer: {
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
-    borderColor: COLORS.border,
+    borderColor: '#E5E7EB', // Figma border color
     borderRadius: SIZES.borderRadius.lg,
     padding: SIZES.spacing.lg,
-    height: 70,
+    minHeight: scaleSize(70), // 최소 높이로 변경하여 오버플로우 방지
+    marginTop: SIZES.spacing.sm,
   },
   weeklyStatsTitle: {
     fontFamily: FONTS.primary,
@@ -236,20 +259,22 @@ export const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  // 학습 현황 섹션
+  // 학습 현황 섹션 (Figma 정확 높이)
   learningStatusCard: {
-    height: 243,
+    height: scaleSize(SIZES.figma.learningCardHeight),
   },
   progressCircleContainer: {
+    flexDirection: 'row', // 내부 요소들 수평 배치
     alignItems: 'center',
     marginBottom: SIZES.spacing.lg,
   },
   progressCircle: {
-    width: SIZES.figma.progressBarWidth,
-    height: SIZES.figma.progressBarHeight,
+    width: scaleSize(SIZES.figma.progressCircleSize),
+    height: scaleSize(SIZES.figma.progressCircleSize),
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.spacing.sm,
+    position: 'relative',
   },
   progressPercentage: {
     fontFamily: FONTS.primary,
@@ -269,6 +294,12 @@ export const styles = StyleSheet.create({
     fontSize: FONTS.sizes.body,
     fontWeight: '400',
     color: COLORS.textMuted,
+  },
+  // 프로그레스 원형 오른쪽 텍스트 영역
+  progressTextContainer: {
+    flex: 1,
+    marginLeft: SIZES.spacing.lg,
+    justifyContent: 'center',
   },
   statsContainer: {
     flexDirection: 'row',
@@ -306,9 +337,9 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
   },
 
-  // 랭킹 섹션
+  // 랭킹 섹션 (Figma 정확 높이)
   rankingCard: {
-    height: 170,
+    height: scaleSize(SIZES.figma.rankingCardHeight),
   },
   rankingTitle: {
     fontFamily: FONTS.primary,
@@ -327,10 +358,10 @@ export const styles = StyleSheet.create({
     marginBottom: SIZES.spacing.sm,
   },
   rankBadge: {
-    width: SIZES.figma.iconXLarge,
-    height: SIZES.figma.iconXLarge,
-    backgroundColor: COLORS.primary,
-    borderRadius: SIZES.figma.iconXLarge / 2,
+    width: scaleSize(SIZES.figma.rankBadgeSize),
+    height: scaleSize(SIZES.figma.rankBadgeSize),
+    backgroundColor: '#F2BED1', // Figma badge color
+    borderRadius: scaleSize(SIZES.figma.rankBadgeSize) / 2,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SIZES.spacing.lg,
@@ -372,19 +403,20 @@ export const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  // 하단 네비게이션
+  // 하단 네비게이션 (Figma 정확 크기)
   bottomNavigation: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: SIZES.figma.bottomNavHeight,
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    height: scaleSize(SIZES.figma.bottomNavHeight),
+    backgroundColor: 'rgba(255, 255, 255, 0.8)', // Figma background
     borderTopWidth: SIZES.borderWidth.thin,
-    borderTopColor: 'rgba(253, 206, 223, 0.1)',
+    borderTopColor: 'rgba(253, 206, 223, 0.1)', // Figma border
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: SIZES.spacing.xl + 14, // 30px
+    paddingHorizontal: SIZES.figma.bottomNavPadding,
+    paddingTop: 15, // Figma vertical alignment
   },
   navItem: {
     flex: 1,
@@ -392,9 +424,10 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   navIcon: {
-    width: SIZES.figma.iconSmall,
-    height: SIZES.figma.iconSmall,
+    width: scaleSize(SIZES.figma.iconSmall),
+    height: scaleSize(SIZES.figma.iconSmall),
     marginBottom: SIZES.spacing.xs,
+    backgroundColor: COLORS.white, // Placeholder for icons
   },
   navLabel: {
     fontFamily: FONTS.primary,
