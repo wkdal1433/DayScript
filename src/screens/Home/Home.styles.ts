@@ -34,7 +34,7 @@ export const styles = StyleSheet.create({
     marginTop: SIZES.figma.terminalTopMargin,
     height: scaleSize(SIZES.figma.terminalHeight),
   },
-  // 터미널 헤더 (왼쪽 정렬)
+  // 터미널 헤더 (왼쪽 정렬, 원래 크기 복원)
   terminalHeader: {
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
@@ -44,8 +44,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    flex: 1,
-    marginRight: SIZES.spacing.md,
+    maxWidth: 220, // Figma에서 측정된 터미널 헤더 최대 너비 (원래 크기)
+    height: scaleSize(SIZES.figma.terminalHeight), // 원래 높이 복원
   },
   // 헤더 버튼 컨테이너 (오른쪽 정렬)
   headerButtons: {
