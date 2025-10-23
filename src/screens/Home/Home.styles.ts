@@ -25,14 +25,15 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  // 헤더 컨테이너 (전체 헤더 영역)
+  // 헤더 컨테이너 (전체 헤더 영역) - 상대적 포지셔닝 컨테이너
   headerContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     marginHorizontal: SIZES.figma.terminalMargin,
     marginTop: SIZES.figma.terminalTopMargin,
     height: scaleSize(SIZES.figma.terminalHeight),
+    position: 'relative', // 절대 위치 기준점
   },
   // 터미널 헤더 (왼쪽 정렬, 원래 크기 복원)
   terminalHeader: {
@@ -47,12 +48,11 @@ export const styles = StyleSheet.create({
     maxWidth: 220, // Figma에서 측정된 터미널 헤더 최대 너비 (원래 크기)
     height: scaleSize(SIZES.figma.terminalHeight), // 원래 높이 복원
   },
-  // 헤더 버튼 컨테이너 (오른쪽 정렬)
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  headerButton: {
+  // 알람 버튼 (절대 위치)
+  alarmButton: {
+    position: 'absolute',
+    left: '73.85%',
+    top: '5.47%',
     width: 36,
     height: 36,
     backgroundColor: COLORS.white,
@@ -61,10 +61,20 @@ export const styles = StyleSheet.create({
     borderRadius: SIZES.borderRadius.md,
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: SIZES.spacing.sm,
   },
-  headerButtonIcon: {
-    fontSize: 18,
+  // 설정 버튼 (절대 위치)
+  settingsButton: {
+    position: 'absolute',
+    left: '85.64%',
+    top: '5.47%',
+    width: 36,
+    height: 36,
+    backgroundColor: COLORS.white,
+    borderWidth: SIZES.borderWidth.thin,
+    borderColor: '#FDCEDF',
+    borderRadius: SIZES.borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   terminalText: {
     fontFamily: FONTS.primary,
@@ -423,36 +433,68 @@ export const styles = StyleSheet.create({
     color: COLORS.primary,
   },
 
-  // 하단 네비게이션 (Figma 정확 크기)
+  // 하단 네비게이션 (Figma 정확 크기 - 절대 위치 컨테이너, 텍스트 수용을 위한 높이 증가)
   bottomNavigation: {
     position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    height: scaleSize(SIZES.figma.bottomNavHeight),
+    height: 70, // 기존 height보다 증가하여 아이콘 + 텍스트 수용 (기본 ~50px → 70px)
     backgroundColor: 'rgba(255, 255, 255, 0.8)', // Figma background
     borderTopWidth: SIZES.borderWidth.thin,
     borderTopColor: 'rgba(253, 206, 223, 0.1)', // Figma border
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SIZES.figma.bottomNavPadding,
-    paddingTop: 15, // Figma vertical alignment
   },
-  navItem: {
-    flex: 1,
+  // Home 버튼 (절대 위치 - 아이콘 + 텍스트 높이 고려)
+  homeButton: {
+    position: 'absolute',
+    width: 60, // 텍스트를 수용할 수 있도록 너비 증가
+    height: 50, // 아이콘(18px) + 마진(6px) + 텍스트(~20px) + 여백 고려
+    left: 9, // 중앙 정렬을 위해 left 위치 조정 (39 - 30 = 9)
+    top: 10,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
   },
-  navIcon: {
-    width: scaleSize(SIZES.figma.iconSmall),
-    height: scaleSize(SIZES.figma.iconSmall),
-    marginBottom: SIZES.spacing.xs,
-    backgroundColor: COLORS.white, // Placeholder for icons
+  // Practice 버튼 (절대 위치 - 아이콘 + 텍스트 높이 고려)
+  practiceButton: {
+    position: 'absolute',
+    width: 60,
+    height: 50,
+    left: 107, // 중앙 정렬을 위해 left 위치 조정 (137 - 30 = 107)
+    top: 10,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+  },
+  // Community 버튼 (절대 위치 - 아이콘 + 텍스트 높이 고려)
+  communityButton: {
+    position: 'absolute',
+    width: 60,
+    height: 50,
+    left: 205, // 중앙 정렬을 위해 left 위치 조정 (235 - 30 = 205)
+    top: 10,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+  },
+  // Profile 버튼 (절대 위치 - 아이콘 + 텍스트 높이 고려)
+  profileButton: {
+    position: 'absolute',
+    width: 60,
+    height: 50,
+    left: 301, // 중앙 정렬을 위해 left 위치 조정 (331 - 30 = 301)
+    top: 10,
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
   },
   navLabel: {
     fontFamily: FONTS.primary,
-    fontSize: FONTS.sizes.nav,
+    fontSize: 10, // 텍스트 크기 약간 조정으로 잘림 방지
     fontWeight: '900',
     color: COLORS.primary,
+    marginTop: 6, // 아이콘과 텍스트 간격 증가
+    textAlign: 'center',
+    width: '100%', // 텍스트가 버튼 너비에 맞게 중앙 정렬
   },
 });
