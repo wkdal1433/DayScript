@@ -65,10 +65,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   };
 
   const renderTerminalHeader = () => (
-    <View style={styles.terminalHeader}>
-      <Text style={styles.terminalText}>user@system:~$</Text>
-      <Text style={styles.appName}>DayScript</Text>
-      <View style={styles.cursor} />
+    <View style={styles.headerContainer}>
+      <View style={styles.terminalHeader}>
+        <Text style={styles.terminalText}>user@system~$</Text>
+        <Text style={styles.appName}>DayScript</Text>
+        <Text style={styles.terminalText}>|</Text>
+      </View>
+      <View style={styles.headerButtons}>
+        <TouchableOpacity style={styles.headerButton} onPress={() => console.log('Alarm pressed')}>
+          <Text style={styles.headerButtonIcon}>🔔</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.headerButton} onPress={() => console.log('Settings pressed')}>
+          <Text style={styles.headerButtonIcon}>⚙️</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 

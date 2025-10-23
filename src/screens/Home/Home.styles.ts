@@ -25,12 +25,17 @@ export const styles = StyleSheet.create({
     flexGrow: 1,
   },
 
-  // 터미널 헤더 (왼쪽 정렬, 오른쪽 공간 확보)
-  terminalHeader: {
-    marginLeft: SIZES.figma.terminalMargin,
-    marginRight: 86 + SIZES.figma.terminalMargin, // 오른쪽 86px(헤더 영역) + 마진
+  // 헤더 컨테이너 (전체 헤더 영역)
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginHorizontal: SIZES.figma.terminalMargin,
     marginTop: SIZES.figma.terminalTopMargin,
     height: scaleSize(SIZES.figma.terminalHeight),
+  },
+  // 터미널 헤더 (왼쪽 정렬)
+  terminalHeader: {
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
     borderColor: '#FDCEDF',
@@ -39,7 +44,27 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    maxWidth: 220, // Figma에서 측정된 터미널 헤더 최대 너비
+    flex: 1,
+    marginRight: SIZES.spacing.md,
+  },
+  // 헤더 버튼 컨테이너 (오른쪽 정렬)
+  headerButtons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerButton: {
+    width: 36,
+    height: 36,
+    backgroundColor: COLORS.white,
+    borderWidth: SIZES.borderWidth.thin,
+    borderColor: '#FDCEDF',
+    borderRadius: SIZES.borderRadius.md,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: SIZES.spacing.sm,
+  },
+  headerButtonIcon: {
+    fontSize: 18,
   },
   terminalText: {
     fontFamily: FONTS.primary,
@@ -54,11 +79,6 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.textPrimary,
     marginRight: SIZES.spacing.sm,
-  },
-  cursor: {
-    width: 2,
-    height: 15,
-    backgroundColor: COLORS.terminal,
   },
 
   // 카드 공통 스타일 (Figma Auto Layout)

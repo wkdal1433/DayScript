@@ -25,7 +25,9 @@
       "Bash(gradlew.bat app:installDebug:*)",
       "Bash(git add:*)",
       "Bash(git push:*)",
-      "mcp__framelink-figma-mcp__get_figma_data"
+      "mcp__framelink-figma-mcp__get_figma_data",
+      "Bash(dir:*)",
+      "Bash(.gradlew.bat app:installDebug -PreactNativeDevServerPort=8081)"
     ],
     "deny": [],
     "ask": []
