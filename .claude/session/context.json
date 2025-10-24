@@ -1,63 +1,79 @@
 {
-  "sessionDate": "2025-10-23",
-  "sessionType": "header-layout-improvement",
-  "summary": "Figma 디자인 시스템에 맞춰 React Native 헤더 레이아웃을 완전히 개선했습니다. 터미널 헤더를 왼쪽 정렬하고 오른쪽에 알람/설정 버튼을 추가한 후, 사용자 피드백에 따라 터미널 헤더 컨테이너의 원본 크기를 복원했습니다.",
+  "sessionDate": "2025-10-24",
+  "sessionType": "component-folder-structure-refactoring",
+  "summary": "React Native 앱의 컴포넌트 폴더 구조를 완전히 리팩토링했습니다. src/components/ 폴더를 BottomNavigation/과 Home/ 폴더로 분리하여 더 나은 구조화를 달성했습니다. 모든 관련 컴포넌트 파일을 각각의 폴더로 이동하고, 모든 import 경로를 새로운 폴더 구조에 맞게 업데이트했습니다.",
   "activeFiles": [
+    "src/components/BottomNavigation/index.ts",
+    "src/components/Home/index.ts",
     "src/screens/Home/HomeScreen.tsx",
-    "src/screens/Home/Home.styles.ts"
+    "src/components/BottomNavigation/BottomNavigationBar.tsx",
+    "src/components/BottomNavigation/BottomNavigationBar.styles.ts",
+    "src/components/Home/TerminalHeader.tsx",
+    "src/components/Home/TodayQuests.tsx",
+    "src/components/Home/QuickActions.tsx",
+    "src/components/Home/LearningStatus.tsx",
+    "src/components/Home/Ranking.tsx"
   ],
   "keyChanges": [
     {
-      "file": "HomeScreen.tsx",
-      "change": "renderTerminalHeader 함수를 수정하여 headerContainer와 headerButtons 구조로 분리",
-      "impact": "터미널 헤더 왼쪽 정렬 및 알람/설정 버튼 오른쪽 배치"
+      "file": "src/components/BottomNavigation/",
+      "change": "BottomNavigationBar 컴포넌트를 전용 폴더로 이동",
+      "impact": "컴포넌트 구조 명확화 및 유지보수성 향상"
     },
     {
-      "file": "Home.styles.ts",
-      "change": "headerContainer, headerButtons, headerButton, headerButtonIcon 스타일 추가 후 터미널 헤더 크기 복원",
-      "impact": "Flexbox 기반 수평 정렬, 36x36 크기 버튼 디자인, maxWidth: 220px로 원본 크기 유지"
+      "file": "src/components/Home/",
+      "change": "홈 화면 관련 모든 컴포넌트를 전용 폴더로 이동",
+      "impact": "기능별 컴포넌트 그룹화 및 관리 효율성 증대"
+    },
+    {
+      "file": "index.ts files",
+      "change": "각 폴더에 index.ts 파일 생성하여 깔끔한 export 제공",
+      "impact": "import 경로 단순화 및 코드 가독성 향상"
+    },
+    {
+      "file": "HomeScreen.tsx",
+      "change": "새로운 폴더 구조에 맞게 모든 import 경로 업데이트",
+      "impact": "컴포넌트 참조 정상화 및 TypeScript 컴파일 성공"
     }
+  ],
+  "structureChanges": [
+    "BottomNavigationBar.tsx → src/components/BottomNavigation/BottomNavigationBar.tsx",
+    "BottomNavigationBar.styles.ts → src/components/BottomNavigation/BottomNavigationBar.styles.ts",
+    "TerminalHeader.tsx → src/components/Home/TerminalHeader.tsx",
+    "TodayQuests.tsx → src/components/Home/TodayQuests.tsx",
+    "QuickActions.tsx → src/components/Home/QuickActions.tsx",
+    "LearningStatus.tsx → src/components/Home/LearningStatus.tsx",
+    "Ranking.tsx → src/components/Home/Ranking.tsx"
   ],
   "designDecisions": [
-    "터미널 헤더 텍스트를 'user@system~$ DayScript |' 형태로 통일",
-    "알람(🔔)과 설정(⚙️) 버튼을 36x36 크기로 표준화",
-    "justifyContent: 'space-between'으로 양쪽 끝 정렬 구현",
-    "사용자 피드백 반영: flex: 1 제거하고 maxWidth: 220px로 원본 크기 복원",
-    "터미널 헤더 고정 크기 유지로 일관된 디자인 확보"
+    "기능별 컴포넌트 그룹화 (BottomNavigation, Home)",
+    "각 폴더에 index.ts 파일로 깔끔한 export 구조",
+    "상대 경로 import 일관성 유지",
+    "TypeScript 타입 안전성 보장",
+    "확장 가능한 폴더 구조 설계"
   ],
-  "figmaAlignment": {
-    "completed": true,
-    "requirements": [
-      "터미널 헤더 왼쪽 정렬",
-      "알람 및 설정 버튼 오른쪽 정렬",
-      "Flexbox 기반 수평 배치"
-    ],
-    "status": "모든 요구사항 충족"
+  "folderStructure": {
+    "before": "src/components/ - 모든 컴포넌트가 한 폴더에 위치",
+    "after": {
+      "BottomNavigation": ["BottomNavigationBar.tsx", "BottomNavigationBar.styles.ts", "index.ts"],
+      "Home": ["TerminalHeader.tsx", "TodayQuests.tsx", "QuickActions.tsx", "LearningStatus.tsx", "Ranking.tsx", "index.ts"]
+    }
   },
   "buildValidation": {
-    "android": "성공",
-    "gradlewCommand": "./gradlew app:installDebug -PreactNativeDevServerPort=8081",
-    "buildTime": "16s",
-    "device": "Medium_Phone(AVD) - 16"
+    "typescript": "성공",
+    "imports": "모든 경로 정상 해결",
+    "compilation": "에러 없음"
   },
-  "commitInfo": [
-    {
-      "hash": "4d00f93",
-      "message": "feat: Figma 헤더 레이아웃 완전 정렬 및 알람/설정 버튼 추가",
-      "pushed": true,
-      "branch": "main"
-    },
-    {
-      "hash": "f00baac",
-      "message": "fix: 터미널 헤더 컨테이너 원본 크기 복원 및 세션 컨텍스트 저장",
-      "pushed": true,
-      "branch": "main"
-    }
-  ],
+  "previousSession": {
+    "date": "2025-10-23",
+    "type": "header-layout-improvement",
+    "summary": "Figma 디자인 시스템에 맞춘 헤더 레이아웃 개선 작업",
+    "status": "완료"
+  },
   "nextSteps": [
-    "버튼 클릭 이벤트 핸들러 구현",
-    "알람 및 설정 화면 연결",
-    "아이콘 디자인 최적화 검토"
+    "Screen 폴더 구조 검토 및 필요시 리팩토링",
+    "컴포넌트 재사용성 향상을 위한 props 인터페이스 표준화",
+    "공통 컴포넌트 라이브러리 구축 검토"
   ],
-  "lastUpdate": "auto"
+  "lastUpdate": "2025-10-24"
 }

@@ -5,7 +5,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { COLORS } from '../constants';
+import { COLORS } from '../../constants';
 import { styles } from './BottomNavigationBar.styles';
 
 interface BottomNavigationBarProps {

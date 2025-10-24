@@ -1,5 +1,5 @@
 import { StyleSheet } from 'react-native';
-import { COLORS, FONTS, SIZES } from '../constants';
+import { COLORS, FONTS, SIZES } from '../../constants';
 
 export const styles = StyleSheet.create({
   // 하단 네비게이션 (분리된 컴포넌트 - 높이 20% 증가)
