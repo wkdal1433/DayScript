@@ -21,12 +21,27 @@ export const styles = StyleSheet.create({
     minHeight: screenHeight,
   },
   scrollContainer: {
-    paddingBottom: SIZES.figma.bottomNavHeight + SIZES.spacing.xl,
+    paddingTop: scaleSize(SIZES.figma.terminalHeight) + SIZES.figma.terminalTopMargin + 47, // 헤더 높이 + 상태 표시줄 높이만 (간격용 패딩 제거)
+    paddingBottom: SIZES.figma.bottomNavHeight + SIZES.spacing.xl + 30, // 기존 하단 패딩 + 추가 30px 여백
     flexGrow: 1,
   },
 
-  // 헤더 컨테이너 (전체 헤더 영역) - Flexbox 레이아웃으로 좌우 정렬
+  // 헤더 컨테이너 (전체 헤더 영역) - 상태 표시줄까지 확장된 Sticky 헤더
   headerContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1000,
+    backgroundColor: '#FCE7F3', // 컨테이너와 동일한 배경색
+    paddingBottom: 10, // 헤더 하단 여백 10px 유지
+  },
+  // 헤더 컨테이너 (동적 그림자 활성화 상태)
+  headerContainerWithShadow: {
+    ...SIZES.shadow.medium, // 스크롤 시 동적으로 적용되는 그림자 효과
+  },
+  // 헤더 내용 컨테이너 (Safe Area 아래 실제 컨텐츠 영역)
+  headerContentContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between', // 터미널 헤더(좌측)와 버튼들(우측) 양끝 정렬
     alignItems: 'center',
@@ -96,7 +111,7 @@ export const styles = StyleSheet.create({
 
   // 오늘의 할일 섹션 (Figma 정확 위치)
   todayQuestCard: {
-    marginTop: 20, // Figma gap between terminal and first card
+    marginTop: 0, // 스크롤 컨테이너의 paddingTop으로 대체됨
     height: scaleSize(SIZES.figma.todoCardHeight),
   },
   sectionTitle: {
@@ -104,7 +119,7 @@ export const styles = StyleSheet.create({
     fontSize: FONTS.sizes.heading,
     fontWeight: '700',
     color: COLORS.textPrimary,
-    marginTop: SIZES.spacing.xl, // 상단 마진 적용
+    marginTop: 20, // 헤더 paddingBottom(10px) + 이 값(20px) = 총 30px 간격이지만 ScrollView paddingTop 최적화로 전체 간격 20px 달성
     marginBottom: SIZES.spacing.lg,
   },
   questItem: {
@@ -365,6 +380,7 @@ export const styles = StyleSheet.create({
     fontWeight: '700',
     color: COLORS.textSecondary,
     textAlign: 'center',
+    marginTop: 20, // sectionTitle과 일치하는 상단 마진 적용
     marginBottom: SIZES.spacing.lg,
   },
   rankingList: {

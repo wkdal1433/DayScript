@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import {
   ScrollView,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavigationBar from '../../components/BottomNavigation';
@@ -14,7 +16,7 @@ import {
 
 import { HomeScreenProps } from './Home.types';
 import { styles } from './Home.styles';
-import { COLORS } from '../../constants';
+import { COLORS, SIZES } from '../../constants';
 import { Quest, LearningStats, UserRanking, ProgrammingLanguage, WeeklyStats } from '../../types/common';
 
 // 목업 데이터
@@ -47,6 +49,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [quests, setQuests] = useState<Quest[]>(mockQuests);
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage>('Python');
   const [activeTab, setActiveTab] = useState('Home');
+  const [headerShadowVisible, setHeaderShadowVisible] = useState(false);
 
   const handleQuestToggle = (questId: string) => {
     setQuests(prevQuests =>
@@ -67,6 +70,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     console.log('Tab pressed:', tab);
   };
 
+  // TodayQuests 카드 높이 계산 (스크롤 임계점 설정용)
+  const todayQuestCardHeight = SIZES.figma.todoCardHeight; // 180px
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    // TodayQuests 카드에 도달한 시점부터 그림자 활성화
+    const shouldShowShadow = scrollY > 0;
+    setHeaderShadowVisible(shouldShowShadow);
+  };
+
 
 
 
@@ -82,13 +95,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TerminalHeader showShadow={headerShadowVisible} />
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.scrollContainer}
         showsVerticalScrollIndicator={false}
         bounces={true}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
       >
-        <TerminalHeader />
         <TodayQuests
           quests={quests}
           onQuestToggle={handleQuestToggle}

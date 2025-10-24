@@ -119,7 +119,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             />
-            <Text style={styles.actionButtonEmoji}>{button.emoji}</Text>
+            {/* <Text style={styles.actionButtonEmoji}>{button.emoji}</Text> */}
             <View style={{ alignItems: 'center', zIndex: 1 }}>
               <Text style={styles.actionButtonTitle}>{button.title}</Text>
               {button.subtitle && <Text style={styles.actionButtonTitle}>{button.subtitle}</Text>}

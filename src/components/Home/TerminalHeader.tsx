@@ -3,6 +3,8 @@ import {
   View,
   Text,
   TouchableOpacity,
+  StatusBar,
+  Platform,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { styles } from '../../screens/Home/Home.styles';
@@ -41,32 +43,44 @@ const SettingsIcon = () => (
 interface TerminalHeaderProps {
   onAlarmPress?: () => void;
   onSettingsPress?: () => void;
+  showShadow?: boolean;
 }
 
 const TerminalHeader: React.FC<TerminalHeaderProps> = ({
   onAlarmPress,
   onSettingsPress,
+  showShadow = false,
 }) => {
+  const statusBarHeight = Platform.OS === 'ios'
+    ? (StatusBar.currentHeight || 47)
+    : (StatusBar.currentHeight || 24);
+
   return (
-    <View style={styles.headerContainer}>
-      <View style={styles.terminalHeader}>
-        <Text style={styles.terminalText}>user@system~$</Text>
-        <Text style={styles.appName}>DayScript</Text>
-        <Text style={styles.terminalText}>|</Text>
-      </View>
-      <View style={styles.headerButtons}>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={onAlarmPress || (() => console.log('Alarm pressed'))}
-        >
-          <BellIcon />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.headerButton}
-          onPress={onSettingsPress || (() => console.log('Settings pressed'))}
-        >
-          <SettingsIcon />
-        </TouchableOpacity>
+    <View style={[
+      styles.headerContainer,
+      { paddingTop: statusBarHeight },
+      showShadow && styles.headerContainerWithShadow
+    ]}>
+      <View style={styles.headerContentContainer}>
+        <View style={styles.terminalHeader}>
+          <Text style={styles.terminalText}>user@system~$</Text>
+          <Text style={styles.appName}>DayScript</Text>
+          <Text style={styles.terminalText}>|</Text>
+        </View>
+        <View style={styles.headerButtons}>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={onAlarmPress || (() => console.log('Alarm pressed'))}
+          >
+            <BellIcon />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.headerButton}
+            onPress={onSettingsPress || (() => console.log('Settings pressed'))}
+          >
+            <SettingsIcon />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );

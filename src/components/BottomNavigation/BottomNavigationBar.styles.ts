@@ -16,6 +16,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-around', // 4개 버튼 균등 분산
     alignItems: 'center',
     paddingHorizontal: SIZES.spacing.md,
+    ...SIZES.shadow.small, // 시각적 계층 구조를 위한 그림자 효과
   },
   // 네비게이션 버튼 (Flexbox 레이아웃 - 기본 상태)
   navButton: {
