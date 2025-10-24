@@ -1,4 +1,4 @@
-import { ScreenProps, Quest, LearningStats, UserRanking, ProgrammingLanguage, ActionButton, WeeklyStats } from '../../types/common';
+import { ScreenProps, Quest, LearningStats, UserRanking, ProgrammingLanguage, WeeklyStats } from '../../types/common';
 
 export interface HomeScreenProps extends ScreenProps {}
 

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -40,6 +40,127 @@ const SettingsIcon = () => (
   </Svg>
 );
 
+/**
+ * TypewriterText Component
+ *
+ * 터미널 텍스트에 타이핑 효과를 제공하는 컴포넌트입니다.
+ * CLI 스타일의 타자기 애니메이션으로 텍스트가 한 글자씩 순차적으로 나타납니다.
+ *
+ * @param text - 애니메이션을 적용할 전체 텍스트 문자열
+ * @param speed - 타이핑 속도 (밀리초 단위, 기본값: 80ms)
+ * @param startDelay - 애니메이션 시작 전 지연 시간 (밀리초 단위, 기본값: 500ms)
+ * @param style - 텍스트 스타일 객체
+ *
+ * @example
+ * <TypewriterText
+ *   text="user@system~$ DayScript |"
+ *   speed={80}
+ *   startDelay={500}
+ *   style={styles.terminalText}
+ * />
+ */
+interface TypewriterTextProps {
+  text: string;
+  speed?: number;
+  startDelay?: number;
+  style?: any;
+}
+
+const TypewriterText: React.FC<TypewriterTextProps> = ({
+  text,
+  speed = 80,
+  startDelay = 500,
+  style,
+}) => {
+  const [displayedText, setDisplayedText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(() => {
+    // 컴포넌트 마운트 시 시작 지연 후 애니메이션 시작
+    const startTimer = setTimeout(() => {
+      setIsAnimating(true);
+    }, startDelay);
+
+    return () => clearTimeout(startTimer);
+  }, [startDelay]);
+
+  useEffect(() => {
+    if (!isAnimating || currentIndex >= text.length) {
+      return;
+    }
+
+    // 타이핑 애니메이션 로직: 각 문자를 지정된 속도로 순차 추가
+    const timer = setTimeout(() => {
+      setDisplayedText(prev => prev + text[currentIndex]);
+      setCurrentIndex(prev => prev + 1);
+    }, speed);
+
+    return () => clearTimeout(timer);
+  }, [currentIndex, isAnimating, text, speed]);
+
+  /**
+   * 텍스트를 스타일별로 분할하여 렌더링하는 함수
+   * "user@system~$", "DayScript", "|" 각각에 다른 스타일 적용
+   */
+  const renderStyledText = () => {
+    const parts = [];
+    const userPrompt = 'user@system~$ ';
+    const appName = 'DayScript';
+
+    // user@system~$ 부분 (터미널 프롬프트 스타일)
+    if (displayedText.length > 0) {
+      const userPromptPart = displayedText.substring(0, Math.min(displayedText.length, userPrompt.length));
+      if (userPromptPart) {
+        parts.push(
+          <Text key="prompt" style={styles.terminalText}>
+            {userPromptPart}
+          </Text>
+        );
+      }
+    }
+
+    // DayScript 부분 (앱 이름 스타일)
+    if (displayedText.length > userPrompt.length) {
+      const appNameStart = userPrompt.length;
+      const appNameEnd = userPrompt.length + appName.length;
+      const appNamePart = displayedText.substring(appNameStart, Math.min(displayedText.length, appNameEnd));
+      if (appNamePart) {
+        parts.push(
+          <Text key="appname" style={styles.appName}>
+            {appNamePart}
+          </Text>
+        );
+      }
+    }
+
+    // | 커서 부분 (터미널 스타일)
+    if (displayedText.length > userPrompt.length + appName.length) {
+      const cursorStart = userPrompt.length + appName.length;
+      const cursorPart = displayedText.substring(cursorStart);
+      if (cursorPart) {
+        parts.push(
+          <Text key="cursor" style={styles.terminalText}>
+            {cursorPart}
+          </Text>
+        );
+      }
+    }
+
+    return parts;
+  };
+
+  // 애니메이션 진행 중일 때 깜빡이는 커서 표시
+  const showCursor = currentIndex < text.length && isAnimating;
+
+  return (
+    <Text style={style}>
+      {renderStyledText()}
+      {showCursor && <Text style={[styles.terminalText, styles.typewriterCursor]}>_</Text>}
+    </Text>
+  );
+};
+
 interface TerminalHeaderProps {
   onAlarmPress?: () => void;
   onSettingsPress?: () => void;
@@ -63,9 +184,11 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
     ]}>
       <View style={styles.headerContentContainer}>
         <View style={styles.terminalHeader}>
-          <Text style={styles.terminalText}>user@system~$</Text>
-          <Text style={styles.appName}>DayScript</Text>
-          <Text style={styles.terminalText}>|</Text>
+          <TypewriterText
+            text="user@system~$ DayScript |"
+            speed={80}
+            startDelay={300}
+          />
         </View>
         <View style={styles.headerButtons}>
           <TouchableOpacity

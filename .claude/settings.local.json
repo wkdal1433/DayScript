@@ -30,7 +30,8 @@
       "Bash(.gradlew.bat app:installDebug -PreactNativeDevServerPort=8081)",
       "Bash(git commit:*)",
       "Bash(npm run typecheck:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm run:*)"
     ],
     "deny": [],
     "ask": []

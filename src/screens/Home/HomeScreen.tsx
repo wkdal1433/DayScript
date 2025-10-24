@@ -16,7 +16,6 @@ import {
 
 import { HomeScreenProps } from './Home.types';
 import { styles } from './Home.styles';
-import { COLORS, SIZES } from '../../constants';
 import { Quest, LearningStats, UserRanking, ProgrammingLanguage, WeeklyStats } from '../../types/common';
 
 // 목업 데이터
@@ -45,7 +44,7 @@ const mockWeeklyStats: WeeklyStats = {
   streakDays: 5,
 };
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({ navigation: _navigation }) => {
   const [quests, setQuests] = useState<Quest[]>(mockQuests);
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage>('Python');
   const [activeTab, setActiveTab] = useState('Home');
@@ -69,9 +68,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     setActiveTab(tab);
     console.log('Tab pressed:', tab);
   };
-
-  // TodayQuests 카드 높이 계산 (스크롤 임계점 설정용)
-  const todayQuestCardHeight = SIZES.figma.todoCardHeight; // 180px
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const scrollY = event.nativeEvent.contentOffset.y;
