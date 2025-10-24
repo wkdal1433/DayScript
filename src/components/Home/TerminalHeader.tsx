@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -41,76 +41,75 @@ const SettingsIcon = () => (
 );
 
 /**
- * TypewriterText Component
+ * AdvancedTypewriterCycle Component
  *
- * 터미널 텍스트에 타이핑 효과를 제공하는 컴포넌트입니다.
- * CLI 스타일의 타자기 애니메이션으로 텍스트가 한 글자씩 순차적으로 나타납니다.
+ * 고급 터미널 타이핑 애니메이션을 제공하는 컴포넌트입니다.
+ * 두 개의 문구를 번갈아가며 타이핑하고, 각 문구마다 다른 색상 스타일을 적용합니다.
  *
- * @param text - 애니메이션을 적용할 전체 텍스트 문자열
+ * 애니메이션 사이클:
+ * 1. "user@system~$ DayScript |" 타이핑 → 1초 대기 → 사라짐
+ * 2. "Hello, World!" 타이핑 (Hello: terminalText 색상, World!: appName 색상) → 1초 대기 → 사라짐
+ * 3. 무한 반복
+ *
  * @param speed - 타이핑 속도 (밀리초 단위, 기본값: 80ms)
- * @param startDelay - 애니메이션 시작 전 지연 시간 (밀리초 단위, 기본값: 500ms)
- * @param style - 텍스트 스타일 객체
+ * @param startDelay - 애니메이션 시작 전 지연 시간 (밀리초 단위, 기본값: 300ms)
+ * @param pauseDuration - 각 문구 타이핑 완료 후 대기 시간 (밀리초 단위, 기본값: 1000ms)
  *
  * @example
- * <TypewriterText
- *   text="user@system~$ DayScript |"
+ * <AdvancedTypewriterCycle
  *   speed={80}
- *   startDelay={500}
- *   style={styles.terminalText}
+ *   startDelay={300}
+ *   pauseDuration={1000}
  * />
  */
-interface TypewriterTextProps {
-  text: string;
+interface AdvancedTypewriterCycleProps {
   speed?: number;
   startDelay?: number;
-  style?: any;
+  pauseDuration?: number;
 }
 
-const TypewriterText: React.FC<TypewriterTextProps> = ({
-  text,
+/**
+ * 애니메이션 단계를 정의하는 열거형
+ */
+enum AnimationPhase {
+  WAITING = 'waiting',      // 대기 중
+  TYPING = 'typing',        // 타이핑 중
+  PAUSED = 'paused',        // 완료 후 대기
+  CLEARING = 'clearing'     // 지우는 중
+}
+
+/**
+ * 문구 정보를 정의하는 인터페이스
+ */
+interface PhraseConfig {
+  id: string;
+  text: string;
+  renderFunction: (displayedText: string) => JSX.Element[];
+}
+
+const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   speed = 80,
-  startDelay = 500,
-  style,
+  startDelay = 300,
+  pauseDuration = 1000,
 }) => {
+  // 상태 관리
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAnimating, setIsAnimating] = useState(false);
-
-  useEffect(() => {
-    // 컴포넌트 마운트 시 시작 지연 후 애니메이션 시작
-    const startTimer = setTimeout(() => {
-      setIsAnimating(true);
-    }, startDelay);
-
-    return () => clearTimeout(startTimer);
-  }, [startDelay]);
-
-  useEffect(() => {
-    if (!isAnimating || currentIndex >= text.length) {
-      return;
-    }
-
-    // 타이핑 애니메이션 로직: 각 문자를 지정된 속도로 순차 추가
-    const timer = setTimeout(() => {
-      setDisplayedText(prev => prev + text[currentIndex]);
-      setCurrentIndex(prev => prev + 1);
-    }, speed);
-
-    return () => clearTimeout(timer);
-  }, [currentIndex, isAnimating, text, speed]);
+  const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
+  const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(AnimationPhase.WAITING);
 
   /**
-   * 텍스트를 스타일별로 분할하여 렌더링하는 함수
-   * "user@system~$", "DayScript", "|" 각각에 다른 스타일 적용
+   * 첫 번째 문구 렌더링 함수 - "user@system~$ DayScript |"
+   * 기존 스타일 분리를 유지
    */
-  const renderStyledText = () => {
+  const renderFirstPhrase = (text: string): JSX.Element[] => {
     const parts = [];
     const userPrompt = 'user@system~$ ';
     const appName = 'DayScript';
 
     // user@system~$ 부분 (터미널 프롬프트 스타일)
-    if (displayedText.length > 0) {
-      const userPromptPart = displayedText.substring(0, Math.min(displayedText.length, userPrompt.length));
+    if (text.length > 0) {
+      const userPromptPart = text.substring(0, Math.min(text.length, userPrompt.length));
       if (userPromptPart) {
         parts.push(
           <Text key="prompt" style={styles.terminalText}>
@@ -121,10 +120,10 @@ const TypewriterText: React.FC<TypewriterTextProps> = ({
     }
 
     // DayScript 부분 (앱 이름 스타일)
-    if (displayedText.length > userPrompt.length) {
+    if (text.length > userPrompt.length) {
       const appNameStart = userPrompt.length;
       const appNameEnd = userPrompt.length + appName.length;
-      const appNamePart = displayedText.substring(appNameStart, Math.min(displayedText.length, appNameEnd));
+      const appNamePart = text.substring(appNameStart, Math.min(text.length, appNameEnd));
       if (appNamePart) {
         parts.push(
           <Text key="appname" style={styles.appName}>
@@ -135,9 +134,9 @@ const TypewriterText: React.FC<TypewriterTextProps> = ({
     }
 
     // | 커서 부분 (터미널 스타일)
-    if (displayedText.length > userPrompt.length + appName.length) {
+    if (text.length > userPrompt.length + appName.length) {
       const cursorStart = userPrompt.length + appName.length;
-      const cursorPart = displayedText.substring(cursorStart);
+      const cursorPart = text.substring(cursorStart);
       if (cursorPart) {
         parts.push(
           <Text key="cursor" style={styles.terminalText}>
@@ -150,12 +149,144 @@ const TypewriterText: React.FC<TypewriterTextProps> = ({
     return parts;
   };
 
-  // 애니메이션 진행 중일 때 깜빡이는 커서 표시
-  const showCursor = currentIndex < text.length && isAnimating;
+  /**
+   * 두 번째 문구 렌더링 함수 - "Hello, World!" (듀얼 컬러)
+   * Hello, → terminalText 스타일 (Color A)
+   * World! → appName 스타일 (Color B)
+   */
+  const renderSecondPhrase = (text: string): JSX.Element[] => {
+    const parts = [];
+    const firstPart = 'Hello, ';
+
+    // "Hello, " 부분 (터미널 텍스트 색상)
+    if (text.length > 0) {
+      const firstPartText = text.substring(0, Math.min(text.length, firstPart.length));
+      if (firstPartText) {
+        parts.push(
+          <Text key="hello" style={styles.terminalText}>
+            {firstPartText}
+          </Text>
+        );
+      }
+    }
+
+    // "World!" 부분 (앱 이름 색상)
+    if (text.length > firstPart.length) {
+      const secondPartStart = firstPart.length;
+      const secondPartText = text.substring(secondPartStart);
+      if (secondPartText) {
+        parts.push(
+          <Text key="world" style={styles.appName}>
+            {secondPartText}
+          </Text>
+        );
+      }
+    }
+
+    return parts;
+  };
+
+  // 🔧 FIX: useMemo를 사용하여 phrases 배열을 메모이제이션하고 안정화
+  const phrases: PhraseConfig[] = useMemo(() => [
+    {
+      id: 'terminal',
+      text: 'user@system~$ DayScript |',
+      renderFunction: renderFirstPhrase,
+    },
+    {
+      id: 'greeting',
+      text: 'Hello, World!',
+      renderFunction: renderSecondPhrase,
+    },
+  ], []);
+
+  // 🔧 FIX: currentPhrase를 useMemo로 안정화
+  const currentPhrase = useMemo(() =>
+    phrases[currentPhraseIndex],
+    [phrases, currentPhraseIndex]
+  );
+
+  /**
+   * 초기 시작 지연 처리
+   */
+  useEffect(() => {
+    const startTimer = setTimeout(() => {
+      setAnimationPhase(AnimationPhase.TYPING);
+    }, startDelay);
+
+    return () => clearTimeout(startTimer);
+  }, [startDelay]);
+
+  /**
+   * 🔧 FIX: 타이핑 애니메이션 로직 - currentPhrase 의존성 추가
+   */
+  useEffect(() => {
+    if (animationPhase !== AnimationPhase.TYPING || currentIndex >= currentPhrase.text.length) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      setDisplayedText(prev => prev + currentPhrase.text[currentIndex]);
+      setCurrentIndex(prev => prev + 1);
+    }, speed);
+
+    return () => clearTimeout(timer);
+  }, [currentIndex, animationPhase, currentPhrase, speed]);
+
+  /**
+   * 🔧 FIX: 타이핑 완료 감지 로직 - animationPhase 의존성 제거로 race condition 방지
+   */
+  useEffect(() => {
+    if (animationPhase === AnimationPhase.TYPING && currentIndex >= currentPhrase.text.length) {
+      // 타이핑 완료 → 대기 단계로 전환
+      setAnimationPhase(AnimationPhase.PAUSED);
+    }
+  }, [animationPhase, currentIndex, currentPhrase.text.length]);
+
+  /**
+   * 🔧 FIX: PAUSED 상태에서 CLEARING으로 전환하는 별도 useEffect
+   * animationPhase만 감시하여 race condition 방지
+   */
+  useEffect(() => {
+    if (animationPhase === AnimationPhase.PAUSED) {
+      const pauseTimer = setTimeout(() => {
+        setAnimationPhase(AnimationPhase.CLEARING);
+      }, pauseDuration);
+
+      return () => clearTimeout(pauseTimer);
+    }
+  }, [animationPhase, pauseDuration]);
+
+  /**
+   * 🔧 FIX: 화면 클리어 및 다음 문구로 전환 로직 - 비동기 상태 업데이트로 수정
+   */
+  useEffect(() => {
+    if (animationPhase === AnimationPhase.CLEARING) {
+      // 비동기적으로 상태 업데이트를 순차적으로 실행
+      const clearAndReset = async () => {
+        // 1. 화면 클리어
+        setDisplayedText('');
+        setCurrentIndex(0);
+
+        // 2. 다음 문구로 전환 (phrases가 안정적으로 참조됨)
+        setCurrentPhraseIndex(prev => (prev + 1) % phrases.length);
+
+        // 3. 짧은 지연 후 타이핑 재시작 (상태 업데이트 완료 대기)
+        setTimeout(() => {
+          setAnimationPhase(AnimationPhase.TYPING);
+        }, 50);
+      };
+
+      clearAndReset();
+    }
+  }, [animationPhase, phrases]);
+
+  // 타이핑 중일 때 커서 표시
+  const showCursor = animationPhase === AnimationPhase.TYPING && currentIndex < currentPhrase.text.length;
 
   return (
-    <Text style={style}>
-      {renderStyledText()}
+    <Text>
+      {currentPhrase.renderFunction(displayedText)}
       {showCursor && <Text style={[styles.terminalText, styles.typewriterCursor]}>_</Text>}
     </Text>
   );
@@ -184,10 +315,10 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
     ]}>
       <View style={styles.headerContentContainer}>
         <View style={styles.terminalHeader}>
-          <TypewriterText
-            text="user@system~$ DayScript |"
+          <AdvancedTypewriterCycle
             speed={80}
             startDelay={300}
+            pauseDuration={1000}
           />
         </View>
         <View style={styles.headerButtons}>
