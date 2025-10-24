@@ -38,7 +38,11 @@ export const styles = StyleSheet.create({
   },
   // 헤더 컨테이너 (동적 그림자 활성화 상태)
   headerContainerWithShadow: {
-    ...SIZES.shadow.medium, // 스크롤 시 동적으로 적용되는 그림자 효과
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4, // Android 그림자 효과
   },
   // 헤더 내용 컨테이너 (Safe Area 아래 실제 컨텐츠 영역)
   headerContentContainer: {
