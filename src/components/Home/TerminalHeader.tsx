@@ -43,29 +43,34 @@ const SettingsIcon = () => (
 /**
  * AdvancedTypewriterCycle Component
  *
- * 고급 터미널 타이핑 애니메이션을 제공하는 컴포넌트입니다.
- * 두 개의 문구를 번갈아가며 타이핑하고, 각 문구마다 다른 색상 스타일을 적용합니다.
+ * 단순한 단일 시퀀스 터미널 타이핑 애니메이션을 제공하는 컴포넌트입니다.
+ * 4개의 문구를 순차적으로 무한 반복하여 표시합니다.
  *
  * 애니메이션 사이클:
- * 1. "user@system~$ DayScript |" 타이핑 → 1초 대기 → 사라짐
- * 2. "Hello, World!" 타이핑 (Hello: terminalText 색상, World!: appName 색상) → 1초 대기 → 사라짐
- * 3. 무한 반복
+ *   1. "user@system~$ DayScript |" 타이핑 → 1.5초 대기 → 사라짐
+ *   2. "Hello, World!" 타이핑 (Hello,: terminalText 색상, World!: appName 색상) → 1.5초 대기 → 사라짐
+ *   3. "Welcome, User" 타이핑 (Welcome,: terminalText 색상, User: appName 색상) → 1.5초 대기 → 사라짐
+ *   4. "반가워요! User" 타이핑 (반가워요!: terminalText 색상, User: appName 색상) → 1.5초 대기 → 사라짐
+ * 무한 반복 (1 → 2 → 3 → 4 → 1 → 2...)
  *
  * @param speed - 타이핑 속도 (밀리초 단위, 기본값: 80ms)
  * @param startDelay - 애니메이션 시작 전 지연 시간 (밀리초 단위, 기본값: 300ms)
- * @param pauseDuration - 각 문구 타이핑 완료 후 대기 시간 (밀리초 단위, 기본값: 1000ms)
+ * @param pauseDuration - 각 문구 타이핑 완료 후 대기 시간 (밀리초 단위, 기본값: 1500ms)
+ * @param userName - 사용자 이름 (기본값: "User")
  *
  * @example
  * <AdvancedTypewriterCycle
  *   speed={80}
  *   startDelay={300}
- *   pauseDuration={1000}
+ *   pauseDuration={1500}
+ *   userName="User"
  * />
  */
 interface AdvancedTypewriterCycleProps {
   speed?: number;
   startDelay?: number;
   pauseDuration?: number;
+  userName?: string;
 }
 
 /**
@@ -84,13 +89,15 @@ enum AnimationPhase {
 interface PhraseConfig {
   id: string;
   text: string;
-  renderFunction: (displayedText: string) => JSX.Element[];
+  renderFunction: (displayedText: string, userName: string) => React.JSX.Element[];
 }
+
 
 const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   speed = 80,
   startDelay = 300,
-  pauseDuration = 1000,
+  pauseDuration = 1500,
+  userName = "User",
 }) => {
   // 상태 관리
   const [displayedText, setDisplayedText] = useState('');
@@ -99,10 +106,10 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(AnimationPhase.WAITING);
 
   /**
-   * 첫 번째 문구 렌더링 함수 - "user@system~$ DayScript |"
+   * 터미널 프롬프트 렌더링 함수 - "user@system~$ DayScript |"
    * 기존 스타일 분리를 유지
    */
-  const renderFirstPhrase = (text: string): JSX.Element[] => {
+  const renderTerminalPhrase = (text: string, _userName: string): React.JSX.Element[] => {
     const parts = [];
     const userPrompt = 'user@system~$ ';
     const appName = 'DayScript';
@@ -150,11 +157,11 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   };
 
   /**
-   * 두 번째 문구 렌더링 함수 - "Hello, World!" (듀얼 컬러)
+   * "Hello, World!" 문구 렌더링 함수 (듀얼 컬러)
    * Hello, → terminalText 스타일 (Color A)
    * World! → appName 스타일 (Color B)
    */
-  const renderSecondPhrase = (text: string): JSX.Element[] => {
+  const renderHelloWorldPhrase = (text: string, _userName: string): React.JSX.Element[] => {
     const parts = [];
     const firstPart = 'Hello, ';
 
@@ -186,21 +193,105 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
     return parts;
   };
 
-  // 🔧 FIX: useMemo를 사용하여 phrases 배열을 메모이제이션하고 안정화
+  /**
+   * "Welcome, {UserName}" 문구 렌더링 함수 (듀얼 컬러)
+   * Welcome, → terminalText 스타일 (Color A)
+   * {UserName} → appName 스타일 (Color B)
+   */
+  const renderWelcomePhrase = (text: string, _userNameParam: string): React.JSX.Element[] => {
+    const parts = [];
+    const firstPart = 'Welcome, ';
+
+    // "Welcome, " 부분 (터미널 텍스트 색상)
+    if (text.length > 0) {
+      const firstPartText = text.substring(0, Math.min(text.length, firstPart.length));
+      if (firstPartText) {
+        parts.push(
+          <Text key="welcome" style={styles.terminalText}>
+            {firstPartText}
+          </Text>
+        );
+      }
+    }
+
+    // "{UserName}" 부분 (앱 이름 색상)
+    if (text.length > firstPart.length) {
+      const secondPartStart = firstPart.length;
+      const secondPartText = text.substring(secondPartStart);
+      if (secondPartText) {
+        parts.push(
+          <Text key="username" style={styles.appName}>
+            {secondPartText}
+          </Text>
+        );
+      }
+    }
+
+    return parts;
+  };
+
+  /**
+   * "반가워요! User" 문구 렌더링 함수 (듀얼 컬러)
+   * 반가워요! → terminalText 스타일 (Color A)
+   * User → appName 스타일 (Color B)
+   */
+  const renderKoreanGreetingPhrase = (text: string, _userNameParam: string): React.JSX.Element[] => {
+    const parts = [];
+    const firstPart = '반가워요! ';
+
+    // "반가워요! " 부분 (터미널 텍스트 색상)
+    if (text.length > 0) {
+      const firstPartText = text.substring(0, Math.min(text.length, firstPart.length));
+      if (firstPartText) {
+        parts.push(
+          <Text key="greeting" style={styles.terminalText}>
+            {firstPartText}
+          </Text>
+        );
+      }
+    }
+
+    // "User" 부분 (앱 이름 색상)
+    if (text.length > firstPart.length) {
+      const secondPartStart = firstPart.length;
+      const secondPartText = text.substring(secondPartStart);
+      if (secondPartText) {
+        parts.push(
+          <Text key="username-kr" style={styles.appName}>
+            {secondPartText}
+          </Text>
+        );
+      }
+    }
+
+    return parts;
+  };
+
+  // 🔧 SIMPLIFIED: 단순한 단일 문구 배열로 사용하여 무한 반복 사이클 구현
   const phrases: PhraseConfig[] = useMemo(() => [
     {
       id: 'terminal',
       text: 'user@system~$ DayScript |',
-      renderFunction: renderFirstPhrase,
+      renderFunction: renderTerminalPhrase,
     },
     {
-      id: 'greeting',
+      id: 'hello-world',
       text: 'Hello, World!',
-      renderFunction: renderSecondPhrase,
+      renderFunction: renderHelloWorldPhrase,
     },
-  ], []);
+    {
+      id: 'welcome-user',
+      text: `Welcome, ${userName}`,
+      renderFunction: renderWelcomePhrase,
+    },
+    {
+      id: 'korean-greeting',
+      text: `반가워요! ${userName}`,
+      renderFunction: renderKoreanGreetingPhrase,
+    },
+  ], [userName]);
 
-  // 🔧 FIX: currentPhrase를 useMemo로 안정화
+  // 🔧 SIMPLIFIED: 단순한 currentPhrase 참조
   const currentPhrase = useMemo(() =>
     phrases[currentPhraseIndex],
     [phrases, currentPhraseIndex]
@@ -258,35 +349,41 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   }, [animationPhase, pauseDuration]);
 
   /**
-   * 🔧 FIX: 화면 클리어 및 다음 문구로 전환 로직 - 비동기 상태 업데이트로 수정
+   * 🔧 SIMPLIFIED: 화면 클리어 및 다음 문구로 전환 로직 - 단순한 무한 루프 사이클
+   *
+   * 수정사항:
+   * 1. 복잡한 시퀀스 로직 완전 제거
+   * 2. 단순한 currentPhraseIndex 순차 증가 로직
+   * 3. 4개 문구 끝에서 0으로 리셋하여 무한 반복
    */
   useEffect(() => {
     if (animationPhase === AnimationPhase.CLEARING) {
-      // 비동기적으로 상태 업데이트를 순차적으로 실행
-      const clearAndReset = async () => {
-        // 1. 화면 클리어
-        setDisplayedText('');
-        setCurrentIndex(0);
+      // 1. 화면 클리어 및 인덱스 초기화
+      setDisplayedText('');
+      setCurrentIndex(0);
 
-        // 2. 다음 문구로 전환 (phrases가 안정적으로 참조됨)
-        setCurrentPhraseIndex(prev => (prev + 1) % phrases.length);
+      // 2. 단순한 문구 인덱스 순차 증가 (무한 루프)
+      setCurrentPhraseIndex(prevPhraseIndex => {
+        const nextPhraseIndex = prevPhraseIndex + 1;
+        // 4개 문구 끝에 도달하면 0으로 리셋 (0, 1, 2, 3, 0, 1, 2, 3...)
+        return nextPhraseIndex >= phrases.length ? 0 : nextPhraseIndex;
+      });
 
-        // 3. 짧은 지연 후 타이핑 재시작 (상태 업데이트 완료 대기)
-        setTimeout(() => {
-          setAnimationPhase(AnimationPhase.TYPING);
-        }, 50);
-      };
+      // 3. 짧은 지연 후 타이핑 재시작
+      const restartTimer = setTimeout(() => {
+        setAnimationPhase(AnimationPhase.TYPING);
+      }, 50);
 
-      clearAndReset();
+      return () => clearTimeout(restartTimer);
     }
-  }, [animationPhase, phrases]);
+  }, [animationPhase, phrases.length]);
 
   // 타이핑 중일 때 커서 표시
   const showCursor = animationPhase === AnimationPhase.TYPING && currentIndex < currentPhrase.text.length;
 
   return (
     <Text>
-      {currentPhrase.renderFunction(displayedText)}
+      {currentPhrase.renderFunction(displayedText, userName)}
       {showCursor && <Text style={[styles.terminalText, styles.typewriterCursor]}>_</Text>}
     </Text>
   );
@@ -296,12 +393,14 @@ interface TerminalHeaderProps {
   onAlarmPress?: () => void;
   onSettingsPress?: () => void;
   showShadow?: boolean;
+  userName?: string;
 }
 
 const TerminalHeader: React.FC<TerminalHeaderProps> = ({
   onAlarmPress,
   onSettingsPress,
   showShadow = false,
+  userName = "User",
 }) => {
   const statusBarHeight = Platform.OS === 'ios'
     ? (StatusBar.currentHeight || 47)
@@ -318,7 +417,8 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
           <AdvancedTypewriterCycle
             speed={80}
             startDelay={300}
-            pauseDuration={1000}
+            pauseDuration={1500}
+            userName={userName}
           />
         </View>
         <View style={styles.headerButtons}>
