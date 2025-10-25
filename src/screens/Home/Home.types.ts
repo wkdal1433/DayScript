@@ -1,6 +1,9 @@
 import { ScreenProps, Quest, LearningStats, UserRanking, ProgrammingLanguage, WeeklyStats } from '../../types/common';
 
-export interface HomeScreenProps extends ScreenProps {}
+export interface HomeScreenProps extends ScreenProps {
+  activeTab?: string;
+  onTabPress?: (tab: string) => void;
+}
 
 export interface TodayQuestProps {
   quests: Quest[];

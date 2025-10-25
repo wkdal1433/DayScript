@@ -18,7 +18,7 @@ const TodayQuests: React.FC<TodayQuestsProps> = ({
 }) => {
   return (
     <View style={[styles.card, styles.todayQuestCard]}>
-      <Text style={styles.sectionTitle}>오늘의 할일</Text>
+      <Text style={styles.sectionTitle}>오늘의 목표</Text>
       {quests.map((quest, index) => (
         <TouchableOpacity
           key={quest.id}

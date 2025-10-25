@@ -13,6 +13,7 @@ interface QuickActionsProps {
   onLanguageSelect: (language: ProgrammingLanguage) => void;
   onActionPress: (actionType: string) => void;
   weeklyStats: WeeklyStats;
+  userLevel: string;
 }
 
 const QuickActions: React.FC<QuickActionsProps> = ({
@@ -20,6 +21,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
   onLanguageSelect,
   onActionPress,
   weeklyStats,
+  userLevel,
 }) => {
   const renderLanguageToggle = () => (
     <View style={styles.languageToggle}>
@@ -53,8 +55,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({
         title: '코딩테스트',
         subtitle: '문제',
         description: '실전 문제 풀이',
-        colors: ['#3B82F6', '#1D4ED8'], // Figma blue gradient
-        borderColor: '#3B82F6',
+        colors: ['#A7C7F9', '#A7C7F9'], // Figma blue gradient
+        borderColor: '#ebeaeaff',
       },
       {
         id: 'grammar',
@@ -62,8 +64,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({
         title: '문법 문제',
         subtitle: '',
         description: '기초 문법 학습',
-        colors: ['#10B981', '#047857'], // Figma green gradient
-        borderColor: '#10B981',
+        colors: ['#A6E3B0', '#A6E3B0'], // Figma green gradient
+        borderColor: '#ebeaeaff',
       },
       {
         id: 'algorithm',
@@ -71,8 +73,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({
         title: '알고리즘',
         subtitle: '퀴즈',
         description: '개념 정리',
-        colors: ['#8B5CF6', '#7C3AED'], // Figma purple gradient
-        borderColor: '#8B5CF6',
+        colors: ['#C7A4F9', '#C7A4F9'], // Figma purple gradient
+        borderColor: '#ebeaeaff',
       },
       {
         id: 'new',
@@ -80,8 +82,8 @@ const QuickActions: React.FC<QuickActionsProps> = ({
         title: '새로운 유형',
         subtitle: '',
         description: '최신 트렌드',
-        colors: ['#F59E0B', '#D97706'], // Figma orange gradient
-        borderColor: '#F59E0B',
+        colors: ['#F6C177', '#F6C177'], // Figma orange gradient
+        borderColor: '#ebeaeaff',
       },
     ];
 
@@ -96,7 +98,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
               // Figma 2x2 그리드 레이아웃
               {
                 marginRight: index % 2 === 0 ? 10 : 0,
-                marginBottom: index < 2 ? 10 : 0,
+                marginBottom: index < 2 ? 1 : 0,
               }
             ]}
             onPress={() => onActionPress(button.id)}
@@ -133,7 +135,13 @@ const QuickActions: React.FC<QuickActionsProps> = ({
 
   const renderWeeklyStats = () => (
     <View style={styles.weeklyStatsContainer}>
-      <Text style={styles.weeklyStatsTitle}>이번 주 학습 현황</Text>
+      <View style={styles.weeklyStatsHeader}>
+        <Text style={styles.weeklyStatsTitle}>이번 주 학습 현황</Text>
+        <View style={styles.userLevelContainer}>
+          <Text style={styles.userLevelLabel}>당신의 단계는</Text>
+          <Text style={styles.userLevelText}>{userLevel}</Text>
+        </View>
+      </View>
       <Text style={styles.weeklyStatsText}>Python 문제 해결률</Text>
       <View style={styles.statsProgressContainer}>
         <View style={styles.statsProgressBar}>
@@ -148,13 +156,24 @@ const QuickActions: React.FC<QuickActionsProps> = ({
     </View>
   );
 
+  const renderShortcutButton = () => (
+    <TouchableOpacity
+      style={styles.shortcutButton}
+      onPress={() => onActionPress('shortcut')}
+      activeOpacity={0.8}
+    >
+      <Text style={styles.shortcutButtonText}>학습 바로가기</Text>
+    </TouchableOpacity>
+  );
+
   return (
     <View style={[styles.card, styles.quickActionCard]}>
       <Text style={styles.sectionTitle}>학습 퀵 액션</Text>
-      <Text style={styles.weeklyStatsText}>원하는 언어와 문제 유형을 선택하세요</Text>
+      {renderWeeklyStats()}
+      <Text style={styles.langugeSelectText}>원하는 언어와 문제 유형을 선택하세요</Text>
       {renderLanguageToggle()}
       {renderActionButtons()}
-      {renderWeeklyStats()}
+      {renderShortcutButton()}
     </View>
   );
 };

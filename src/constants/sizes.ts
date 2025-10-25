@@ -62,6 +62,13 @@ export const SIZES = {
 
     // 랭킹 뱃지
     rankBadgeSize: 40,
+
+    // Practice 화면 전용 크기
+    practiceFilterHeight: 176,
+    practiceCardHeight: 90,
+    practiceCardSpacing: 12,
+    practiceTagHeight: 18,
+    practiceButtonHeight: 24,
   },
 
   // Border Radius

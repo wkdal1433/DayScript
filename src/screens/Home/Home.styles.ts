@@ -181,13 +181,14 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
   },
 
-  // 학습 퀵 액션 섹션 (Figma 정확 높이)
+  // 학습 퀵 액션 섹션 (유연한 높이)
   quickActionCard: {
-    height: scaleSize(SIZES.figma.quickActionCardHeight),
+    minHeight: scaleSize(SIZES.figma.quickActionCardHeight), // 최소 높이로 변경
+    flex: 0, // flex 비활성화로 고정
   },
   languageToggle: {
     flexDirection: 'row',
-    marginBottom: SIZES.spacing.xl,
+    marginBottom: SIZES.spacing.md,
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
     borderColor: '#E5E7EB', // Figma border color
@@ -217,8 +218,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginBottom: SIZES.spacing.lg, // 줄인 마진으로 잠림 방지
-    marginTop: SIZES.spacing.sm, // 상단 마진 추가
+    marginBottom: SIZES.spacing.sm, // lg(16px) → sm(8px)로 반으로 축소
+    marginTop: SIZES.spacing.xs, // sm(8px) → xs(4px)로 반으로 축소
     gap: SIZES.figma.actionButtonSpacing,
   },
   actionButton: {
@@ -228,7 +229,7 @@ export const styles = StyleSheet.create({
     padding: 12, // 줄인 패딩으로 잠림 방지
     alignItems: 'center',
     justifyContent: 'space-around',
-    marginBottom: SIZES.spacing.sm, // 줄인 하단 마진
+    marginBottom: 2, // xs(4px) → 2px로 반으로 추가 축소
     borderWidth: SIZES.borderWidth.thin,
   },
   actionButtonEmoji: {
@@ -255,8 +256,8 @@ export const styles = StyleSheet.create({
     borderWidth: SIZES.borderWidth.thin,
     borderColor: '#E5E7EB', // Figma border color
     borderRadius: SIZES.borderRadius.lg,
-    padding: SIZES.spacing.lg,
-    minHeight: scaleSize(70), // 최소 높이로 변경하여 오버플로우 방지
+    padding: SIZES.spacing.md, // lg(16px) → md(10px)로 축소하여 내부 요소 상단 정렬
+    height: scaleSize(90), // 내부 요소 오버플로우 방지를 위한 높이 증가 (70→90)
     marginTop: SIZES.spacing.sm,
   },
   weeklyStatsTitle: {
@@ -271,7 +272,16 @@ export const styles = StyleSheet.create({
     fontSize: FONTS.sizes.caption,
     fontWeight: '400',
     color: COLORS.textMuted,
-    marginBottom: SIZES.spacing.sm,
+    marginTop: SIZES.spacing.xs, // sm(8px) → xs(4px)로 축소하여 타이트한 배치
+    marginBottom: SIZES.spacing.xs, // sm(8px) → xs(4px)로 축소하여 타이트한 배치
+  },
+    langugeSelectText: {
+    fontFamily: FONTS.primary,
+    fontSize: FONTS.sizes.caption,
+    fontWeight: '400',
+    color: COLORS.textMuted,
+    marginTop: SIZES.spacing.md, // sm(8px) → xs(4px)로 축소하여 타이트한 배치
+    marginBottom: SIZES.spacing.xs, // sm(8px) → xs(4px)로 축소하여 타이트한 배치
   },
   statsProgressContainer: {
     flexDirection: 'row',
@@ -295,15 +305,61 @@ export const styles = StyleSheet.create({
   },
   streakLabel: {
     fontFamily: FONTS.primary,
-    fontSize: FONTS.sizes.caption,
+    fontSize: FONTS.sizes.captionSm,
     fontWeight: '400',
     color: COLORS.textMuted,
   },
   streakValue: {
     fontFamily: FONTS.primary,
-    fontSize: FONTS.sizes.subtitle,
+    fontSize: FONTS.sizes.tiny,
     fontWeight: '700',
     color: COLORS.primary,
+  },
+
+  // WeeklyStats Header Styles
+  weeklyStatsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center', // 한 줄 정렬을 위해 center로 변경
+    marginBottom: SIZES.spacing.xs,
+  },
+  userLevelContainer: {
+    flexDirection: 'row', // 가로 배치
+    alignItems: 'center', // 세로 중앙 정렬
+    gap: SIZES.spacing.xs, // 텍스트 간격
+  },
+  userLevelLabel: {
+    fontFamily: FONTS.primary,
+    fontSize: FONTS.sizes.caption,
+    fontWeight: '400',
+    color: COLORS.textMuted,
+  },
+  userLevelText: {
+    fontFamily: FONTS.primary,
+    fontSize: FONTS.sizes.bodySmall,
+    fontWeight: '700',
+    color: '#FDCEDF',
+  },
+
+  // Shortcut Button Styles
+  shortcutButton: {
+    backgroundColor: '#FDCEDF',
+    borderWidth: SIZES.borderWidth.thin,
+    borderColor: '#E5E7EB',
+    borderRadius: SIZES.borderRadius.lg,
+    padding: SIZES.spacing.md, // 패딩 축소
+    height: scaleSize(47), // 2/3 높이 (70 * 2/3 = 47)
+    marginTop: SIZES.spacing.sm, // lg(16px) → sm(8px)로 반으로 축소
+    marginBottom: SIZES.spacing.sm, // lg(16px) → sm(8px)로 반으로 축소
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  shortcutButtonText: {
+    fontFamily: FONTS.primary,
+    fontSize: FONTS.sizes.body, // Larger than other action buttons
+    fontWeight: '700',
+    color: COLORS.white,
+    textAlign: 'center',
   },
 
   // 학습 현황 섹션 (Figma 정확 높이)
