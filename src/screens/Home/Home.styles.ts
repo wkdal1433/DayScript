@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     marginTop: SIZES.figma.terminalTopMargin,
     height: scaleSize(SIZES.figma.terminalHeight),
   },
-  // 터미널 헤더 (왼쪽 정렬, 원래 크기 복원)
+  // 터미널 헤더 (자연스러운 콘텐츠 기반 동적 너비)
   terminalHeader: {
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
@@ -59,10 +59,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    minWidth: 220, // 최소 너비로 변경하여 긴 텍스트 처리
-    maxWidth: 280, // 최대 너비 확장
-    flexGrow: 1, // 유동적 너비 확장
-    flexShrink: 1, // 필요시 축소 허용
+    alignSelf: 'flex-start', // 콘텐츠 크기 기반 자동 조정
+    maxWidth: 280, // 최대 너비 제한으로 레이아웃 보호
     height: scaleSize(SIZES.figma.terminalHeight), // 원래 높이 복원
   },
   // 헤더 버튼 컨테이너 (우측 정렬)
