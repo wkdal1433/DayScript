@@ -120,6 +120,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
           onLanguageSelect={setSelectedLanguage}
           onActionPress={handleActionPress}
           weeklyStats={mockWeeklyStats}
+          userLevel="입문"
         />
         <LearningStatus
           learningStats={mockLearningStats}
