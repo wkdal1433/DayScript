@@ -13,6 +13,7 @@ import {
   LearningStatus,
   Ranking
 } from '../../components/Home';
+import { DifficultySelectionModal, DifficultyLevel } from '../../components/Modals';
 
 import { HomeScreenProps } from './Home.types';
 import { styles } from './Home.styles';
@@ -52,6 +53,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const [quests, setQuests] = useState<Quest[]>(mockQuests);
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage>('Python');
   const [internalActiveTab, setInternalActiveTab] = useState('Home');
+  const [isDifficultyModalVisible, setIsDifficultyModalVisible] = useState(false);
 
   // Use external activeTab if provided, otherwise use internal state
   const activeTab = externalActiveTab || internalActiveTab;
@@ -69,6 +71,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handleActionPress = (actionType: string) => {
     console.log('Action pressed:', actionType);
+
+    // Handle shortcut button press - show difficulty selection modal
+    if (actionType === 'shortcut') {
+      setIsDifficultyModalVisible(true);
+    }
   };
 
   const handleTabPress = (tab: string) => {
@@ -85,6 +92,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     // TodayQuests 카드에 도달한 시점부터 그림자 활성화
     const shouldShowShadow = scrollY > 0;
     setHeaderShadowVisible(shouldShowShadow);
+  };
+
+  const handleModalClose = () => {
+    setIsDifficultyModalVisible(false);
+  };
+
+  const handleLevelSelect = (level: DifficultyLevel) => {
+    console.log('Selected difficulty level:', level);
+    // Here you can navigate to the actual problem screen
+    // For now, just log the selection
+    setIsDifficultyModalVisible(false);
   };
 
 
@@ -132,6 +150,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
       <BottomNavigationBar
         activeTab={activeTab}
         onTabPress={handleTabPress}
+      />
+
+      {/* Difficulty Selection Modal */}
+      <DifficultySelectionModal
+        isVisible={isDifficultyModalVisible}
+        onClose={handleModalClose}
+        onSelectLevel={handleLevelSelect}
+        selectedLanguage={selectedLanguage}
       />
     </SafeAreaView>
   );
