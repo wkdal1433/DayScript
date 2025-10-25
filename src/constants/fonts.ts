@@ -15,6 +15,7 @@ export const FONTS = {
     bodySmall: 12,  // style_KNRZ4T (체크마크)
 
     // Captions
+    captionSm:8,
     caption: 10,    // style_MSLGV3 (버튼 설명)
     tiny: 12,       // style_ZCU3LJ (작은 텍스트)
 

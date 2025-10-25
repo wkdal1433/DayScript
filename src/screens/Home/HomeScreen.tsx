@@ -44,10 +44,17 @@ const mockWeeklyStats: WeeklyStats = {
   streakDays: 5,
 };
 
-const HomeScreen: React.FC<HomeScreenProps> = ({ navigation: _navigation }) => {
+const HomeScreen: React.FC<HomeScreenProps> = ({
+  navigation: _navigation,
+  activeTab: externalActiveTab,
+  onTabPress: externalOnTabPress
+}) => {
   const [quests, setQuests] = useState<Quest[]>(mockQuests);
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage>('Python');
-  const [activeTab, setActiveTab] = useState('Home');
+  const [internalActiveTab, setInternalActiveTab] = useState('Home');
+
+  // Use external activeTab if provided, otherwise use internal state
+  const activeTab = externalActiveTab || internalActiveTab;
   const [headerShadowVisible, setHeaderShadowVisible] = useState(false);
 
   const handleQuestToggle = (questId: string) => {
@@ -65,8 +72,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation: _navigation }) => {
   };
 
   const handleTabPress = (tab: string) => {
-    setActiveTab(tab);
-    console.log('Tab pressed:', tab);
+    if (externalOnTabPress) {
+      externalOnTabPress(tab);
+    } else {
+      setInternalActiveTab(tab);
+      console.log('Tab pressed:', tab);
+    }
   };
 
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -109,6 +120,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation: _navigation }) => {
           onLanguageSelect={setSelectedLanguage}
           onActionPress={handleActionPress}
           weeklyStats={mockWeeklyStats}
+          userLevel="입문"
         />
         <LearningStatus
           learningStats={mockLearningStats}
