@@ -369,7 +369,7 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
           <AdvancedTypewriterCycle
             speed={200}
             startDelay={300}
-            pauseDuration={8000}
+            pauseDuration={5000}
           />
         </View>
         <View style={styles.headerButtons}>
