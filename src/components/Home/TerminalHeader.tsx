@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StatusBar,
   Platform,
+  Animated,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { styles } from '../../screens/Home/Home.styles';
@@ -43,34 +44,41 @@ const SettingsIcon = () => (
 /**
  * AdvancedTypewriterCycle Component
  *
- * 단순한 단일 시퀀스 터미널 타이핑 애니메이션을 제공하는 컴포넌트입니다.
- * 4개의 문구를 순차적으로 무한 반복하여 표시합니다.
+ * 고정 접두사와 애니메이션 터미널 타이핑을 제공하는 컴포넌트입니다.
+ * 8개의 커맨드 스타일 문구를 순차적으로 무한 반복하여 표시합니다.
  *
  * 애니메이션 사이클:
- *   1. "user@system~$ DayScript |" 타이핑 → 1.5초 대기 → 사라짐
- *   2. "Hello, World!" 타이핑 (Hello,: terminalText 색상, World!: appName 색상) → 1.5초 대기 → 사라짐
- *   3. "Welcome, User" 타이핑 (Welcome,: terminalText 색상, User: appName 색상) → 1.5초 대기 → 사라짐
- *   4. "반가워요! User" 타이핑 (반가워요!: terminalText 색상, User: appName 색상) → 1.5초 대기 → 사라짐
- * 무한 반복 (1 → 2 → 3 → 4 → 1 → 2...)
+ * - 고정 접두사: "user@system~$ " (항상 표시, 애니메이션 없음)
+ * - 애니메이션 부분:
+ *   1. "booting..." 타이핑 → 2.5초 대기 → 사라짐
+ *   2. "Hello, World!" 타이핑 → 2.5초 대기 → 사라짐
+ *   3. "반가워요 :)" 타이핑 → 2.5초 대기 → 사라짐
+ *   4. "compiling day..." 타이핑 → 2.5초 대기 → 사라짐
+ *   5. "오늘의 한 줄은?" 타이핑 → 2.5초 대기 → 사라짐
+ *   6. "run DayScript" 타이핑 → 2.5초 대기 → 사라짐
+ *   7. "기록을 시작합니다" 타이핑 → 2.5초 대기 → 사라짐
+ *   8. "log: new start" 타이핑 → 2.5초 대기 → 사라짐
+ * 무한 반복 (1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 → 1...)
+ *
+ * 색상 규칙:
+ * - 고정 접두사: terminalText 색상 (Color A)
+ * - 애니메이션 부분: appName 색상 (Color B)
  *
  * @param speed - 타이핑 속도 (밀리초 단위, 기본값: 80ms)
  * @param startDelay - 애니메이션 시작 전 지연 시간 (밀리초 단위, 기본값: 300ms)
- * @param pauseDuration - 각 문구 타이핑 완료 후 대기 시간 (밀리초 단위, 기본값: 1500ms)
- * @param userName - 사용자 이름 (기본값: "User")
+ * @param pauseDuration - 각 문구 타이핑 완료 후 대기 시간 (밀리초 단위, 기본값: 2500ms)
  *
  * @example
  * <AdvancedTypewriterCycle
  *   speed={80}
  *   startDelay={300}
- *   pauseDuration={1500}
- *   userName="User"
+ *   pauseDuration={2500}
  * />
  */
 interface AdvancedTypewriterCycleProps {
   speed?: number;
   startDelay?: number;
   pauseDuration?: number;
-  userName?: string;
 }
 
 /**
@@ -86,18 +94,23 @@ enum AnimationPhase {
 /**
  * 문구 정보를 정의하는 인터페이스
  */
+interface TextSegment {
+  text: string;
+  color: string;
+}
+
 interface PhraseConfig {
   id: string;
   text: string;
-  renderFunction: (displayedText: string, userName: string) => React.JSX.Element[];
+  segments?: TextSegment[]; // 선택적 듀얼 컬러 세그먼트
+  baseColor: string; // 기본 색상
 }
 
 
 const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   speed = 80,
   startDelay = 300,
-  pauseDuration = 1500,
-  userName = "User",
+  pauseDuration = 2500,
 }) => {
   // 상태 관리
   const [displayedText, setDisplayedText] = useState('');
@@ -105,197 +118,101 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(AnimationPhase.WAITING);
 
-  /**
-   * 터미널 프롬프트 렌더링 함수 - "user@system~$ DayScript |"
-   * 기존 스타일 분리를 유지
-   */
-  const renderTerminalPhrase = (text: string, _userName: string): React.JSX.Element[] => {
-    const parts = [];
-    const userPrompt = 'user@system~$ ';
-    const appName = 'DayScript';
+  // 동적 너비 애니메이션을 위한 Animated.Value
+  const animatedWidth = useRef(new Animated.Value(220)).current; // 최소 너비에서 시작
 
-    // user@system~$ 부분 (터미널 프롬프트 스타일)
-    if (text.length > 0) {
-      const userPromptPart = text.substring(0, Math.min(text.length, userPrompt.length));
-      if (userPromptPart) {
-        parts.push(
-          <Text key="prompt" style={styles.terminalText}>
-            {userPromptPart}
-          </Text>
-        );
-      }
-    }
+  // 터미널 프롬프트 접두사 (고정 표시)
+  const terminalPrefix = 'user@system~$ ';
 
-    // DayScript 부분 (앱 이름 스타일)
-    if (text.length > userPrompt.length) {
-      const appNameStart = userPrompt.length;
-      const appNameEnd = userPrompt.length + appName.length;
-      const appNamePart = text.substring(appNameStart, Math.min(text.length, appNameEnd));
-      if (appNamePart) {
-        parts.push(
-          <Text key="appname" style={styles.appName}>
-            {appNamePart}
-          </Text>
-        );
-      }
-    }
-
-    // | 커서 부분 (터미널 스타일)
-    if (text.length > userPrompt.length + appName.length) {
-      const cursorStart = userPrompt.length + appName.length;
-      const cursorPart = text.substring(cursorStart);
-      if (cursorPart) {
-        parts.push(
-          <Text key="cursor" style={styles.terminalText}>
-            {cursorPart}
-          </Text>
-        );
-      }
-    }
-
-    return parts;
-  };
-
-  /**
-   * "Hello, World!" 문구 렌더링 함수 (듀얼 컬러)
-   * Hello, → terminalText 스타일 (Color A)
-   * World! → appName 스타일 (Color B)
-   */
-  const renderHelloWorldPhrase = (text: string, _userName: string): React.JSX.Element[] => {
-    const parts = [];
-    const firstPart = 'Hello, ';
-
-    // "Hello, " 부분 (터미널 텍스트 색상)
-    if (text.length > 0) {
-      const firstPartText = text.substring(0, Math.min(text.length, firstPart.length));
-      if (firstPartText) {
-        parts.push(
-          <Text key="hello" style={styles.terminalText}>
-            {firstPartText}
-          </Text>
-        );
-      }
-    }
-
-    // "World!" 부분 (앱 이름 색상)
-    if (text.length > firstPart.length) {
-      const secondPartStart = firstPart.length;
-      const secondPartText = text.substring(secondPartStart);
-      if (secondPartText) {
-        parts.push(
-          <Text key="world" style={styles.appName}>
-            {secondPartText}
-          </Text>
-        );
-      }
-    }
-
-    return parts;
-  };
-
-  /**
-   * "Welcome, {UserName}" 문구 렌더링 함수 (듀얼 컬러)
-   * Welcome, → terminalText 스타일 (Color A)
-   * {UserName} → appName 스타일 (Color B)
-   */
-  const renderWelcomePhrase = (text: string, _userNameParam: string): React.JSX.Element[] => {
-    const parts = [];
-    const firstPart = 'Welcome, ';
-
-    // "Welcome, " 부분 (터미널 텍스트 색상)
-    if (text.length > 0) {
-      const firstPartText = text.substring(0, Math.min(text.length, firstPart.length));
-      if (firstPartText) {
-        parts.push(
-          <Text key="welcome" style={styles.terminalText}>
-            {firstPartText}
-          </Text>
-        );
-      }
-    }
-
-    // "{UserName}" 부분 (앱 이름 색상)
-    if (text.length > firstPart.length) {
-      const secondPartStart = firstPart.length;
-      const secondPartText = text.substring(secondPartStart);
-      if (secondPartText) {
-        parts.push(
-          <Text key="username" style={styles.appName}>
-            {secondPartText}
-          </Text>
-        );
-      }
-    }
-
-    return parts;
-  };
-
-  /**
-   * "반가워요! User" 문구 렌더링 함수 (듀얼 컬러)
-   * 반가워요! → terminalText 스타일 (Color A)
-   * User → appName 스타일 (Color B)
-   */
-  const renderKoreanGreetingPhrase = (text: string, _userNameParam: string): React.JSX.Element[] => {
-    const parts = [];
-    const firstPart = '반가워요! ';
-
-    // "반가워요! " 부분 (터미널 텍스트 색상)
-    if (text.length > 0) {
-      const firstPartText = text.substring(0, Math.min(text.length, firstPart.length));
-      if (firstPartText) {
-        parts.push(
-          <Text key="greeting" style={styles.terminalText}>
-            {firstPartText}
-          </Text>
-        );
-      }
-    }
-
-    // "User" 부분 (앱 이름 색상)
-    if (text.length > firstPart.length) {
-      const secondPartStart = firstPart.length;
-      const secondPartText = text.substring(secondPartStart);
-      if (secondPartText) {
-        parts.push(
-          <Text key="username-kr" style={styles.appName}>
-            {secondPartText}
-          </Text>
-        );
-      }
-    }
-
-    return parts;
-  };
-
-  // 🔧 SIMPLIFIED: 단순한 단일 문구 배열로 사용하여 무한 반복 사이클 구현
+  // 🔧 COMMAND PHRASES: 8개의 커맨드 스타일 문구 배열 (접두사 제외) + 듀얼 컬러 하이라이트
   const phrases: PhraseConfig[] = useMemo(() => [
     {
-      id: 'terminal',
-      text: 'user@system~$ DayScript |',
-      renderFunction: renderTerminalPhrase,
+      id: 'booting',
+      text: 'Booting...',
+      baseColor: '#2B2B2B',
+      // 강조 없음
     },
     {
       id: 'hello-world',
       text: 'Hello, World!',
-      renderFunction: renderHelloWorldPhrase,
+      baseColor: '#2B2B2B',
+      segments: [
+        { text: 'Hello, ', color: '#2B2B2B' },
+        { text: 'World!', color: '#F2BED1' }
+      ]
     },
     {
-      id: 'welcome-user',
-      text: `Welcome, ${userName}`,
-      renderFunction: renderWelcomePhrase,
+      id: 'greeting',
+      text: '반가워요 :)',
+      baseColor: '#2B2B2B',
+      // 강조 없음
     },
     {
-      id: 'korean-greeting',
-      text: `반가워요! ${userName}`,
-      renderFunction: renderKoreanGreetingPhrase,
+      id: 'compiling',
+      text: 'Compiling Day...',
+      baseColor: '#2B2B2B',
+      // 강조 없음
     },
-  ], [userName]);
+    {
+      id: 'daily-question',
+      text: '오늘의 한 줄은?',
+      baseColor: '#2B2B2B',
+      // 강조 없음
+    },
+    {
+      id: 'run-command',
+      text: 'Run DayScript',
+      baseColor: '#2B2B2B',
+      segments: [
+        { text: 'Run ', color: '#2B2B2B' },
+        { text: 'DayScript', color: '#F2BED1' }
+      ]
+    },
+    {
+      id: 'start-recording',
+      text: '기록을 시작합니다',
+      baseColor: '#2B2B2B',
+      // 강조 없음
+    },
+    {
+      id: 'log-start',
+      text: 'Log: New Start',
+      baseColor: '#2B2B2B',
+      segments: [
+        { text: 'Log: ', color: '#2B2B2B' },
+        { text: 'New Start', color: '#F2BED1' }
+      ]
+    },
+  ], []);
 
   // 🔧 SIMPLIFIED: 단순한 currentPhrase 참조
   const currentPhrase = useMemo(() =>
     phrases[currentPhraseIndex],
     [phrases, currentPhraseIndex]
   );
+
+  // 동적 너비 계산 (글자 수 기반)
+  const calculateWidth = (text: string) => {
+    const baseWidth = 220; // 최소 너비 (terminalPrefix 기준)
+    const charWidth = 8; // 글자당 예상 너비
+    const totalText = terminalPrefix + text;
+    const calculatedWidth = Math.min(280, baseWidth + (totalText.length * charWidth * 0.6));
+    return Math.max(baseWidth, calculatedWidth);
+  };
+
+  // 너비 애니메이션 효과 (CLEARING 단계 지원)
+  useEffect(() => {
+    const targetWidth = calculateWidth(displayedText);
+
+    // CLEARING 단계에서는 즉시 최소 너비로 축소
+    const animationDuration = animationPhase === AnimationPhase.CLEARING ? 100 : 150;
+
+    Animated.timing(animatedWidth, {
+      toValue: targetWidth,
+      duration: animationDuration,
+      useNativeDriver: false,
+    }).start();
+  }, [displayedText, animatedWidth, animationPhase]);
 
   /**
    * 초기 시작 지연 처리
@@ -381,11 +298,72 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   // 타이핑 중일 때 커서 표시
   const showCursor = animationPhase === AnimationPhase.TYPING && currentIndex < currentPhrase.text.length;
 
+  // 듀얼 컬러 텍스트 렌더링 함수
+  const renderColoredText = () => {
+    if (!currentPhrase.segments) {
+      // 단일 색상 렌더링 (기본)
+      return (
+        <Text style={[styles.appName, { color: currentPhrase.baseColor }]}>
+          {displayedText}
+        </Text>
+      );
+    }
+
+    // 듀얼 컬러 렌더링 (세그먼트 기반)
+    let charIndex = 0;
+    const renderedSegments = [];
+
+    for (let i = 0; i < currentPhrase.segments.length; i++) {
+      const segment = currentPhrase.segments[i];
+      const segmentLength = segment.text.length;
+      const segmentEndIndex = charIndex + segmentLength;
+
+      // 현재 표시된 텍스트에서 이 세그먼트가 보여져야 하는 부분 계산
+      if (charIndex < displayedText.length) {
+        const visibleStart = Math.max(0, charIndex);
+        const visibleEnd = Math.min(displayedText.length, segmentEndIndex);
+
+        if (visibleStart < visibleEnd) {
+          const visibleText = displayedText.slice(visibleStart, visibleEnd);
+
+          renderedSegments.push(
+            <Text
+              key={`segment-${i}`}
+              style={[styles.appName, { color: segment.color }]}
+            >
+              {visibleText}
+            </Text>
+          );
+        }
+      }
+
+      charIndex = segmentEndIndex;
+    }
+
+    return renderedSegments;
+  };
+
   return (
-    <Text>
-      {currentPhrase.renderFunction(displayedText, userName)}
-      {showCursor && <Text style={[styles.terminalText, styles.typewriterCursor]}>_</Text>}
-    </Text>
+    <Animated.View style={{ width: animatedWidth }}>
+      <Text numberOfLines={1} ellipsizeMode="clip">
+        {/* 고정 터미널 접두사 (항상 표시, 고정 색상: #00ADB5) */}
+        <Text style={[styles.terminalText, { color: '#00ADB5' }]}>{terminalPrefix}</Text>
+
+        {/* 애니메이션 부분 (듀얼 컬러 하이라이트 지원) */}
+        {renderColoredText()}
+
+        {/* 타이핑 커서 (현재 세그먼트 색상 또는 기본 색상) */}
+        {showCursor && (
+          <Text style={[
+            styles.terminalText,
+            styles.typewriterCursor,
+            { color: currentPhrase.baseColor }
+          ]}>
+            _
+          </Text>
+        )}
+      </Text>
+    </Animated.View>
   );
 };
 
@@ -393,14 +371,12 @@ interface TerminalHeaderProps {
   onAlarmPress?: () => void;
   onSettingsPress?: () => void;
   showShadow?: boolean;
-  userName?: string;
 }
 
 const TerminalHeader: React.FC<TerminalHeaderProps> = ({
   onAlarmPress,
   onSettingsPress,
   showShadow = false,
-  userName = "User",
 }) => {
   const statusBarHeight = Platform.OS === 'ios'
     ? (StatusBar.currentHeight || 47)
@@ -417,8 +393,7 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
           <AdvancedTypewriterCycle
             speed={80}
             startDelay={300}
-            pauseDuration={1500}
-            userName={userName}
+            pauseDuration={2500}
           />
         </View>
         <View style={styles.headerButtons}>

@@ -13,7 +13,7 @@ export const COLORS = {
   textPrimary: '#393E46',   // fill_7FMIJV (메인 텍스트)
   textSecondary: '#1F2937', // fill_5FNOR5 (보조 텍스트)
   textMuted: '#6B7280',     // fill_V5DCA0 (흐린 텍스트)
-  textTertiary: '#00ADB5',  // fill_287NHJ (터미널 텍스트)
+  textTertiary: '#007A7A',  // fill_287NHJ (터미널 텍스트)
 
   // Status Colors
   success: '#10B981',       // 성공/완료 컬러

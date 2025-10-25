@@ -59,7 +59,10 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'flex-start',
-    maxWidth: 220, // Figma에서 측정된 터미널 헤더 최대 너비 (원래 크기)
+    minWidth: 220, // 최소 너비로 변경하여 긴 텍스트 처리
+    maxWidth: 280, // 최대 너비 확장
+    flexGrow: 1, // 유동적 너비 확장
+    flexShrink: 1, // 필요시 축소 허용
     height: scaleSize(SIZES.figma.terminalHeight), // 원래 높이 복원
   },
   // 헤더 버튼 컨테이너 (우측 정렬)
@@ -83,7 +86,7 @@ export const styles = StyleSheet.create({
     fontFamily: FONTS.primary,
     fontSize: FONTS.sizes.body,
     fontWeight: '400',
-    color: COLORS.textTertiary,
+    color: '#00ADB5', // 터미널 프롬프트 전용 색상
     marginRight: SIZES.spacing.sm,
   },
   appName: {
@@ -95,6 +98,16 @@ export const styles = StyleSheet.create({
   },
   typewriterCursor: {
     opacity: 0.7,
+  },
+  // 문구별 색상 스타일
+  phraseColorDark: {
+    color: '#2B2B2B',
+  },
+  phraseColorBlue: {
+    color: '#3563E9',
+  },
+  phraseColorLightBlue: {
+    color: '#4B72FF',
   },
 
   // 카드 공통 스타일 (Figma Auto Layout)
