@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   StatusBar,
   Platform,
-  Animated,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { styles } from '../../screens/Home/Home.styles';
@@ -110,16 +109,13 @@ interface PhraseConfig {
 const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   speed = 80,
   startDelay = 300,
-  pauseDuration = 2500,
+  pauseDuration = 4500,
 }) => {
   // 상태 관리
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentPhraseIndex, setCurrentPhraseIndex] = useState(0);
   const [animationPhase, setAnimationPhase] = useState<AnimationPhase>(AnimationPhase.WAITING);
-
-  // 동적 너비 애니메이션을 위한 Animated.Value
-  const animatedWidth = useRef(new Animated.Value(220)).current; // 최소 너비에서 시작
 
   // 터미널 프롬프트 접두사 (고정 표시)
   const terminalPrefix = 'user@system~$ ';
@@ -129,55 +125,59 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
     {
       id: 'booting',
       text: 'Booting...',
-      baseColor: '#2B2B2B',
+      baseColor: '#F2BED1',
       // 강조 없음
     },
     {
       id: 'hello-world',
       text: 'Hello, World!',
-      baseColor: '#2B2B2B',
-      segments: [
-        { text: 'Hello, ', color: '#2B2B2B' },
-        { text: 'World!', color: '#F2BED1' }
-      ]
+      baseColor: '#F2BED1',
     },
     {
       id: 'greeting',
       text: '반가워요 :)',
-      baseColor: '#2B2B2B',
+      baseColor: '#F2BED1',
       // 강조 없음
     },
     {
       id: 'compiling',
       text: 'Compiling Day...',
-      baseColor: '#2B2B2B',
+      baseColor: '#F2BED1',
       // 강조 없음
     },
     {
       id: 'daily-question',
       text: '오늘의 한 줄은?',
-      baseColor: '#2B2B2B',
-      // 강조 없음
-    },
+      baseColor: '#F2BED1',
+      segments: [
+        { text: '오늘의 ', color: '#F2BED1' },
+        { text: '한 줄', color: '#f1aac4ff' },
+        { text: '은?', color: '#F2BED1' },
+
+      ]    },
     {
       id: 'run-command',
       text: 'Run DayScript',
-      baseColor: '#2B2B2B',
+      baseColor: '#F2BED1',
       segments: [
-        { text: 'Run ', color: '#2B2B2B' },
-        { text: 'DayScript', color: '#F2BED1' }
+        { text: 'Run ', color: '#F2BED1' },
+        { text: 'DayScript', color: '#f1aac4ff' }
       ]
     },
     {
       id: 'start-recording',
-      text: '기록을 시작합니다',
-      baseColor: '#2B2B2B',
+      text: '기록을 시작합니다.',
+      baseColor: '#F2BED1',
+      segments: [
+        { text: '기록', color: '#f1aac4ff' },
+        { text: '을 시작합니다.', color: '#F2BED1' }
+      ]
       // 강조 없음
     },
     {
       id: 'log-start',
       text: 'Log: New Start',
-      baseColor: '#2B2B2B',
+      baseColor: '#F2BED1',
       segments: [
         { text: 'Log: ', color: '#2B2B2B' },
         { text: 'New Start', color: '#F2BED1' }
@@ -191,28 +191,6 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
     [phrases, currentPhraseIndex]
   );
 
-  // 동적 너비 계산 (글자 수 기반)
-  const calculateWidth = (text: string) => {
-    const baseWidth = 220; // 최소 너비 (terminalPrefix 기준)
-    const charWidth = 8; // 글자당 예상 너비
-    const totalText = terminalPrefix + text;
-    const calculatedWidth = Math.min(280, baseWidth + (totalText.length * charWidth * 0.6));
-    return Math.max(baseWidth, calculatedWidth);
-  };
-
-  // 너비 애니메이션 효과 (CLEARING 단계 지원)
-  useEffect(() => {
-    const targetWidth = calculateWidth(displayedText);
-
-    // CLEARING 단계에서는 즉시 최소 너비로 축소
-    const animationDuration = animationPhase === AnimationPhase.CLEARING ? 100 : 150;
-
-    Animated.timing(animatedWidth, {
-      toValue: targetWidth,
-      duration: animationDuration,
-      useNativeDriver: false,
-    }).start();
-  }, [displayedText, animatedWidth, animationPhase]);
 
   /**
    * 초기 시작 지연 처리
@@ -344,26 +322,24 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   };
 
   return (
-    <Animated.View style={{ width: animatedWidth }}>
-      <Text numberOfLines={1} ellipsizeMode="clip">
-        {/* 고정 터미널 접두사 (항상 표시, 고정 색상: #00ADB5) */}
-        <Text style={[styles.terminalText, { color: '#00ADB5' }]}>{terminalPrefix}</Text>
+    <Text numberOfLines={1} ellipsizeMode="clip">
+      {/* 고정 터미널 접두사 (항상 표시, 고정 색상: #00ADB5) */}
+      <Text style={[styles.terminalText, { color: '#00ADB5' }]}>{terminalPrefix}</Text>
 
-        {/* 애니메이션 부분 (듀얼 컬러 하이라이트 지원) */}
-        {renderColoredText()}
+      {/* 애니메이션 부분 (듀얼 컬러 하이라이트 지원) */}
+      {renderColoredText()}
 
-        {/* 타이핑 커서 (현재 세그먼트 색상 또는 기본 색상) */}
-        {showCursor && (
-          <Text style={[
-            styles.terminalText,
-            styles.typewriterCursor,
-            { color: currentPhrase.baseColor }
-          ]}>
-            _
-          </Text>
-        )}
-      </Text>
-    </Animated.View>
+      {/* 타이핑 커서 (현재 세그먼트 색상 또는 기본 색상) */}
+      {showCursor && (
+        <Text style={[
+          styles.terminalText,
+          styles.typewriterCursor,
+          { color: currentPhrase.baseColor }
+        ]}>
+          _
+        </Text>
+      )}
+    </Text>
   );
 };
 
@@ -391,9 +367,9 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
       <View style={styles.headerContentContainer}>
         <View style={styles.terminalHeader}>
           <AdvancedTypewriterCycle
-            speed={80}
+            speed={200}
             startDelay={300}
-            pauseDuration={2500}
+            pauseDuration={8000}
           />
         </View>
         <View style={styles.headerButtons}>
