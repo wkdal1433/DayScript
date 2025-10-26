@@ -14,6 +14,8 @@ import {
   Ranking
 } from '../../components/Home';
 import { DifficultySelectionModal, DifficultyLevel } from '../../components/Modals';
+import Lv1OXProblemScreen from '../Practice/Lv1OXProblemScreen';
+import Lv2MultipleChoiceProblemScreen from '../Practice/Lv2MultipleChoiceProblemScreen';
 
 import { HomeScreenProps } from './Home.types';
 import { styles } from './Home.styles';
@@ -54,6 +56,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage>('Python');
   const [internalActiveTab, setInternalActiveTab] = useState('Home');
   const [isDifficultyModalVisible, setIsDifficultyModalVisible] = useState(false);
+  const [showProblemScreen, setShowProblemScreen] = useState(false);
+  const [currentProblemType, setCurrentProblemType] = useState<'OX' | 'MultipleChoice'>('OX');
 
   // Use external activeTab if provided, otherwise use internal state
   const activeTab = externalActiveTab || internalActiveTab;
@@ -100,9 +104,31 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handleLevelSelect = (level: DifficultyLevel) => {
     console.log('Selected difficulty level:', level);
-    // Here you can navigate to the actual problem screen
-    // For now, just log the selection
     setIsDifficultyModalVisible(false);
+
+    // Navigate to problem screen based on difficulty level
+    if (level === '입문') {
+      // Randomly select between OX and Multiple Choice for variety
+      const problemTypes: ('OX' | 'MultipleChoice')[] = ['OX', 'MultipleChoice'];
+      const randomType = problemTypes[Math.floor(Math.random() * problemTypes.length)];
+      setCurrentProblemType(randomType);
+      setShowProblemScreen(true);
+    }
+    // TODO: Add navigation for other difficulty levels
+  };
+
+  const handleProblemScreenClose = () => {
+    setShowProblemScreen(false);
+  };
+
+  const handleAnswerSelect = (answer: 'O' | 'X' | 'A' | 'B' | 'C' | 'D') => {
+    console.log('Answer selected:', answer);
+    // TODO: Handle answer processing
+  };
+
+  const handleNextProblem = () => {
+    console.log('Moving to next problem');
+    // TODO: Load next problem or complete session
   };
 
 
@@ -159,6 +185,29 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
         onSelectLevel={handleLevelSelect}
         selectedLanguage={selectedLanguage}
       />
+
+      {/* Problem Screen (conditionally rendered) */}
+      {showProblemScreen && currentProblemType === 'OX' && (
+        <Lv1OXProblemScreen
+          onAnswerSelect={handleAnswerSelect}
+          onClose={handleProblemScreenClose}
+          onNext={handleNextProblem}
+          currentProblem={1}
+          totalProblems={10}
+          timeRemaining={30}
+        />
+      )}
+
+      {showProblemScreen && currentProblemType === 'MultipleChoice' && (
+        <Lv2MultipleChoiceProblemScreen
+          onAnswerSelect={handleAnswerSelect}
+          onClose={handleProblemScreenClose}
+          onNext={handleNextProblem}
+          currentProblem={2}
+          totalProblems={10}
+          timeRemaining={30}
+        />
+      )}
     </SafeAreaView>
   );
 };
