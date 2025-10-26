@@ -325,28 +325,60 @@ export const styles = StyleSheet.create({
     color: COLORS.textMuted, // #6B7280 fill_DOCPBU
   },
 
-  // Result Overlay (for showing answer feedback)
-  resultOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  // Result View Styles (Based on Figma Design)
+  resultContentContainer: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingTop: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
   },
 
-  resultContainer: {
-    backgroundColor: COLORS.white,
-    borderRadius: 20,
-    padding: 30,
-    marginHorizontal: 40,
+  achievementBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.1)', // Success green background
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 20,
+  },
+
+  achievementText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#4CAF50', // Success green
+    textAlign: 'center',
+  },
+
+  resultStatusContainer: {
+    marginBottom: 24,
     alignItems: 'center',
   },
 
-  resultText: {
+  resultStatusText: {
+    fontSize: 32,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+
+  correctText: {
+    color: '#4CAF50', // Success green
+  },
+
+  incorrectText: {
+    color: '#FF4D4D', // Error red
+  },
+
+  explanationContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 40,
+  },
+
+  celebrationText: {
     fontSize: 24,
     fontFamily: FONTS.primary,
     fontWeight: FONTS.weights.bold.toString(),
@@ -362,5 +394,126 @@ export const styles = StyleSheet.create({
     color: COLORS.textMuted,
     textAlign: 'center',
     lineHeight: 22,
+  },
+
+  // Result Bottom Section
+  resultBottomSection: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+
+  statsContainer: {
+    backgroundColor: 'rgba(245, 247, 250, 1)', // Light background
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+  },
+
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+
+  statLabel: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textPrimary,
+  },
+
+  pointsContainer: {
+    backgroundColor: 'rgba(255, 215, 0, 0.1)', // Gold background
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+
+  pointsText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#FFD700', // Gold color
+  },
+
+  expContainer: {
+    marginBottom: 8,
+  },
+
+  expLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted,
+    marginBottom: 4,
+  },
+
+  expText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary,
+  },
+
+  expBarContainer: {
+    marginTop: 8,
+  },
+
+  expBarBg: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+
+  expBarFill: {
+    height: '100%',
+    backgroundColor: '#FFD700', // Gold for experience
+    borderRadius: 4,
+  },
+
+  // Result Action Buttons
+  resultActionButtons: {
+    gap: 12,
+  },
+
+  nextButton: {
+    backgroundColor: COLORS.primary, // #F2BED1
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  nextButtonText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.white,
+    textAlign: 'center',
+  },
+
+  retryButton: {
+    backgroundColor: 'rgba(248, 232, 238, 0.8)', // Light background
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  retryButtonText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textPrimary,
+    textAlign: 'center',
   },
 });

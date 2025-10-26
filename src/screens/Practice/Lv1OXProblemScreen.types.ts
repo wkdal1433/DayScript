@@ -2,6 +2,24 @@
 
 export type OXAnswer = 'O' | 'X';
 
+export type ResultState = 'ANSWERING' | 'CORRECT' | 'INCORRECT';
+
+export interface ResultData {
+  isCorrect: boolean;
+  userAnswer: OXAnswer;
+  correctAnswer: OXAnswer;
+  explanation: string;
+  pointsEarned: number;
+  streakCount: number;
+  currentScore: string;
+  totalScore: string;
+  experiencePoints: {
+    current: number;
+    required: number;
+  };
+  achievements?: string[];
+}
+
 export interface ProblemData {
   id: string;
   title: string;

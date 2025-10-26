@@ -2,6 +2,24 @@
 
 export type MultipleChoiceAnswer = 'A' | 'B' | 'C' | 'D';
 
+export type ResultState = 'ANSWERING' | 'CORRECT' | 'INCORRECT';
+
+export interface MultipleChoiceResultData {
+  isCorrect: boolean;
+  userAnswer: MultipleChoiceAnswer;
+  correctAnswer: MultipleChoiceAnswer;
+  explanation: string;
+  pointsEarned: number;
+  streakCount: number;
+  currentScore: string;
+  totalScore: string;
+  experiencePoints: {
+    current: number;
+    required: number;
+  };
+  achievements?: string[];
+}
+
 export interface ChoiceOption {
   id: MultipleChoiceAnswer;
   text: string;
