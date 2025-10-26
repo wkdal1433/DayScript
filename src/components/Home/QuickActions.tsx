@@ -162,7 +162,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({
       onPress={() => onActionPress('shortcut')}
       activeOpacity={0.8}
     >
-      <Text style={styles.shortcutButtonText}>학습 바로가기</Text>
+      <Text style={styles.shortcutButtonText}>챌린지 학습 바로가기</Text>
     </TouchableOpacity>
   );
 

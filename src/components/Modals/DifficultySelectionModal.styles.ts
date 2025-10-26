@@ -12,18 +12,18 @@ export const styles = StyleSheet.create({
   },
 
   modalContainer: {
-    width: 390,
-    height: 844,
+    width: 350,
+    height: 690,
     backgroundColor: COLORS.white,
-    borderRadius: 30,
+    borderRadius: 24,
     overflow: 'hidden',
   },
 
   // Header styles
   header: {
-    paddingTop: 51,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+    paddingTop: 24,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(253, 206, 223, 0.3)',
@@ -35,15 +35,15 @@ export const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: 24,
+    fontSize: 19,
     fontWeight: FONTS.weights.bold,
     color: COLORS.textPrimary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
 
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: FONTS.weights.regular,
     color: COLORS.textMuted,
     textAlign: 'center',
@@ -51,16 +51,16 @@ export const styles = StyleSheet.create({
 
   closeButton: {
     position: 'absolute',
-    top: 51,
-    right: 20,
-    width: 30,
-    height: 30,
+    top: 24,
+    right: 16,
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   closeButtonText: {
-    fontSize: 18,
+    fontSize: 14,
     color: COLORS.textMuted,
     fontWeight: FONTS.weights.medium,
   },
@@ -71,22 +71,22 @@ export const styles = StyleSheet.create({
   },
 
   content: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
   },
 
   // Language badge
   languageBadge: {
     alignSelf: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 13,
     backgroundColor: COLORS.primary,
-    marginBottom: 16,
+    marginBottom: 13,
   },
 
   languageBadgeText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: FONTS.weights.bold,
     color: COLORS.white,
     textAlign: 'center',
@@ -97,14 +97,14 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 24,
-    gap: 20,
+    marginBottom: 19,
+    gap: 16,
   },
 
   progressDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     backgroundColor: COLORS.border,
   },
 
@@ -115,35 +115,35 @@ export const styles = StyleSheet.create({
   // Instructions
   instructionsContainer: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 26,
   },
 
   instructionsTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: FONTS.weights.bold,
     color: COLORS.textPrimary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
 
   instructionsSubtitle: {
-    fontSize: 14,
+    fontSize: 11,
     fontWeight: FONTS.weights.regular,
     color: COLORS.textMuted,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 16,
   },
 
   // Difficulty cards container
   difficultyContainer: {
-    gap: 16,
-    paddingBottom: 20,
+    gap: 13,
+    paddingBottom: 16,
   },
 
   // Difficulty card styles
   difficultyCard: {
     backgroundColor: COLORS.white,
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: '#F8E8EE',
     padding: 0,
@@ -163,22 +163,22 @@ export const styles = StyleSheet.create({
 
   progressBarFill: {
     height: '100%',
-    borderRadius: 2,
+    borderRadius: 1.6,
   },
 
   completionBadge: {
     position: 'absolute',
-    top: 12,
-    right: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 10,
+    top: 10,
+    right: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 8,
     backgroundColor: '#FFD700',
     zIndex: 1,
   },
 
   completionBadgeText: {
-    fontSize: 10,
+    fontSize: 8,
     fontWeight: FONTS.weights.bold,
     color: COLORS.white,
   },
@@ -186,21 +186,21 @@ export const styles = StyleSheet.create({
   cardContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    paddingBottom: 8,
+    padding: 13,
+    paddingBottom: 6,
   },
 
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
   },
 
   iconEmoji: {
-    fontSize: 24,
+    fontSize: 19,
   },
 
   cardInfo: {
@@ -208,60 +208,60 @@ export const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: FONTS.weights.bold,
     color: COLORS.textPrimary,
     marginBottom: 2,
   },
 
   cardSubtitle: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: FONTS.weights.regular,
     color: COLORS.textMuted,
   },
 
   cardArrow: {
-    fontSize: 20,
+    fontSize: 16,
     color: '#C9738F',
     fontWeight: FONTS.weights.regular,
   },
 
   cardDescription: {
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: FONTS.weights.regular,
     color: COLORS.textMuted,
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    lineHeight: 18,
+    paddingHorizontal: 13,
+    paddingBottom: 10,
+    lineHeight: 14,
   },
 
   cardStats: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    gap: 40,
+    paddingHorizontal: 13,
+    paddingBottom: 13,
+    gap: 32,
   },
 
   statItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
   },
 
   statIcon: {
-    fontSize: 12,
+    fontSize: 10,
   },
 
   statText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: FONTS.weights.medium,
     color: '#8B5A6B',
   },
 
   // Bottom section
   bottomSection: {
-    padding: 20,
-    paddingBottom: 34,
+    padding: 8,
+    paddingBottom: 16,
     backgroundColor: COLORS.white,
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
@@ -269,27 +269,27 @@ export const styles = StyleSheet.create({
 
   startButton: {
     backgroundColor: 'rgba(185, 227, 216, 0.8)',
-    borderRadius: 27,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
+    borderRadius: 16,
+    paddingVertical: 13,
+    paddingHorizontal: 26,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#B9E3D8',
   },
 
   startButtonText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: FONTS.weights.bold,
     color: '#065F46',
   },
 
   backButton: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 13,
   },
 
   backButtonText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: FONTS.weights.bold,
     color: '#065F46',
   },

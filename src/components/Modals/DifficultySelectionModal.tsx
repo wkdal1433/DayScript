@@ -48,7 +48,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       timeEstimate: '15분',
       difficulty: '쉬움',
       gradient: ['rgba(248, 232, 238, 1)', 'rgba(253, 206, 223, 1)'],
-      borderColor: '#F8E8EE',
+      borderColor: '#FDCEDF',
     },
     {
       id: 'intermediate',
@@ -59,7 +59,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       problemCount: '25문제',
       timeEstimate: '20분',
       difficulty: '보통',
-      gradient: ['rgba(253, 206, 223, 1)', 'rgba(242, 190, 209, 1)'],
+      gradient: ['rgba(248, 232, 238, 1)', 'rgba(253, 206, 223, 1)'],
       borderColor: '#FDCEDF',
     },
     {
@@ -71,7 +71,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       problemCount: '30문제',
       timeEstimate: '25분',
       difficulty: '어려움',
-      gradient: ['rgba(242, 190, 209, 1)', 'rgba(216, 140, 160, 1)'],
+      gradient: ['rgba(248, 232, 238, 1)', 'rgba(253, 206, 223, 1)'],
       borderColor: '#F2BED1',
     },
     {
@@ -83,8 +83,8 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       problemCount: '15문제',
       timeEstimate: '10분',
       difficulty: '최고난이도',
-      gradient: ['rgba(216, 140, 160, 1)', 'rgba(201, 115, 143, 1)'],
-      borderColor: '#D88CA0',
+      gradient: ['rgba(248, 232, 238, 1)', 'rgba(253, 206, 223, 1)'],
+      borderColor: '#F2BED1',
     },
   ];
 
@@ -210,7 +210,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
           onPress={handleStartPress}
           activeOpacity={0.8}
         >
-          <Text style={styles.startButtonText}>풀기</Text>
+          <Text style={styles.startButtonText}>문제 풀기</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
