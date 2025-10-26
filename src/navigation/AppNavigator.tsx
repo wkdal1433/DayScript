@@ -10,37 +10,55 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from '../screens/Home/HomeScreen';
 import PracticeScreen from '../screens/Practice/PracticeScreen';
+import Lv1OXProblemScreen from '../screens/Practice/Lv1OXProblemScreen';
+import Lv2MultipleChoiceProblemScreen from '../screens/Practice/Lv2MultipleChoiceProblemScreen';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem';
 
 interface AppNavigatorProps {}
 
 const AppNavigator: React.FC<AppNavigatorProps> = () => {
   const [activeTab, setActiveTab] = useState<TabName>('Home');
+  const [currentScreen, setCurrentScreen] = useState<ScreenName>('Home');
 
-  // 임시 네비게이션 객체 (React Navigation 대용)
+  // Enhanced navigation object with problem screen support
   const mockNavigation = {
-    navigate: (screen: string) => {
-      console.log('Navigate to:', screen);
+    navigate: (screen: string, params?: any) => {
+      console.log('Navigate to:', screen, params);
+      setCurrentScreen(screen as ScreenName);
+
+      // Update activeTab for tab screens
       if (screen === 'Home' || screen === 'Practice' || screen === 'Community' || screen === 'Profile') {
         setActiveTab(screen as TabName);
       }
     },
-    goBack: () => console.log('Go back'),
-    push: (screen: string) => console.log('Push:', screen),
-    replace: (screen: string) => console.log('Replace:', screen),
+    goBack: () => {
+      console.log('Go back');
+      // Return to the current active tab
+      setCurrentScreen(activeTab);
+    },
+    push: (screen: string, params?: any) => {
+      console.log('Push:', screen, params);
+      setCurrentScreen(screen as ScreenName);
+    },
+    replace: (screen: string, params?: any) => {
+      console.log('Replace:', screen, params);
+      setCurrentScreen(screen as ScreenName);
+    },
   };
 
   const mockRoute = {
-    key: activeTab,
-    name: activeTab,
+    key: currentScreen,
+    name: currentScreen,
     params: {},
   };
 
   // 탭 전환 핸들러
   const handleTabPress = (tab: string) => {
     setActiveTab(tab as TabName);
+    setCurrentScreen(tab as ScreenName);
     console.log('Tab switched to:', tab);
   };
 
@@ -52,7 +70,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
 
   // 현재 활성화된 화면 렌더링
   const renderActiveScreen = () => {
-    switch (activeTab) {
+    switch (currentScreen) {
       case 'Home':
         return (
           <HomeScreen
@@ -88,6 +106,28 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
             route={{ ...mockRoute, name: 'Profile' }}
             activeTab={activeTab}
             onTabPress={handleTabPress}
+          />
+        );
+      case 'OXProblem':
+        return (
+          <Lv1OXProblemScreen
+            onAnswerSelect={(answer) => console.log('OX Answer:', answer)}
+            onClose={() => mockNavigation.goBack()}
+            onNext={() => console.log('Next problem')}
+            currentProblem={1}
+            totalProblems={10}
+            timeRemaining={30}
+          />
+        );
+      case 'MultipleChoiceProblem':
+        return (
+          <Lv2MultipleChoiceProblemScreen
+            onAnswerSelect={(answer) => console.log('MC Answer:', answer)}
+            onClose={() => mockNavigation.goBack()}
+            onNext={() => console.log('Next problem')}
+            currentProblem={2}
+            totalProblems={10}
+            timeRemaining={30}
           />
         );
       default:

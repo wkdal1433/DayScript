@@ -1,12 +1,16 @@
 {
-  "summary": "Lv1 O/X 및 Lv2 객관식 문제 화면 구현 완료 - Figma 디자인 기반 통합 문제 풀이 시스템",
-  "lastCommit": "e9605b7 feat: Lv1 O/X 및 Lv2 객관식 문제 화면 구현 완료",
+  "summary": "State-Based Difficulty Selection UX and Access Control 구현 완료 - 유저 진행 상태 기반 동적 난이도 선택 시스템",
+  "lastCommit": "f00a120 feat: State-Based Difficulty Selection UX and Access Control Implementation",
   "implementedFeatures": [
     "Lv1OXProblemScreen - O/X 문제 화면 (Figma 노드 76:228)",
     "Lv2MultipleChoiceProblemScreen - 객관식 문제 화면 (Figma 노드 93:27)",
+    "State-Based Difficulty Selection - 유저 진행 상태 기반 동적 접근 제어",
+    "User Progression State 모델 - 해금/완료 상태 추적 시스템",
+    "접근 제한 UX - opacity 0.4, 🔒 아이콘, 해금 조건 모달",
+    "시도 제한 시스템 - 중급 단계 3회 제한 + 소진 UI",
     "랜덤 문제 타입 선택 시스템 (O/X ↔ 객관식)",
     "통합 네비게이션 및 상태 관리",
-    "완전한 TypeScript 지원 및 테스트 커버리지 (310+ 테스트 케이스)",
+    "완전한 TypeScript 지원 및 테스트 커버리지 (325+ 테스트 케이스)",
     "Figma 디자인 완벽 재현 (390x844 화면 기준)",
     "Animated API 기반 진행률 애니메이션"
   ],
@@ -14,7 +18,7 @@
   "completedComponents": [
     "HomeScreen (랜덤 문제 선택 통합 완성)",
     "PracticeScreen (완성)",
-    "DifficultySelectionModal (완성)",
+    "DifficultySelectionModal (State-Based Access Control 완성)",
     "Lv1OXProblemScreen (완성)",
     "Lv2MultipleChoiceProblemScreen (완성)",
     "BottomNavigationBar (완성)",
@@ -28,9 +32,12 @@
     "src/screens/Practice/Lv2MultipleChoiceProblemScreen.*": "객관식 문제 화면 (5개 파일)"
   },
   "nextSteps": [
-    "중급/고급/챌린지 난이도 문제 화면 구현",
-    "실제 문제 데이터베이스 연동",
-    "문제 풀이 결과 저장 및 통계",
+    "중급/고급/챌린지 난이도 문제 화면 구현 (Lv3 빈칸 채우기, Lv4 디버깅, Lv5 라이브 코딩)",
+    "실제 문제 데이터베이스 연동 및 백엔드 API 구성",
+    "문제 풀이 결과 저장 및 통계 대시보드",
+    "User Progression State 영구 저장 시스템",
+    "보상 시스템 (입문 완료 시 중급 시도 횟수 복구)",
+    "성취 배지 및 진행률 애니메이션 강화",
     "문제 풀이 세션 관리 시스템"
   ],
   "technicalDetails": {
@@ -54,20 +61,27 @@
       "src/screens/Practice/Lv2MultipleChoiceProblemScreen.types.ts (68 lines)",
       "src/screens/Practice/Lv2MultipleChoiceProblemScreen.test.tsx (168 lines)",
       "src/screens/Practice/Lv2MultipleChoiceProblemScreen.md (상세 문서)",
-      "src/screens/Practice/README.md (Lv1 구현 문서)"
+      "src/screens/Practice/README.md (Lv1 구현 문서)",
+      "src/components/Modals/DifficultySelectionModal.test.tsx (147 lines - State-Based 테스트)",
+      "src/components/Modals/DIFFICULTY_SCALING_IMPLEMENTATION.md (상세 구현 가이드)"
     ],
     "modified": [
       "src/screens/Home/HomeScreen.tsx (랜덤 문제 선택 로직 통합)",
-      "src/screens/Practice/index.ts (새 컴포넌트 export 추가)"
+      "src/screens/Practice/index.ts (새 컴포넌트 export 추가)",
+      "src/components/Modals/DifficultySelectionModal.tsx (State-Based Access Control 구현)",
+      "src/components/Modals/DifficultySelectionModal.styles.ts (잠금/해금 모달 스타일 추가)"
     ]
   },
   "keyAchievements": [
     "Figma 디자인 100% 정확 재현 (노드 ID 매핑)",
     "완전한 TypeScript 타입 안전성",
-    "포괄적 테스트 커버리지 (310+ 테스트)",
+    "포괄적 테스트 커버리지 (325+ 테스트)",
+    "User Progression State 기반 동적 접근 제어 시스템",
+    "단계별 해금 조건 및 시도 제한 UX",
     "확장 가능한 문제 시스템 아키텍처",
     "네이티브 성능 애니메이션",
-    "랜덤 문제 선택으로 사용자 경험 다양화"
+    "랜덤 문제 선택으로 사용자 경험 다양화",
+    "접근성 고려한 잠금/해금 시각적 피드백"
   ],
-  "lastUpdate": "2025-01-28T16:45:00Z"
+  "lastUpdate": "2025-01-28T18:30:00Z"
 }

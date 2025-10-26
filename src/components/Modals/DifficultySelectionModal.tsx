@@ -47,6 +47,10 @@ interface DifficultySelectionModalProps {
   selectedLanguage?: string;
   userProgressionState?: UserProgressionState;
   onUpdateProgression?: (state: UserProgressionState) => void;
+  navigation?: {
+    navigate: (screen: string, params?: any) => void;
+    goBack: () => void;
+  };
 }
 
 const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
@@ -56,6 +60,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   selectedLanguage = 'Python',
   userProgressionState,
   onUpdateProgression,
+  navigation,
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<DifficultyLevel | null>(null);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
@@ -178,7 +183,25 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   const handleStartPress = () => {
     if (selectedLevel) {
       onSelectLevel(selectedLevel);
-      onClose();
+
+      // Implement random navigation logic for 입문 level
+      if (selectedLevel.id === 'beginner' && navigation) {
+        // Random selection between OX and Multiple Choice
+        const problemRoutes = ['OXProblem', 'MultipleChoiceProblem'];
+        const randomRoute = problemRoutes[Math.floor(Math.random() * problemRoutes.length)];
+
+        console.log('Random problem route selected:', randomRoute);
+
+        // Close modal first, then navigate
+        onClose();
+        navigation.navigate(randomRoute, {
+          difficulty: selectedLevel,
+          language: selectedLanguage,
+        });
+      } else {
+        // For other levels or when navigation is not available, use existing logic
+        onClose();
+      }
     }
   };
 
@@ -308,27 +331,32 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     );
   };
 
-  const renderBottomSection = () => (
-    <View style={styles.bottomSection}>
-      {selectedLevel ? (
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={handleStartPress}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.startButtonText}>문제 풀기</Text>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={onClose}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.backButtonText}>← 뒤로가기</Text>
-        </TouchableOpacity>
-      )}
-    </View>
-  );
+  const renderBottomSection = () => {
+    const canStartLevel = selectedLevel && selectedLevel.isUnlocked &&
+      !(selectedLevel.id === 'intermediate' && selectedLevel.attemptsRemaining === 0);
+
+    return (
+      <View style={styles.bottomSection}>
+        {canStartLevel ? (
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={handleStartPress}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.startButtonText}>문제 풀기</Text>
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={onClose}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.backButtonText}>← 뒤로가기</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    );
+  };
 
   return (
     <Modal
