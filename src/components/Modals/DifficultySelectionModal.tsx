@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,24 @@ export interface DifficultyLevel {
   difficulty: string;
   gradient: string[];
   borderColor: string;
+  isUnlocked: boolean;
+  unlockCondition?: string;
+  completionRate?: number;
+  attemptsRemaining?: number;
+}
+
+export interface UserProgressionState {
+  unlockedLevels: string[];
+  completedLevels: string[];
+  currentLevel: string | null;
+  levelStats: {
+    [levelId: string]: {
+      completionRate: number;
+      attemptsUsed: number;
+      maxAttempts: number;
+      isCompleted: boolean;
+    };
+  };
 }
 
 interface DifficultySelectionModalProps {
@@ -27,6 +45,8 @@ interface DifficultySelectionModalProps {
   onClose: () => void;
   onSelectLevel: (level: DifficultyLevel) => void;
   selectedLanguage?: string;
+  userProgressionState?: UserProgressionState;
+  onUpdateProgression?: (state: UserProgressionState) => void;
 }
 
 const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
@@ -34,10 +54,29 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   onClose,
   onSelectLevel,
   selectedLanguage = 'Python',
+  userProgressionState,
+  onUpdateProgression,
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<DifficultyLevel | null>(null);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [selectedLockedLevel, setSelectedLockedLevel] = useState<DifficultyLevel | null>(null);
 
-  const difficultyLevels: DifficultyLevel[] = [
+  // Default progression state - only 입문 unlocked initially
+  const defaultProgressionState: UserProgressionState = {
+    unlockedLevels: ['beginner'],
+    completedLevels: [],
+    currentLevel: null,
+    levelStats: {
+      beginner: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
+      intermediate: { completionRate: 0, attemptsUsed: 0, maxAttempts: 3, isCompleted: false },
+      advanced: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
+      challenge: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
+    },
+  };
+
+  const currentProgressionState = userProgressionState || defaultProgressionState;
+
+  const baseDifficultyLevels: Omit<DifficultyLevel, 'isUnlocked' | 'unlockCondition' | 'completionRate' | 'attemptsRemaining'>[] = [
     {
       id: 'beginner',
       emoji: '🌱',
@@ -88,7 +127,51 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     },
   ];
 
+  // Enhanced difficulty levels with dynamic unlock conditions
+  const difficultyLevels: DifficultyLevel[] = baseDifficultyLevels.map((level) => {
+    const isUnlocked = currentProgressionState.unlockedLevels.includes(level.id);
+    const stats = currentProgressionState.levelStats[level.id];
+
+    let unlockCondition = '';
+    if (!isUnlocked) {
+      switch (level.id) {
+        case 'intermediate':
+          unlockCondition = '입문 단계를 완료해야 합니다';
+          break;
+        case 'advanced':
+          unlockCondition = '중급 단계를 완료해야 합니다';
+          break;
+        case 'challenge':
+          unlockCondition = '고급 단계를 완료해야 합니다';
+          break;
+      }
+    }
+
+    return {
+      ...level,
+      isUnlocked,
+      unlockCondition,
+      completionRate: stats?.completionRate || 0,
+      attemptsRemaining: level.id === 'intermediate' ?
+        Math.max(0, (stats?.maxAttempts || 3) - (stats?.attemptsUsed || 0)) :
+        undefined,
+    };
+  });
+
   const handleLevelPress = (level: DifficultyLevel) => {
+    if (!level.isUnlocked) {
+      setSelectedLockedLevel(level);
+      setShowUnlockModal(true);
+      return;
+    }
+
+    // Check if intermediate level has attempts remaining
+    if (level.id === 'intermediate' && level.attemptsRemaining === 0) {
+      setSelectedLockedLevel(level);
+      setShowUnlockModal(true);
+      return;
+    }
+
     setSelectedLevel(level);
   };
 
@@ -136,7 +219,9 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
 
   const renderDifficultyCard = (level: DifficultyLevel, index: number) => {
     const isSelected = selectedLevel?.id === level.id;
-    const isCompleted = index === 0; // Mock completion for first level
+    const isCompleted = currentProgressionState.completedLevels.includes(level.id);
+    const isLocked = !level.isUnlocked;
+    const hasNoAttempts = level.id === 'intermediate' && level.attemptsRemaining === 0;
 
     return (
       <TouchableOpacity
@@ -145,16 +230,21 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
           styles.difficultyCard,
           { borderColor: isSelected ? level.borderColor : '#F8E8EE' },
           isSelected && styles.difficultyCardSelected,
+          (isLocked || hasNoAttempts) && { opacity: 0.4 },
         ]}
         onPress={() => handleLevelPress(level)}
-        activeOpacity={0.8}
+        activeOpacity={isLocked || hasNoAttempts ? 1 : 0.8}
+        disabled={false} // Always allow taps to show unlock modals
       >
         {/* Progress bar */}
         <View style={styles.progressBar}>
           <View
             style={[
               styles.progressBarFill,
-              { backgroundColor: level.borderColor, width: isCompleted ? '100%' : '0%' }
+              {
+                backgroundColor: level.borderColor,
+                width: isCompleted ? '100%' : `${level.completionRate || 0}%`
+              }
             ]}
           />
         </View>
@@ -163,6 +253,22 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
         {isCompleted && (
           <View style={styles.completionBadge}>
             <Text style={styles.completionBadgeText}>완료!</Text>
+          </View>
+        )}
+
+        {/* Lock indicator for locked levels */}
+        {isLocked && (
+          <View style={styles.lockIndicator}>
+            <Text style={styles.lockIcon}>🔒</Text>
+          </View>
+        )}
+
+        {/* Attempts remaining for intermediate level */}
+        {level.id === 'intermediate' && level.isUnlocked && !isCompleted && (
+          <View style={styles.attemptsContainer}>
+            <Text style={styles.attemptsText}>
+              남은 기회: {level.attemptsRemaining}회
+            </Text>
           </View>
         )}
 
@@ -254,6 +360,59 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
           {renderBottomSection()}
         </Pressable>
       </Pressable>
+
+      {/* Unlock Conditions Modal */}
+      {showUnlockModal && selectedLockedLevel && (
+        <Modal
+          visible={showUnlockModal}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setShowUnlockModal(false)}
+        >
+          <Pressable
+            style={styles.unlockModalOverlay}
+            onPress={() => setShowUnlockModal(false)}
+          >
+            <Pressable
+              style={styles.unlockModalContainer}
+              onPress={(e) => e.stopPropagation()}
+            >
+              <View style={styles.unlockModalContent}>
+                <Text style={styles.unlockModalIcon}>🔒</Text>
+                <Text style={styles.unlockModalTitle}>단계 잠금</Text>
+
+                {selectedLockedLevel.attemptsRemaining === 0 ? (
+                  <>
+                    <Text style={styles.unlockModalMessage}>
+                      중급 단계의 테스트 기회를 모두 사용했습니다.
+                    </Text>
+                    <Text style={styles.unlockModalSubMessage}>
+                      입문 단계를 다시 완료하면 추가 기회를 얻을 수 있습니다.
+                    </Text>
+                  </>
+                ) : (
+                  <>
+                    <Text style={styles.unlockModalMessage}>
+                      이 단계를 시작하려면
+                    </Text>
+                    <Text style={styles.unlockModalCondition}>
+                      {selectedLockedLevel.unlockCondition}
+                    </Text>
+                  </>
+                )}
+
+                <TouchableOpacity
+                  style={styles.unlockModalButton}
+                  onPress={() => setShowUnlockModal(false)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.unlockModalButtonText}>확인</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Pressable>
+        </Modal>
+      )}
     </Modal>
   );
 };

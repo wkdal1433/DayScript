@@ -293,4 +293,127 @@ export const styles = StyleSheet.create({
     fontWeight: FONTS.weights.bold,
     color: '#065F46',
   },
+
+  // Lock and attempts indicators
+  lockIndicator: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+
+  lockIcon: {
+    fontSize: 12,
+  },
+
+  attemptsContainer: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: '#F8E8EE',
+    borderRadius: 8,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderWidth: 1,
+    borderColor: '#E295B3',
+  },
+
+  attemptsText: {
+    fontSize: 10,
+    fontWeight: FONTS.weights.medium,
+    color: '#E295B3',
+  },
+
+  // Unlock modal styles
+  unlockModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  unlockModalContainer: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    margin: 20,
+    maxWidth: 300,
+    width: '90%',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+
+  unlockModalContent: {
+    padding: 24,
+    alignItems: 'center',
+  },
+
+  unlockModalIcon: {
+    fontSize: 32,
+    marginBottom: 16,
+  },
+
+  unlockModalTitle: {
+    fontSize: 18,
+    fontWeight: FONTS.weights.bold,
+    color: COLORS.textPrimary,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+
+  unlockModalMessage: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 20,
+  },
+
+  unlockModalSubMessage: {
+    fontSize: 12,
+    color: '#8B5A6B',
+    textAlign: 'center',
+    marginBottom: 20,
+    lineHeight: 16,
+  },
+
+  unlockModalCondition: {
+    fontSize: 14,
+    fontWeight: FONTS.weights.medium,
+    color: '#E295B3',
+    textAlign: 'center',
+    marginBottom: 20,
+    backgroundColor: '#F8E8EE',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#F2BED1',
+  },
+
+  unlockModalButton: {
+    backgroundColor: '#E295B3',
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+
+  unlockModalButtonText: {
+    fontSize: 14,
+    fontWeight: FONTS.weights.bold,
+    color: COLORS.white,
+  },
 });

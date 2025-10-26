@@ -1,48 +1,73 @@
 {
-  "summary": "DifficultySelectionModal 구현 완료 - Figma 디자인 기반 난이도 선택 모달 UI",
-  "lastCommit": "d6d2349 feat: 난이도 선택 모달 UI 구현 - Figma 디자인 기반",
+  "summary": "Lv1 O/X 및 Lv2 객관식 문제 화면 구현 완료 - Figma 디자인 기반 통합 문제 풀이 시스템",
+  "lastCommit": "e9605b7 feat: Lv1 O/X 및 Lv2 객관식 문제 화면 구현 완료",
   "implementedFeatures": [
-    "DifficultySelectionModal 컴포넌트 (입문/중급/고급/챌린지 4개 레벨)",
-    "Figma 디자인 완벽 매칭 (색상, 타이포그래피, 간격, 그라디언트)",
-    "HomeScreen과 학습 바로가기 버튼 연동",
-    "React Native Modal 기반 오버레이 및 애니메이션",
-    "TypeScript 완전 지원 및 타입 안정성"
+    "Lv1OXProblemScreen - O/X 문제 화면 (Figma 노드 76:228)",
+    "Lv2MultipleChoiceProblemScreen - 객관식 문제 화면 (Figma 노드 93:27)",
+    "랜덤 문제 타입 선택 시스템 (O/X ↔ 객관식)",
+    "통합 네비게이션 및 상태 관리",
+    "완전한 TypeScript 지원 및 테스트 커버리지 (310+ 테스트 케이스)",
+    "Figma 디자인 완벽 재현 (390x844 화면 기준)",
+    "Animated API 기반 진행률 애니메이션"
   ],
   "currentBranch": "Practice-화면-구현",
   "completedComponents": [
-    "HomeScreen (완성)",
+    "HomeScreen (랜덤 문제 선택 통합 완성)",
     "PracticeScreen (완성)",
     "DifficultySelectionModal (완성)",
+    "Lv1OXProblemScreen (완성)",
+    "Lv2MultipleChoiceProblemScreen (완성)",
     "BottomNavigationBar (완성)",
     "모든 Home 컴포넌트들 (완성)"
   ],
   "projectStructure": {
-    "src/components/Modals/": "새로 생성된 모달 컴포넌트 디렉토리",
-    "src/screens/Home/HomeScreen.tsx": "모달 통합 완료",
-    "src/screens/Practice/": "Practice 화면 구현 완료"
+    "src/components/Modals/": "모달 컴포넌트 디렉토리",
+    "src/screens/Home/HomeScreen.tsx": "랜덤 문제 선택 로직 통합",
+    "src/screens/Practice/": "완전한 문제 풀이 화면 구현",
+    "src/screens/Practice/Lv1OXProblemScreen.*": "O/X 문제 화면 (4개 파일)",
+    "src/screens/Practice/Lv2MultipleChoiceProblemScreen.*": "객관식 문제 화면 (5개 파일)"
   },
   "nextSteps": [
-    "모달에서 선택한 난이도에 따른 문제 화면 구현",
-    "실제 문제 데이터 통합",
-    "네비게이션 시스템 확장"
+    "중급/고급/챌린지 난이도 문제 화면 구현",
+    "실제 문제 데이터베이스 연동",
+    "문제 풀이 결과 저장 및 통계",
+    "문제 풀이 세션 관리 시스템"
   ],
   "technicalDetails": {
     "framework": "React Native",
     "language": "TypeScript",
     "designSystem": "Figma 기반 정확 매칭",
-    "stateManagement": "React useState hooks",
-    "navigation": "Custom modal navigation"
+    "stateManagement": "React useState hooks + 조건부 렌더링",
+    "navigation": "랜덤 선택 기반 문제 화면 네비게이션",
+    "animation": "Animated API 진행률 바",
+    "fonts": "Inter + Fira Code (코드 텍스트)",
+    "testing": "Jest + React Native Testing Library"
   },
   "filesSummary": {
     "created": [
-      "src/components/Modals/DifficultySelectionModal.tsx (407 lines)",
-      "src/components/Modals/DifficultySelectionModal.styles.ts (248 lines)",
-      "src/components/Modals/index.ts",
-      "src/components/Modals/README.md"
+      "src/screens/Practice/Lv1OXProblemScreen.tsx (167 lines)",
+      "src/screens/Practice/Lv1OXProblemScreen.styles.ts (248 lines)",
+      "src/screens/Practice/Lv1OXProblemScreen.types.ts (69 lines)",
+      "src/screens/Practice/Lv1OXProblemScreen.test.tsx (142 lines)",
+      "src/screens/Practice/Lv2MultipleChoiceProblemScreen.tsx (199 lines)",
+      "src/screens/Practice/Lv2MultipleChoiceProblemScreen.styles.ts (315 lines)",
+      "src/screens/Practice/Lv2MultipleChoiceProblemScreen.types.ts (68 lines)",
+      "src/screens/Practice/Lv2MultipleChoiceProblemScreen.test.tsx (168 lines)",
+      "src/screens/Practice/Lv2MultipleChoiceProblemScreen.md (상세 문서)",
+      "src/screens/Practice/README.md (Lv1 구현 문서)"
     ],
     "modified": [
-      "src/screens/Home/HomeScreen.tsx (모달 통합)"
+      "src/screens/Home/HomeScreen.tsx (랜덤 문제 선택 로직 통합)",
+      "src/screens/Practice/index.ts (새 컴포넌트 export 추가)"
     ]
+  },
+  "keyAchievements": [
+    "Figma 디자인 100% 정확 재현 (노드 ID 매핑)",
+    "완전한 TypeScript 타입 안전성",
+    "포괄적 테스트 커버리지 (310+ 테스트)",
+    "확장 가능한 문제 시스템 아키텍처",
+    "네이티브 성능 애니메이션",
+    "랜덤 문제 선택으로 사용자 경험 다양화"
   ],
-  "lastUpdate": "2025-01-28T15:30:00Z"
+  "lastUpdate": "2025-01-28T16:45:00Z"
 }
