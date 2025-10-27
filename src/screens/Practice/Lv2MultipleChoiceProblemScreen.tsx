@@ -16,61 +16,60 @@ import {
   ResultState,
   MultipleChoiceResultData
 } from './Lv2MultipleChoiceProblemScreen.types';
+import {
+  sessionManager,
+  createNewSession,
+  getCurrentProblem,
+  submitAnswer,
+  goToNextProblem,
+  getSessionProgress,
+  isSessionCompleted,
+  clearCurrentSession
+} from '../../data/sessionManager';
 
 const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenProps> = ({
   onAnswerSelect = (answer) => console.log('Answer selected:', answer),
   onClose = () => console.log('Screen closed'),
   onNext = () => console.log('Next problem'),
-  currentProblem = 2,
-  totalProblems = 10,
+  onSessionComplete = () => console.log('Session completed'),
   timeRemaining = 30,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<MultipleChoiceAnswer | null>(null);
   const [resultState, setResultState] = useState<ResultState>('ANSWERING');
   const [resultData, setResultData] = useState<MultipleChoiceResultData | null>(null);
   const [progressAnimation] = useState(new Animated.Value(0));
+  const [currentProblemData, setCurrentProblemData] = useState<MultipleChoiceProblemData | null>(null);
+  const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
 
-  // Mock problem data based on Figma design
-  const problemData: MultipleChoiceProblemData = {
-    id: '2',
-    title: 'Python에서 함수를 정의할 때 사용하는',
-    subtitle: '키워드는 무엇일까요?',
-    correctAnswer: 'C',
-    explanation: 'Python에서 함수를 정의할 때는 "def" 키워드를 사용합니다.',
-    category: '기초 문법 : 함수 정의',
-    choices: [
-      {
-        id: 'A',
-        text: 'function',
-        isCorrect: false,
-      },
-      {
-        id: 'B',
-        text: 'define',
-        isCorrect: false,
-      },
-      {
-        id: 'C',
-        text: 'def',
-        isCorrect: true,
-      },
-      {
-        id: 'D',
-        text: 'func',
-        isCorrect: false,
-      },
-    ],
-  };
+  // Initialize session and get current problem
+  useEffect(() => {
+    let currentSession = sessionManager.getCurrentSession();
+
+    // Create new session if none exists
+    if (!currentSession) {
+      currentSession = createNewSession('MULTIPLE_CHOICE', 10);
+    }
+
+    // Load current problem
+    const problem = getCurrentProblem() as MultipleChoiceProblemData;
+    if (problem) {
+      setCurrentProblemData(problem);
+    }
+
+    // Update progress
+    const progress = getSessionProgress();
+    setSessionProgress(progress);
+  }, []);
 
   useEffect(() => {
-    // Calculate progress percentage
-    const progressPercentage = (currentProblem / totalProblems) * 100;
+    // Calculate progress percentage based on session progress
+    const progressPercentage = sessionProgress.percentage;
     Animated.timing(progressAnimation, {
       toValue: progressPercentage,
       duration: 500,
       useNativeDriver: false,
     }).start();
-  }, [currentProblem, totalProblems, progressAnimation]);
+  }, [sessionProgress, progressAnimation]);
 
   const handleChoicePress = (choiceId: MultipleChoiceAnswer) => {
     if (selectedAnswer || resultState !== 'ANSWERING') return; // Prevent multiple selections
@@ -80,11 +79,41 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
   };
 
   const handleNextProblem = () => {
-    // Reset states for next problem
-    setSelectedAnswer(null);
-    setResultState('ANSWERING');
-    setResultData(null);
-    onNext();
+    // Check if session is completed
+    if (isSessionCompleted()) {
+      // Session completed, trigger completion callback
+      if (onSessionComplete) {
+        onSessionComplete();
+      }
+      return;
+    }
+
+    // Move to next problem in session
+    const hasNextProblem = goToNextProblem();
+
+    if (hasNextProblem) {
+      // Reset states for next problem
+      setSelectedAnswer(null);
+      setResultState('ANSWERING');
+      setResultData(null);
+
+      // Load next problem
+      const nextProblem = getCurrentProblem() as MultipleChoiceProblemData;
+      if (nextProblem) {
+        setCurrentProblemData(nextProblem);
+      }
+
+      // Update progress
+      const progress = getSessionProgress();
+      setSessionProgress(progress);
+
+      onNext();
+    } else {
+      // No more problems, complete session
+      if (onSessionComplete) {
+        onSessionComplete();
+      }
+    }
   };
 
   const handleRetryProblem = () => {
@@ -92,6 +121,12 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
     setSelectedAnswer(null);
     setResultState('ANSWERING');
     setResultData(null);
+  };
+
+  const handleClose = () => {
+    // Clear session when closing
+    clearCurrentSession();
+    onClose();
   };
 
   const formatTime = (seconds: number): string => {
@@ -156,14 +191,14 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
       <SafeAreaView style={styles.container}>
         {/* Header Section - Same as problem view */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onClose}>
+          <TouchableOpacity style={styles.backButton} onPress={handleClose}>
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
 
           <View style={styles.headerCenter}>
-            <Text style={styles.problemCounter}>문제 {currentProblem}/ {totalProblems}</Text>
+            <Text style={styles.problemCounter}>문제 {sessionProgress.current} / {sessionProgress.total}</Text>
             <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{problemData.category}</Text>
+              <Text style={styles.categoryText}>{currentProblemData?.category || ''}</Text>
             </View>
           </View>
 
@@ -273,14 +308,14 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
     <SafeAreaView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+        <TouchableOpacity style={styles.backButton} onPress={handleClose}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={styles.problemCounter}>문제 {currentProblem}/ {totalProblems}</Text>
+          <Text style={styles.problemCounter}>문제 {sessionProgress.current} / {sessionProgress.total}</Text>
           <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{problemData.category}</Text>
+            <Text style={styles.categoryText}>{currentProblemData?.category || ''}</Text>
           </View>
         </View>
 
@@ -314,13 +349,13 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
       >
         {/* Problem Content */}
         <View style={styles.problemContainer}>
-          <Text style={styles.problemTitle}>{problemData.title}</Text>
-          <Text style={styles.problemSubtitle}>{problemData.subtitle}</Text>
+          <Text style={styles.problemTitle}>{currentProblemData?.title || ''}</Text>
+          <Text style={styles.problemSubtitle}>{currentProblemData?.subtitle || ''}</Text>
         </View>
 
         {/* Multiple Choice Options */}
         <View style={styles.choicesContainer}>
-          {problemData.choices.map(renderChoice)}
+          {currentProblemData?.choices.map(renderChoice)}
         </View>
       </ScrollView>
 
@@ -332,21 +367,28 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
             selectedAnswer && styles.submitButtonEnabled,
           ]}
           onPress={() => {
-            if (selectedAnswer && resultState === 'ANSWERING') {
+            if (selectedAnswer && resultState === 'ANSWERING' && currentProblemData) {
               // Determine if answer is correct
-              const isCorrect = selectedAnswer === problemData.correctAnswer;
+              const isCorrect = selectedAnswer === currentProblemData.correctAnswer;
               const newResultState: ResultState = isCorrect ? 'CORRECT' : 'INCORRECT';
+
+              // Submit answer to session manager
+              submitAnswer(selectedAnswer, isCorrect);
+
+              // Get current session stats for result data
+              const progress = getSessionProgress();
+              const sessionStats = sessionManager.getSessionStats();
 
               // Create result data
               const result: MultipleChoiceResultData = {
                 isCorrect,
                 userAnswer: selectedAnswer,
-                correctAnswer: problemData.correctAnswer,
-                explanation: problemData.explanation,
+                correctAnswer: currentProblemData.correctAnswer,
+                explanation: currentProblemData.explanation,
                 pointsEarned: isCorrect ? 15 : 0,
                 streakCount: isCorrect ? 3 : 0, // Mock streak count
-                currentScore: '3',
-                totalScore: '10',
+                currentScore: sessionStats?.correctAnswers.toString() || '0',
+                totalScore: progress.total.toString(),
                 experiencePoints: {
                   current: isCorrect ? 680 : 650, // Mock XP gain
                   required: 1000
@@ -386,7 +428,7 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
           </View>
           <View style={styles.progressLabels}>
             <Text style={styles.progressLabel}>전체 진행률</Text>
-            <Text style={styles.progressPercentage}>{Math.round((currentProblem / totalProblems) * 100)}%</Text>
+            <Text style={styles.progressPercentage}>{sessionProgress.percentage}%</Text>
           </View>
         </View>
       </View>

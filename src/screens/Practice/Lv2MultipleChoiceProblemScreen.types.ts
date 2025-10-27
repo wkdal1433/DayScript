@@ -46,16 +46,13 @@ export interface Lv2MultipleChoiceProblemScreenProps {
   /** Callback when moving to next problem */
   onNext?: () => void;
 
-  /** Current problem number (1-based) */
-  currentProblem?: number;
-
-  /** Total number of problems */
-  totalProblems?: number;
+  /** Callback when session is completed (all 10 problems finished) */
+  onSessionComplete?: () => void;
 
   /** Time remaining in seconds */
   timeRemaining?: number;
 
-  /** Custom problem data (optional) */
+  /** Custom problem data (optional) - now managed by session */
   problemData?: MultipleChoiceProblemData;
 }
 

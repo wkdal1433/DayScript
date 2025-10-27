@@ -8,61 +8,88 @@ import {
 } from 'react-native';
 import { styles } from './Lv1OXProblemScreen.styles';
 import { Lv1OXProblemScreenProps, OXAnswer, ProblemData, ResultState, ResultData } from './Lv1OXProblemScreen.types';
+import {
+  sessionManager,
+  createNewSession,
+  getCurrentProblem,
+  submitAnswer,
+  goToNextProblem,
+  getSessionProgress,
+  isSessionCompleted,
+  clearCurrentSession
+} from '../../data/sessionManager';
 
 const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   onAnswerSelect = (answer) => console.log('Answer selected:', answer),
   onClose = () => console.log('Screen closed'),
   onNext = () => console.log('Next problem'),
-  currentProblem = 1,
-  totalProblems = 10,
+  onSessionComplete = () => console.log('Session completed'),
   timeRemaining = 30,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<OXAnswer | null>(null);
   const [resultState, setResultState] = useState<ResultState>('ANSWERING');
   const [resultData, setResultData] = useState<ResultData | null>(null);
   const [progressAnimation] = useState(new Animated.Value(0));
+  const [currentProblemData, setCurrentProblemData] = useState<ProblemData | null>(null);
+  const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
 
-  // Mock problem data based on Figma design
-  const problemData: ProblemData = {
-    id: '1',
-    title: 'Python에서 리스트는',
-    subtitle: '가변(mutable) 자료형이다.',
-    correctAnswer: 'O',
-    explanation: '리스트는 생성 후에도 요소를 추가, 삭제, 수정할 수 있는 가변 자료형입니다.',
-    category: 'Python 기초',
-    emoji: '🤔',
-  };
+  // Initialize session and get current problem
+  useEffect(() => {
+    let currentSession = sessionManager.getCurrentSession();
+
+    // Create new session if none exists
+    if (!currentSession) {
+      currentSession = createNewSession('OX', 10);
+    }
+
+    // Load current problem
+    const problem = getCurrentProblem() as ProblemData;
+    if (problem) {
+      setCurrentProblemData(problem);
+    }
+
+    // Update progress
+    const progress = getSessionProgress();
+    setSessionProgress(progress);
+  }, []);
 
   useEffect(() => {
-    // Calculate progress percentage
-    const progressPercentage = (currentProblem / totalProblems) * 100;
+    // Calculate progress percentage based on session progress
+    const progressPercentage = sessionProgress.percentage;
     Animated.timing(progressAnimation, {
       toValue: progressPercentage,
       duration: 500,
       useNativeDriver: false,
     }).start();
-  }, [currentProblem, totalProblems, progressAnimation]);
+  }, [sessionProgress, progressAnimation]);
 
   const handleAnswerPress = (answer: OXAnswer) => {
-    if (selectedAnswer || resultState !== 'ANSWERING') return; // Prevent multiple selections
+    if (selectedAnswer || resultState !== 'ANSWERING' || !currentProblemData) return;
 
     setSelectedAnswer(answer);
     onAnswerSelect(answer);
 
     // Determine if answer is correct
-    const isCorrect = answer === problemData.correctAnswer;
+    const isCorrect = answer === currentProblemData.correctAnswer;
     const newResultState: ResultState = isCorrect ? 'CORRECT' : 'INCORRECT';
+
+    // Submit answer to session manager
+    submitAnswer(answer, isCorrect);
+
+    // Get current session stats for result data
+    const progress = getSessionProgress();
+    const sessionStats = sessionManager.getSessionStats();
 
     // Create result data
     const result: ResultData = {
       isCorrect,
       userAnswer: answer,
-      correctAnswer: problemData.correctAnswer,
-      explanation: problemData.explanation,
+      correctAnswer: currentProblemData.correctAnswer,
+      explanation: currentProblemData.explanation,
       pointsEarned: isCorrect ? 10 : 0,
       streakCount: isCorrect ? 4 : 0, // Mock streak count
-      currentScore: '4',
-      totalScore: '10',
+      currentScore: sessionStats?.correctAnswers.toString() || '0',
+      totalScore: progress.total.toString(),
       experiencePoints: {
         current: isCorrect ? 660 : 650, // Mock XP gain
         required: 1000
@@ -75,11 +102,41 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   };
 
   const handleNextProblem = () => {
-    // Reset states for next problem
-    setSelectedAnswer(null);
-    setResultState('ANSWERING');
-    setResultData(null);
-    onNext();
+    // Check if session is completed
+    if (isSessionCompleted()) {
+      // Session completed, trigger completion callback
+      if (onSessionComplete) {
+        onSessionComplete();
+      }
+      return;
+    }
+
+    // Move to next problem in session
+    const hasNextProblem = goToNextProblem();
+
+    if (hasNextProblem) {
+      // Reset states for next problem
+      setSelectedAnswer(null);
+      setResultState('ANSWERING');
+      setResultData(null);
+
+      // Load next problem
+      const nextProblem = getCurrentProblem() as ProblemData;
+      if (nextProblem) {
+        setCurrentProblemData(nextProblem);
+      }
+
+      // Update progress
+      const progress = getSessionProgress();
+      setSessionProgress(progress);
+
+      onNext();
+    } else {
+      // No more problems, complete session
+      if (onSessionComplete) {
+        onSessionComplete();
+      }
+    }
   };
 
   const handleRetryProblem = () => {
@@ -87,6 +144,12 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
     setSelectedAnswer(null);
     setResultState('ANSWERING');
     setResultData(null);
+  };
+
+  const handleClose = () => {
+    // Clear session when closing
+    clearCurrentSession();
+    onClose();
   };
 
   const formatTime = (seconds: number): string => {
@@ -103,14 +166,14 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
       <SafeAreaView style={styles.container}>
         {/* Header Section - Same as problem view */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.backButton} onPress={onClose}>
+          <TouchableOpacity style={styles.backButton} onPress={handleClose}>
             <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
 
           <View style={styles.headerCenter}>
-            <Text style={styles.problemCounter}>문제 {currentProblem} / {totalProblems}</Text>
+            <Text style={styles.problemCounter}>문제 {sessionProgress.current} / {sessionProgress.total}</Text>
             <View style={styles.categoryBadge}>
-              <Text style={styles.categoryText}>{problemData.category}</Text>
+              <Text style={styles.categoryText}>{currentProblemData?.category || ''}</Text>
             </View>
           </View>
 
@@ -220,14 +283,14 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
     <SafeAreaView style={styles.container}>
       {/* Header Section */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={onClose}>
+        <TouchableOpacity style={styles.backButton} onPress={handleClose}>
           <Text style={styles.backButtonText}>←</Text>
         </TouchableOpacity>
 
         <View style={styles.headerCenter}>
-          <Text style={styles.problemCounter}>문제 {currentProblem} / {totalProblems}</Text>
+          <Text style={styles.problemCounter}>문제 {sessionProgress.current} / {sessionProgress.total}</Text>
           <View style={styles.categoryBadge}>
-            <Text style={styles.categoryText}>{problemData.category}</Text>
+            <Text style={styles.categoryText}>{currentProblemData?.category || ''}</Text>
           </View>
         </View>
 
@@ -257,11 +320,11 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
       {/* Problem Content */}
       <View style={styles.problemContainer}>
         <View style={styles.emojiContainer}>
-          <Text style={styles.emoji}>{problemData.emoji}</Text>
+          <Text style={styles.emoji}>{currentProblemData?.emoji || '🤔'}</Text>
         </View>
 
-        <Text style={styles.problemTitle}>{problemData.title}</Text>
-        <Text style={styles.problemSubtitle}>{problemData.subtitle}</Text>
+        <Text style={styles.problemTitle}>{currentProblemData?.title || ''}</Text>
+        <Text style={styles.problemSubtitle}>{currentProblemData?.subtitle || ''}</Text>
 
         <View style={styles.hintContainer}>
           <Text style={styles.hintText}>힌트</Text>
@@ -319,7 +382,7 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
         </View>
         <View style={styles.progressLabels}>
           <Text style={styles.progressLabel}>진행률</Text>
-          <Text style={styles.progressPercentage}>{Math.round((currentProblem / totalProblems) * 100)}%</Text>
+          <Text style={styles.progressPercentage}>{sessionProgress.percentage}%</Text>
         </View>
       </View>
     </SafeAreaView>

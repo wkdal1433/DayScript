@@ -114,8 +114,6 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
             onAnswerSelect={(answer) => console.log('OX Answer:', answer)}
             onClose={() => mockNavigation.goBack()}
             onNext={() => console.log('Next problem')}
-            currentProblem={1}
-            totalProblems={10}
             timeRemaining={30}
           />
         );
@@ -125,8 +123,6 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
             onAnswerSelect={(answer) => console.log('MC Answer:', answer)}
             onClose={() => mockNavigation.goBack()}
             onNext={() => console.log('Next problem')}
-            currentProblem={2}
-            totalProblems={10}
             timeRemaining={30}
           />
         );
