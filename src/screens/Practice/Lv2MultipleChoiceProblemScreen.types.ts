@@ -49,6 +49,9 @@ export interface Lv2MultipleChoiceProblemScreenProps {
   /** Callback when session is completed (all 10 problems finished) */
   onSessionComplete?: () => void;
 
+  /** Callback when goal completion modal should be shown */
+  onShowGoalModal?: () => void;
+
   /** Time remaining in seconds */
   timeRemaining?: number;
 

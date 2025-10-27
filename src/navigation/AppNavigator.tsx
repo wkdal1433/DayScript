@@ -10,8 +10,7 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from '../screens/Home/HomeScreen';
 import PracticeScreen from '../screens/Practice/PracticeScreen';
-import Lv1OXProblemScreen from '../screens/Practice/Lv1OXProblemScreen';
-import Lv2MultipleChoiceProblemScreen from '../screens/Practice/Lv2MultipleChoiceProblemScreen';
+import PracticeContainer from '../screens/Practice/PracticeContainer';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
@@ -110,20 +109,18 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
         );
       case 'OXProblem':
         return (
-          <Lv1OXProblemScreen
-            onAnswerSelect={(answer) => console.log('OX Answer:', answer)}
-            onClose={() => mockNavigation.goBack()}
-            onNext={() => console.log('Next problem')}
-            timeRemaining={30}
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="OX"
           />
         );
       case 'MultipleChoiceProblem':
         return (
-          <Lv2MultipleChoiceProblemScreen
-            onAnswerSelect={(answer) => console.log('MC Answer:', answer)}
-            onClose={() => mockNavigation.goBack()}
-            onNext={() => console.log('Next problem')}
-            timeRemaining={30}
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="MULTIPLE_CHOICE"
           />
         );
       default:

@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { styles } from './Lv1OXProblemScreen.styles';
 import { Lv1OXProblemScreenProps, OXAnswer, ProblemData, ResultState, ResultData } from './Lv1OXProblemScreen.types';
+import ProblemReviewModal from '../../components/Modals/ProblemReviewModal';
 import {
   sessionManager,
   createNewSession,
@@ -24,6 +25,7 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   onClose = () => console.log('Screen closed'),
   onNext = () => console.log('Next problem'),
   onSessionComplete = () => console.log('Session completed'),
+  onShowGoalModal = () => console.log('Show goal modal'),
   timeRemaining = 30,
 }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<OXAnswer | null>(null);
@@ -32,6 +34,7 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   const [progressAnimation] = useState(new Animated.Value(0));
   const [currentProblemData, setCurrentProblemData] = useState<ProblemData | null>(null);
   const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   // Initialize session and get current problem
   useEffect(() => {
@@ -140,7 +143,7 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   };
 
   const handleRetryProblem = () => {
-    // Reset to problem view
+    // Reset to problem view (keeping original functionality as fallback)
     setSelectedAnswer(null);
     setResultState('ANSWERING');
     setResultData(null);
@@ -257,17 +260,27 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
 
           {/* Action Buttons */}
           <View style={styles.resultActionButtons}>
-            <TouchableOpacity
-              style={styles.nextButton}
-              onPress={handleNextProblem}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.nextButtonText}>다음 문제로 이동 →</Text>
-            </TouchableOpacity>
+            {(sessionProgress.current >= sessionProgress.total) ? (
+              <TouchableOpacity
+                style={styles.goalCompleteButton}
+                onPress={onShowGoalModal}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.goalCompleteButtonText}>🎯 오늘의 목표 완료</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={handleNextProblem}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.nextButtonText}>다음 문제로 이동 →</Text>
+              </TouchableOpacity>
+            )}
 
             <TouchableOpacity
               style={styles.retryButton}
-              onPress={handleRetryProblem}
+              onPress={() => setShowReviewModal(true)}
               activeOpacity={0.8}
             >
               <Text style={styles.retryButtonText}>📖 문제 다시 보기</Text>
@@ -389,11 +402,20 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   );
 
   // Main render based on current state
-  if (resultState === 'CORRECT' || resultState === 'INCORRECT') {
-    return renderResultView();
-  }
+  return (
+    <>
+      {(resultState === 'CORRECT' || resultState === 'INCORRECT') ? renderResultView() : renderProblemView()}
 
-  return renderProblemView();
+      <ProblemReviewModal
+        visible={showReviewModal}
+        onClose={() => setShowReviewModal(false)}
+        problemData={currentProblemData}
+        userAnswer={selectedAnswer || ''}
+        isCorrect={resultData?.isCorrect || false}
+        problemType="OX"
+      />
+    </>
+  );
 };
 
 export default Lv1OXProblemScreen;

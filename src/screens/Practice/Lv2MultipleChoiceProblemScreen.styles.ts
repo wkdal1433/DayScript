@@ -516,4 +516,30 @@ export const styles = StyleSheet.create({
     color: COLORS.textPrimary,
     textAlign: 'center',
   },
+
+  goalCompleteButton: {
+    backgroundColor: '#88C7A1',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#88C7A1',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  goalCompleteButtonText: {
+    fontSize: 18,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
 });
