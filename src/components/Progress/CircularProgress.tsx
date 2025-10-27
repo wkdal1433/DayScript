@@ -1,24 +1,27 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Animated } from 'react-native';
+import { View, Animated, Easing } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import { styles } from './CircularProgress.styles';
 import { CircularProgressProps } from './CircularProgress.types';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
   size = 120,
   strokeWidth = 8,
   progress = 0,
   duration = 1400,
-  color = '#88C7A1',
-  backgroundColor = '#E5E5E5',
+  color = '#6BCB77',
+  backgroundColor = 'rgba(107,203,119,0.2)',
   isReduceMotionEnabled = false,
   onComplete,
 }) => {
   const animatedProgress = useRef(new Animated.Value(0)).current;
-  const radius = (size - strokeWidth) / 2;
 
-  // Ensure safe container size that accounts for stroke width
-  const containerSize = size;
-  const circleSize = size - strokeWidth; // Prevent border overflow
+  // Calculate circle properties
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const center = size / 2;
 
   useEffect(() => {
     if (isReduceMotionEnabled) {
@@ -28,10 +31,11 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
         onComplete();
       }
     } else {
-      // Animate from current value to target progress
+      // Animate with ease-out timing for satisfying completion feel
       Animated.timing(animatedProgress, {
         toValue: progress,
         duration,
+        easing: Easing.out(Easing.quad), // Ease-out for satisfaction
         useNativeDriver: false,
       }).start((finished) => {
         if (finished && progress >= 100 && onComplete) {
@@ -41,96 +45,41 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
     }
   }, [progress, duration, isReduceMotionEnabled, onComplete, animatedProgress]);
 
-  // Calculate rotation angle for progress animation
-  const progressRotation = animatedProgress.interpolate({
+  // Calculate stroke-dashoffset for arc animation
+  const strokeDashoffset = animatedProgress.interpolate({
     inputRange: [0, 100],
-    outputRange: ['0deg', '360deg'],
+    outputRange: [circumference, 0],
     extrapolate: 'clamp',
   });
 
   return (
-    <View style={[styles.container, {
-      width: containerSize,
-      height: containerSize,
-      borderRadius: containerSize / 2, // Ensure circular boundary
-    }]}>
-      {/* Background Circle */}
-      <View
-        style={[
-          styles.backgroundCircle,
-          {
-            width: circleSize,
-            height: circleSize,
-            borderRadius: circleSize / 2,
-            borderWidth: strokeWidth,
-            borderColor: backgroundColor,
-          },
-        ]}
-      />
+    <View style={[styles.container, { width: size, height: size }]}>
+      <Svg width={size} height={size} style={styles.svgContainer}>
+        {/* Background Circle */}
+        <Circle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke={backgroundColor}
+          strokeWidth={strokeWidth}
+          fill="transparent"
+          strokeLinecap="round"
+        />
 
-      {/* Progress Circle Container with Overflow Hidden */}
-      <View style={[styles.progressContainer, {
-        width: circleSize,
-        height: circleSize,
-        borderRadius: circleSize / 2, // Ensure circular clipping
-      }]}>
-        {/* First Half (0-50%) */}
-        <View style={[styles.halfCircle, styles.leftHalf]}>
-          <Animated.View
-            style={[
-              styles.progressBar,
-              {
-                width: circleSize,
-                height: circleSize,
-                borderRadius: circleSize / 2,
-                borderWidth: strokeWidth,
-                borderColor: 'transparent',
-                borderRightColor: color,
-                transform: [
-                  {
-                    rotate: animatedProgress.interpolate({
-                      inputRange: [0, 50],
-                      outputRange: ['0deg', '180deg'],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                ],
-              },
-            ]}
-          />
-        </View>
-
-        {/* Second Half (50-100%) */}
-        <View style={[styles.halfCircle, styles.rightHalf]}>
-          <Animated.View
-            style={[
-              styles.progressBar,
-              {
-                width: circleSize,
-                height: circleSize,
-                borderRadius: circleSize / 2,
-                borderWidth: strokeWidth,
-                borderColor: 'transparent',
-                borderRightColor: color,
-                transform: [
-                  {
-                    rotate: animatedProgress.interpolate({
-                      inputRange: [50, 100],
-                      outputRange: ['0deg', '180deg'],
-                      extrapolate: 'clamp',
-                    }),
-                  },
-                ],
-                opacity: animatedProgress.interpolate({
-                  inputRange: [0, 50, 50.01, 100],
-                  outputRange: [0, 0, 1, 1],
-                  extrapolate: 'clamp',
-                }),
-              },
-            ]}
-          />
-        </View>
-      </View>
+        {/* Progress Arc */}
+        <AnimatedCircle
+          cx={center}
+          cy={center}
+          r={radius}
+          stroke={color}
+          strokeWidth={strokeWidth + 2} // Slightly thicker than background
+          fill="transparent"
+          strokeDasharray={circumference}
+          strokeDashoffset={strokeDashoffset}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${center} ${center})`} // Start from top (-90deg)
+        />
+      </Svg>
     </View>
   );
 };

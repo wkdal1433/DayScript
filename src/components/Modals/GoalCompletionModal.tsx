@@ -9,6 +9,7 @@ import {
   BackHandler,
 } from 'react-native';
 import CircularProgress from '../Progress/CircularProgress';
+import CanvasConfetti from '../Effects/CanvasConfetti';
 import { styles } from './GoalCompletionModal.styles';
 import { GoalCompletionModalProps } from './GoalCompletionModal.types';
 
@@ -25,17 +26,6 @@ const GoalCompletionModal: React.FC<GoalCompletionModalProps> = ({
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const confettiAnim = useRef(new Animated.Value(0)).current;
-
-  // Multiple confetti animations for enhanced effect
-  const confettiAnims = {
-    fall1: useRef(new Animated.Value(0)).current,
-    fall2: useRef(new Animated.Value(0)).current,
-    fall3: useRef(new Animated.Value(0)).current,
-    rotation1: useRef(new Animated.Value(0)).current,
-    rotation2: useRef(new Animated.Value(0)).current,
-    rotation3: useRef(new Animated.Value(0)).current,
-  };
 
   // Check accessibility settings
   useEffect(() => {
@@ -75,9 +65,6 @@ const GoalCompletionModal: React.FC<GoalCompletionModalProps> = ({
       // Reset states
       setProgress(0);
       setShowConfetti(false);
-      confettiAnim.setValue(0);
-      // Reset all confetti animations
-      Object.values(confettiAnims).forEach(anim => anim.setValue(0));
 
       if (isReduceMotionEnabled) {
         // Immediate appearance for accessibility
@@ -113,160 +100,23 @@ const GoalCompletionModal: React.FC<GoalCompletionModalProps> = ({
       setProgress(0);
       setShowConfetti(false);
     }
-  }, [visible, isReduceMotionEnabled, fadeAnim, scaleAnim, confettiAnim]);
+  }, [visible, isReduceMotionEnabled, fadeAnim, scaleAnim]);
 
-  // Handle progress completion
+  // Handle progress completion - trigger Canvas Confetti
   const handleProgressComplete = () => {
-    setShowConfetti(true);
-
     if (!isReduceMotionEnabled) {
-      // Enhanced confetti animations with staggered timing
-      const confettiSequence = [
-        // Initial burst
-        Animated.timing(confettiAnim, {
-          toValue: 1,
-          duration: 200,
-          useNativeDriver: true,
-        }),
-        // Falling animations with different delays
-        Animated.parallel([
-          Animated.timing(confettiAnims.fall1, {
-            toValue: 1,
-            duration: 2000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(confettiAnims.fall2, {
-            toValue: 1,
-            duration: 2200,
-            delay: 150,
-            useNativeDriver: true,
-          }),
-          Animated.timing(confettiAnims.fall3, {
-            toValue: 1,
-            duration: 2400,
-            delay: 300,
-            useNativeDriver: true,
-          }),
-          // Continuous rotation animations
-          Animated.loop(
-            Animated.timing(confettiAnims.rotation1, {
-              toValue: 1,
-              duration: 1000,
-              useNativeDriver: true,
-            })
-          ),
-          Animated.loop(
-            Animated.timing(confettiAnims.rotation2, {
-              toValue: 1,
-              duration: 1200,
-              useNativeDriver: true,
-            })
-          ),
-          Animated.loop(
-            Animated.timing(confettiAnims.rotation3, {
-              toValue: 1,
-              duration: 800,
-              useNativeDriver: true,
-            })
-          ),
-        ]),
-      ];
-
-      Animated.sequence(confettiSequence).start();
+      // Slight delay for natural feeling
+      setTimeout(() => {
+        setShowConfetti(true);
+      }, 100);
     }
   };
 
-  // Enhanced confetti component with multiple layers and animations
-  const renderConfetti = () => {
-    if (!showConfetti) return null;
-
-    const confettiPieces = [
-      { emoji: '🎉', color: '#FF6B6B', delay: 0 },
-      { emoji: '✨', color: '#4ECDC4', delay: 100 },
-      { emoji: '🎊', color: '#45B7D1', delay: 200 },
-      { emoji: '🌟', color: '#FFA726', delay: 300 },
-      { emoji: '💫', color: '#AB47BC', delay: 150 },
-      { emoji: '🎁', color: '#66BB6A', delay: 250 },
-      { emoji: '🏆', color: '#FFD54F', delay: 350 },
-      { emoji: '⭐', color: '#EF5350', delay: 50 },
-    ];
-
-    return (
-      <View style={styles.confettiContainer}>
-        {/* Background burst effect */}
-        <Animated.View
-          style={[
-            styles.confettiBurst,
-            {
-              opacity: confettiAnim.interpolate({
-                inputRange: [0, 0.3, 1],
-                outputRange: [0, 1, 0],
-              }),
-              transform: [
-                {
-                  scale: confettiAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.5, 3],
-                  }),
-                },
-              ],
-            },
-          ]}
-        />
-
-        {/* Individual confetti pieces */}
-        {confettiPieces.map((piece, index) => {
-          const fallAnim = index % 3 === 0 ? confettiAnims.fall1 :
-                          index % 3 === 1 ? confettiAnims.fall2 : confettiAnims.fall3;
-          const rotationAnim = index % 3 === 0 ? confettiAnims.rotation1 :
-                              index % 3 === 1 ? confettiAnims.rotation2 : confettiAnims.rotation3;
-
-          return (
-            <Animated.View
-              key={index}
-              style={[
-                styles.confettiPiece,
-                {
-                  left: `${(index * 12 + 10) % 90}%`,
-                  opacity: confettiAnim,
-                  transform: [
-                    {
-                      translateY: fallAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: [-50, 600],
-                      }),
-                    },
-                    {
-                      translateX: fallAnim.interpolate({
-                        inputRange: [0, 0.5, 1],
-                        outputRange: [0, (index % 2 === 0 ? 30 : -30), 0],
-                      }),
-                    },
-                    {
-                      rotate: rotationAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['0deg', '360deg'],
-                      }),
-                    },
-                    {
-                      scale: fallAnim.interpolate({
-                        inputRange: [0, 0.5, 1],
-                        outputRange: [1, 1.2, 0.8],
-                      }),
-                    },
-                  ],
-                },
-              ]}
-            >
-              <Text style={[styles.confettiEmoji, { color: piece.color }]}>
-                {piece.emoji}
-              </Text>
-            </Animated.View>
-          );
-        })}
-      </View>
-    );
+  // Handle confetti completion
+  const handleConfettiComplete = () => {
+    setShowConfetti(false);
   };
+
 
   return (
     <Modal
@@ -292,8 +142,14 @@ const GoalCompletionModal: React.FC<GoalCompletionModalProps> = ({
               },
             ]}
           >
-            {/* Confetti Layer */}
-            {renderConfetti()}
+            {/* Canvas-Style Confetti Layer */}
+            <CanvasConfetti
+              visible={showConfetti}
+              onComplete={handleConfettiComplete}
+              particleCount={60}
+              duration={2000}
+              explosionPoints={3}
+            />
 
             {/* Modal Content */}
             <View style={styles.contentContainer}>
@@ -302,10 +158,10 @@ const GoalCompletionModal: React.FC<GoalCompletionModalProps> = ({
                 <CircularProgress
                   progress={progress}
                   size={150}
-                  strokeWidth={12}
+                  strokeWidth={10}
                   duration={animationDuration}
-                  color="#88C7A1"
-                  backgroundColor="#E8F5E8"
+                  color="#6BCB77" // Design guide main color
+                  backgroundColor="rgba(107,203,119,0.2)" // Design guide background
                   isReduceMotionEnabled={isReduceMotionEnabled}
                   onComplete={handleProgressComplete}
                 />

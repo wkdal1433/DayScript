@@ -30,39 +30,6 @@ export const styles = StyleSheet.create({
     shadowRadius: 16,
     elevation: 16,
   },
-  confettiContainer: {
-    position: 'absolute',
-    top: -50,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    width: '100%',
-    height: '120%',
-    justifyContent: 'center',
-    alignItems: 'center',
-    pointerEvents: 'none',
-    zIndex: 10,
-  },
-  confettiBurst: {
-    position: 'absolute',
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255, 215, 0, 0.3)',
-    top: '30%',
-    alignSelf: 'center',
-  },
-  confettiPiece: {
-    position: 'absolute',
-    top: 0,
-  },
-  confettiEmoji: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0, 0, 0, 0.3)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
   contentContainer: {
     alignItems: 'center',
     width: '100%',
@@ -80,16 +47,18 @@ export const styles = StyleSheet.create({
   },
   progressText: {
     fontSize: 28,
-    fontWeight: '700',
-    color: '#88C7A1',
+    fontWeight: '600', // Design guide specification
+    color: '#6BCB77', // Updated to design guide color
     textAlign: 'center',
+    letterSpacing: -0.5, // Design guide letter spacing
   },
   progressSubtext: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600', // Enhanced for stability
     color: '#666666',
     textAlign: 'center',
     marginTop: 2,
+    letterSpacing: -0.3,
   },
   messageContainer: {
     alignItems: 'center',
