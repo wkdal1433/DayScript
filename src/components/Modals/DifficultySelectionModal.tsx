@@ -66,13 +66,14 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [selectedLockedLevel, setSelectedLockedLevel] = useState<DifficultyLevel | null>(null);
 
-  // Default progression state - only 입문 unlocked initially
+  // Default progression state - both 입문 and 초급 unlocked initially
   const defaultProgressionState: UserProgressionState = {
-    unlockedLevels: ['beginner'],
+    unlockedLevels: ['beginner', 'elementary'],
     completedLevels: [],
     currentLevel: null,
     levelStats: {
       beginner: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
+      elementary: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
       intermediate: { completionRate: 0, attemptsUsed: 0, maxAttempts: 3, isCompleted: false },
       advanced: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
       challenge: { completionRate: 0, attemptsUsed: 0, maxAttempts: 999, isCompleted: false },
@@ -87,7 +88,19 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       emoji: '🌱',
       title: '입문',
       subtitle: 'Python 기초 문법',
-      description: 'O/X 퀴즈와 객관식 문제로 기본 개념을 다져보아요.',
+      description: 'O/X 퀴즈로 기본 개념을 확실하게 다져보아요.',
+      problemCount: '20문제',
+      timeEstimate: '15분',
+      difficulty: '쉬움',
+      gradient: ['rgba(248, 232, 238, 1)', 'rgba(253, 206, 223, 1)'],
+      borderColor: '#FDCEDF',
+    },
+    {
+      id: 'elementary',
+      emoji: '📚',
+      title: '초급',
+      subtitle: 'Python 응용 문법',
+      description: '객관식 문제로 기본 문법을 응용해보아요.',
       problemCount: '20문제',
       timeEstimate: '15분',
       difficulty: '쉬움',
@@ -121,7 +134,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     {
       id: 'challenge',
       emoji: '🏆',
-      title: '챌린지',
+      title: '챌린저',
       subtitle: '실전 문제 도전',
       description: '코드 리뷰와 라이브 코딩으로 실전 감각을 완성해보아요.',
       problemCount: '15문제',
@@ -140,8 +153,11 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     let unlockCondition = '';
     if (!isUnlocked) {
       switch (level.id) {
-        case 'intermediate':
+        case 'elementary':
           unlockCondition = '입문 단계를 완료해야 합니다';
+          break;
+        case 'intermediate':
+          unlockCondition = '초급 단계를 완료해야 합니다';
           break;
         case 'advanced':
           unlockCondition = '중급 단계를 완료해야 합니다';
@@ -184,22 +200,36 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     if (selectedLevel) {
       onSelectLevel(selectedLevel);
 
-      // Implement random navigation logic for 입문 level
-      if (selectedLevel.id === 'beginner' && navigation) {
-        // Random selection between OX and Multiple Choice
-        const problemRoutes = ['OXProblem', 'MultipleChoiceProblem'];
-        const randomRoute = problemRoutes[Math.floor(Math.random() * problemRoutes.length)];
+      // Fixed navigation mapping: 입문→OX, 초급→Multiple Choice
+      if (navigation) {
+        let targetRoute = '';
 
-        console.log('Random problem route selected:', randomRoute);
+        switch (selectedLevel.id) {
+          case 'beginner':
+            // 입문: LV1 문제 세트 (O/X 문제)
+            targetRoute = 'OXProblem';
+            break;
+          case 'elementary':
+            // 초급: LV2 문제 세트 (객관식 문제)
+            targetRoute = 'MultipleChoiceProblem';
+            break;
+          default:
+            // For other difficulty levels, can be extended later
+            console.log('Navigation for level', selectedLevel.id, 'not yet implemented');
+            onClose();
+            return;
+        }
+
+        console.log('Navigating to:', targetRoute, 'for level:', selectedLevel.id);
 
         // Close modal first, then navigate
         onClose();
-        navigation.navigate(randomRoute, {
+        navigation.navigate(targetRoute, {
           difficulty: selectedLevel,
           language: selectedLanguage,
         });
       } else {
-        // For other levels or when navigation is not available, use existing logic
+        // For when navigation is not available, use existing logic
         onClose();
       }
     }
@@ -226,6 +256,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   const renderProgressDots = () => (
     <View style={styles.progressDots}>
       <View style={[styles.progressDot, styles.progressDotActive]} />
+      <View style={styles.progressDot} />
       <View style={styles.progressDot} />
       <View style={styles.progressDot} />
       <View style={styles.progressDot} />
@@ -415,7 +446,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
                       중급 단계의 테스트 기회를 모두 사용했습니다.
                     </Text>
                     <Text style={styles.unlockModalSubMessage}>
-                      입문 단계를 다시 완료하면 추가 기회를 얻을 수 있습니다.
+                      초급 단계를 다시 완료하면 추가 기회를 얻을 수 있습니다.
                     </Text>
                   </>
                 ) : (
