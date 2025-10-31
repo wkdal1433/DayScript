@@ -93,21 +93,22 @@ describe('Lv2MultipleChoiceProblemScreen', () => {
     expect(mockProps.onAnswerSelect).toHaveBeenCalledWith('A');
   });
 
-  it('disables choice buttons after selection', () => {
+  it('allows changing answer selection before submission', () => {
     const { getByText } = render(<Lv2MultipleChoiceProblemScreen {...mockProps} />);
 
     const defChoice = getByText('def');
     const functionChoice = getByText('function');
 
-    // Press def choice
+    // Press def choice first
     fireEvent.press(defChoice);
 
-    // Try to press function choice, should not trigger onAnswerSelect again
+    // Press function choice to change selection
     fireEvent.press(functionChoice);
 
-    // Should only be called once (for def choice)
-    expect(mockProps.onAnswerSelect).toHaveBeenCalledTimes(1);
-    expect(mockProps.onAnswerSelect).toHaveBeenCalledWith('C');
+    // Should be called twice (for def choice, then function choice)
+    expect(mockProps.onAnswerSelect).toHaveBeenCalledTimes(2);
+    expect(mockProps.onAnswerSelect).toHaveBeenNthCalledWith(1, 'C');
+    expect(mockProps.onAnswerSelect).toHaveBeenNthCalledWith(2, 'A');
   });
 
   it('enables submit button after answer selection', () => {

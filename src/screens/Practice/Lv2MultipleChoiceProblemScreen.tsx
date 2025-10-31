@@ -75,7 +75,7 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
   }, [sessionProgress, progressAnimation]);
 
   const handleChoicePress = (choiceId: MultipleChoiceAnswer) => {
-    if (selectedAnswer || resultState !== 'ANSWERING') return; // Prevent multiple selections
+    if (resultState !== 'ANSWERING') return; // Only prevent selection after submission
 
     setSelectedAnswer(choiceId);
     onAnswerSelect(choiceId);
@@ -152,7 +152,7 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
           showIncorrectAnswer && styles.choiceContainerIncorrect,
         ]}
         onPress={() => handleChoicePress(choice.id)}
-        disabled={selectedAnswer !== null}
+        disabled={resultState !== 'ANSWERING'}
         activeOpacity={0.8}
       >
         <View style={styles.choiceContent}>

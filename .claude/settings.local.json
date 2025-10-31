@@ -11,7 +11,8 @@
       "mcp__framelink-figma-mcp__get_figma_data",
       "Bash(del:*)",
       "Bash(git clean:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(npm test:*)"
     ],
     "deny": [],
     "ask": []
