@@ -386,6 +386,10 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
             // 중급: LV3 문제 세트 (빈칸 채우기 문제)
             targetRoute = 'FillInBlankProblem';
             break;
+          case 'advanced':
+            // 고급: LV4 문제 세트 (디버깅 문제)
+            targetRoute = 'DebuggingProblem';
+            break;
           default:
             // For other difficulty levels, can be extended later
             console.log('Navigation for level', selectedLevel.id, 'not yet implemented');
