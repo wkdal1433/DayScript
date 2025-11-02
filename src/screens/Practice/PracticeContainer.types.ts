@@ -1,4 +1,4 @@
-export type ProblemType = 'OX' | 'MULTIPLE_CHOICE';
+export type ProblemType = 'OX' | 'MULTIPLE_CHOICE' | 'FILL_IN_BLANK';
 
 export interface PracticeContainerProps {
   /**

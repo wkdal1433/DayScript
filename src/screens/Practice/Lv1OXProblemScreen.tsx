@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   Animated,
 } from 'react-native';
+import { useHint, HintStep } from '../../hooks/useHint';
 import { styles } from './Lv1OXProblemScreen.styles';
 import { Lv1OXProblemScreenProps, OXAnswer, ProblemData, ResultState, ResultData } from './Lv1OXProblemScreen.types';
 import ProblemReviewModal from '../../components/Modals/ProblemReviewModal';
@@ -35,6 +36,36 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   const [currentProblemData, setCurrentProblemData] = useState<ProblemData | null>(null);
   const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
   const [showReviewModal, setShowReviewModal] = useState(false);
+
+  // Hint system integration
+  const hintConfig = { maxSteps: 2, xpDeductionPerStep: 5 };
+  const {
+    hintState,
+    hintAnimation,
+    slideAnimation,
+    showHint,
+    nextHint,
+    hideHint,
+    resetHint,
+    getCurrentHintData,
+    isLastStep,
+  } = useHint(hintConfig);
+
+  // Mock hint data for OX problems
+  const hintData: HintStep[] = [
+    {
+      id: 1,
+      title: '💡 개념적 단서',
+      content: currentProblemData?.hints?.[0] || '이 문제의 핵심 개념을 떠올려보세요.',
+      type: 'concept',
+    },
+    {
+      id: 2,
+      title: '⚖️ 판단 기준',
+      content: currentProblemData?.hints?.[1] || '참/거짓을 판단하는 명확한 기준이 있습니다.',
+      type: 'context',
+    },
+  ];
 
   // Initialize session and get current problem
   useEffect(() => {
@@ -122,6 +153,7 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
       setSelectedAnswer(null);
       setResultState('ANSWERING');
       setResultData(null);
+      resetHint();
 
       // Load next problem
       const nextProblem = getCurrentProblem() as ProblemData;
@@ -147,6 +179,88 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
     setSelectedAnswer(null);
     setResultState('ANSWERING');
     setResultData(null);
+    resetHint();
+  };
+
+  // Handle hint request
+  const handleHintRequest = () => {
+    if (!hintState.isVisible) {
+      showHint();
+    } else if (!isLastStep()) {
+      nextHint();
+    }
+  };
+
+  // Render HintBubble component
+  const renderHintBubble = () => {
+    if (!hintState.isVisible) return null;
+
+    const currentHint = getCurrentHintData(hintData);
+    if (!currentHint) return null;
+
+    return (
+      <Animated.View
+        style={[
+          styles.hintBubble,
+          {
+            opacity: hintAnimation,
+            transform: [{ translateY: slideAnimation }],
+          },
+        ]}
+        accessibilityRole="alert"
+        accessibilityLabel={`힌트 ${hintState.currentStep}단계`}
+        accessibilityLiveRegion="polite"
+      >
+        <View style={styles.hintBubbleHeader}>
+          <Text style={styles.hintBubbleTitle}>{currentHint.title}</Text>
+          <TouchableOpacity
+            style={styles.hintBubbleClose}
+            onPress={hideHint}
+            accessibilityRole="button"
+            accessibilityLabel="힌트 닫기"
+          >
+            <Text style={styles.hintBubbleCloseText}>×</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.hintBubbleContent}>{currentHint.content}</Text>
+
+        {/* XP Deduction Notice */}
+        <View style={styles.xpNotice}>
+          <Text style={styles.xpNoticeText}>
+            💰 힌트 사용으로 {hintState.currentStep * 5} XP가 차감되었습니다
+          </Text>
+        </View>
+
+        <View style={styles.hintBubbleActions}>
+          <Text style={styles.hintStepText}>
+            단계 {hintState.currentStep} / {hintConfig.maxSteps}
+          </Text>
+
+          {!isLastStep() && (
+            <TouchableOpacity
+              style={styles.hintNextButton}
+              onPress={handleHintRequest}
+              accessibilityRole="button"
+              accessibilityLabel="다음 힌트 보기"
+            >
+              <Text style={styles.hintNextButtonText}>힌트 더보기</Text>
+            </TouchableOpacity>
+          )}
+
+          {isLastStep() && (
+            <TouchableOpacity
+              style={[styles.hintNextButton, styles.hintNextButtonDisabled]}
+              disabled={true}
+            >
+              <Text style={[styles.hintNextButtonText, styles.hintNextButtonTextDisabled]}>
+                마지막 힌트
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </Animated.View>
+    );
   };
 
   const handleClose = () => {
@@ -339,13 +453,34 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
         <Text style={styles.problemTitle}>{currentProblemData?.title || ''}</Text>
         <Text style={styles.problemSubtitle}>{currentProblemData?.subtitle || ''}</Text>
 
-        <View style={styles.hintContainer}>
-          <Text style={styles.hintText}>힌트</Text>
-        </View>
+        {/* Hint Button */}
+        <TouchableOpacity
+          style={[
+            styles.hintButton,
+            hintState.isVisible && styles.hintButtonActive,
+          ]}
+          onPress={handleHintRequest}
+          disabled={resultState !== 'ANSWERING'}
+          accessibilityRole="button"
+          accessibilityLabel="힌트 보기"
+        >
+          <Text style={[
+            styles.hintButtonText,
+            hintState.isVisible && styles.hintButtonTextActive,
+          ]}>
+            💡 힌트 보기 {hintState.usedSteps > 0 && `(${hintState.usedSteps}/${hintConfig.maxSteps})`}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Hint Bubble */}
+        {renderHintBubble()}
       </View>
 
-      {/* Answer Buttons */}
-      <View style={styles.answerSection}>
+      {/* Answer Buttons - with background color transition */}
+      <View style={[
+        styles.answerSection,
+        hintState.isVisible && styles.answerSectionHinted,
+      ]}>
         <TouchableOpacity
           style={[
             styles.answerButton,

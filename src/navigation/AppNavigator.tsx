@@ -14,7 +14,7 @@ import PracticeContainer from '../screens/Practice/PracticeContainer';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem';
 
 interface AppNavigatorProps {}
 
@@ -121,6 +121,14 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
             navigation={mockNavigation}
             route={mockRoute}
             problemType="MULTIPLE_CHOICE"
+          />
+        );
+      case 'FillInBlankProblem':
+        return (
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="FILL_IN_BLANK"
           />
         );
       default:

@@ -510,4 +510,150 @@ export const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
   },
+
+  // Hint System Styles
+  hintButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#F8E8EE',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginTop: 16,
+    alignSelf: 'center',
+  },
+
+  hintButtonActive: {
+    backgroundColor: '#F8E8EE',
+    borderColor: '#FDCEDF',
+  },
+
+  hintButtonText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#BE185D',
+    textAlign: 'center',
+  },
+
+  hintButtonTextActive: {
+    color: '#8B5A6B',
+  },
+
+  hintBubble: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    right: 20,
+    backgroundColor: '#F8E8EE',
+    borderRadius: 15,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#FDCEDF',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 10,
+  },
+
+  hintBubbleHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  hintBubbleTitle: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#8B5A6B',
+  },
+
+  hintBubbleClose: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FDCEDF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  hintBubbleCloseText: {
+    fontSize: 12,
+    color: '#8B5A6B',
+    fontWeight: 'bold',
+  },
+
+  hintBubbleContent: {
+    fontSize: 13,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#5D4E75',
+    lineHeight: 18,
+    marginBottom: 12,
+  },
+
+  xpNotice: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    borderRadius: 6,
+    padding: 6,
+    marginBottom: 8,
+    alignItems: 'center',
+  },
+
+  xpNoticeText: {
+    fontSize: 11,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#DC2626',
+    textAlign: 'center',
+  },
+
+  hintBubbleActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  hintStepText: {
+    fontSize: 11,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#8B5A6B',
+  },
+
+  hintNextButton: {
+    backgroundColor: '#BE185D',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 15,
+  },
+
+  hintNextButtonText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.white,
+  },
+
+  hintNextButtonDisabled: {
+    backgroundColor: '#E5E7EB',
+  },
+
+  hintNextButtonTextDisabled: {
+    color: '#9CA3AF',
+  },
+
+  // Background color transition for answer section
+  answerSectionHinted: {
+    backgroundColor: 'rgba(253, 206, 223, 0.1)',
+  },
 });

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Lv1OXProblemScreen from './Lv1OXProblemScreen';
 import Lv2MultipleChoiceProblemScreen from './Lv2MultipleChoiceProblemScreen';
+import Lv3FillInTheBlankProblemScreen from './Lv3FillInTheBlankProblemScreen';
 import GoalCompletionModal from '../../components/Modals/GoalCompletionModal';
 import { PracticeContainerProps } from './PracticeContainer.types';
 
@@ -56,13 +57,22 @@ const PracticeContainer: React.FC<PracticeContainerProps> = ({
     timeRemaining: 30, // Default timer
   };
 
+  const renderProblemScreen = () => {
+    switch (problemType) {
+      case 'OX':
+        return <Lv1OXProblemScreen {...commonProps} />;
+      case 'MULTIPLE_CHOICE':
+        return <Lv2MultipleChoiceProblemScreen {...commonProps} />;
+      case 'FILL_IN_BLANK':
+        return <Lv3FillInTheBlankProblemScreen {...commonProps} />;
+      default:
+        return <Lv1OXProblemScreen {...commonProps} />;
+    }
+  };
+
   return (
     <>
-      {problemType === 'OX' ? (
-        <Lv1OXProblemScreen {...commonProps} />
-      ) : (
-        <Lv2MultipleChoiceProblemScreen {...commonProps} />
-      )}
+      {renderProblemScreen()}
 
       <GoalCompletionModal
         visible={showGoalModal}

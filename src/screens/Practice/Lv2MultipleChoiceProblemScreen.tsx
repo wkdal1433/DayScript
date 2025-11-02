@@ -7,6 +7,7 @@ import {
   Animated,
   ScrollView,
 } from 'react-native';
+import { useHint, HintStep } from '../../hooks/useHint';
 import { styles } from './Lv2MultipleChoiceProblemScreen.styles';
 import {
   Lv2MultipleChoiceProblemScreenProps,
@@ -43,6 +44,53 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
   const [currentProblemData, setCurrentProblemData] = useState<MultipleChoiceProblemData | null>(null);
   const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [eliminatedOptions, setEliminatedOptions] = useState<string[]>([]);
+
+  // Hint system integration
+  const hintConfig = { maxSteps: 2, xpDeductionPerStep: 5 };
+  const {
+    hintState,
+    hintAnimation,
+    slideAnimation,
+    scaleAnimation,
+    showHint,
+    nextHint,
+    hideHint,
+    resetHint,
+    getCurrentHintData,
+    isLastStep,
+  } = useHint(hintConfig);
+
+  // Mock hint data for Multiple Choice problems
+  const hintData: HintStep[] = [
+    {
+      id: 1,
+      title: '💡 단서 제공',
+      content: currentProblemData?.hints?.[0] || '이 문제를 해결하는 데 도움이 되는 핵심 단서입니다.',
+      type: 'concept',
+    },
+    {
+      id: 2,
+      title: '❌ 오답 제거',
+      content: '명백하게 틀린 선택지 하나를 제거해드릴게요!',
+      type: 'elimination',
+      data: {
+        eliminateOptionId: getIncorrectOptionToEliminate(),
+      },
+    },
+  ];
+
+  // Function to get an incorrect option to eliminate
+  function getIncorrectOptionToEliminate(): MultipleChoiceAnswer | null {
+    if (!currentProblemData) return null;
+
+    const incorrectOptions = currentProblemData.choices
+      .filter(choice => !choice.isCorrect)
+      .map(choice => choice.id);
+
+    // Return the first incorrect option, or null if none found
+    return incorrectOptions.length > 0 ? incorrectOptions[0] : null;
+  }
 
   // Initialize session and get current problem
   useEffect(() => {
@@ -99,6 +147,8 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
       setSelectedAnswer(null);
       setResultState('ANSWERING');
       setResultData(null);
+      setEliminatedOptions([]);
+      resetHint();
 
       // Load next problem
       const nextProblem = getCurrentProblem() as MultipleChoiceProblemData;
@@ -124,6 +174,107 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
     setSelectedAnswer(null);
     setResultState('ANSWERING');
     setResultData(null);
+    setEliminatedOptions([]);
+    resetHint();
+  };
+
+  // Handle hint request
+  const handleHintRequest = () => {
+    if (!hintState.isVisible) {
+      showHint();
+    } else if (!isLastStep()) {
+      nextHint();
+
+      // Apply elimination effect for step 2
+      const nextStepData = hintData.find(hint => hint.id === 2);
+      if (nextStepData && nextStepData.type === 'elimination' && nextStepData.data && nextStepData.data.eliminateOptionId) {
+        setEliminatedOptions([nextStepData.data.eliminateOptionId]);
+      }
+    }
+  };
+
+  // Render HintCard component
+  const renderHintCard = () => {
+    if (!hintState.isVisible) return null;
+
+    const currentHint = getCurrentHintData(hintData);
+    if (!currentHint) return null;
+
+    return (
+      <Animated.View
+        style={[
+          styles.hintCard,
+          {
+            opacity: hintAnimation,
+            transform: [
+              { translateY: slideAnimation },
+              { scale: scaleAnimation },
+            ],
+          },
+        ]}
+        accessibilityRole="alert"
+        accessibilityLabel={`힌트 카드 ${hintState.currentStep}단계`}
+        accessibilityLiveRegion="polite"
+      >
+        <View style={styles.hintCardHeader}>
+          <Text style={styles.hintCardTitle}>{currentHint.title}</Text>
+          <TouchableOpacity
+            style={styles.hintCardClose}
+            onPress={hideHint}
+            accessibilityRole="button"
+            accessibilityLabel="힌트 카드 닫기"
+          >
+            <Text style={styles.hintCardCloseText}>×</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.hintCardContent}>{currentHint.content}</Text>
+
+        {/* Elimination Notice for Step 2 */}
+        {currentHint.type === 'elimination' && eliminatedOptions.length > 0 && (
+          <View style={styles.eliminationNotice}>
+            <Text style={styles.eliminationText}>
+              ⚙️ 오답 선택지가 회색으로 표시되었습니다!
+            </Text>
+          </View>
+        )}
+
+        {/* XP Deduction Notice */}
+        <View style={styles.xpNotice}>
+          <Text style={styles.xpNoticeText}>
+            💰 힌트 사용으로 {hintState.currentStep * 5} XP가 차감되었습니다
+          </Text>
+        </View>
+
+        <View style={styles.hintCardActions}>
+          <Text style={styles.hintStepText}>
+            단계 {hintState.currentStep} / {hintConfig.maxSteps}
+          </Text>
+
+          {!isLastStep() && (
+            <TouchableOpacity
+              style={styles.hintNextButton}
+              onPress={handleHintRequest}
+              accessibilityRole="button"
+              accessibilityLabel="다음 힌트 보기"
+            >
+              <Text style={styles.hintNextButtonText}>힌트 더보기</Text>
+            </TouchableOpacity>
+          )}
+
+          {isLastStep() && (
+            <TouchableOpacity
+              style={[styles.hintNextButton, styles.hintNextButtonDisabled]}
+              disabled={true}
+            >
+              <Text style={[styles.hintNextButtonText, styles.hintNextButtonTextDisabled]}>
+                마지막 힌트
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </Animated.View>
+    );
   };
 
   const handleClose = () => {
@@ -139,6 +290,7 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
   const renderChoice = (choice: ChoiceOption) => {
     const isSelected = selectedAnswer === choice.id;
     const isCorrect = choice.isCorrect;
+    const isEliminated = eliminatedOptions.includes(choice.id);
     const showCorrectAnswer = (resultState === 'CORRECT' || resultState === 'INCORRECT') && isCorrect;
     const showIncorrectAnswer = (resultState === 'INCORRECT') && isSelected && !isCorrect;
 
@@ -150,10 +302,11 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
           isSelected && styles.choiceContainerSelected,
           showCorrectAnswer && styles.choiceContainerCorrect,
           showIncorrectAnswer && styles.choiceContainerIncorrect,
+          isEliminated && styles.choiceContainerEliminated,
         ]}
-        onPress={() => handleChoicePress(choice.id)}
-        disabled={resultState !== 'ANSWERING'}
-        activeOpacity={0.8}
+        onPress={() => !isEliminated && handleChoicePress(choice.id)}
+        disabled={resultState !== 'ANSWERING' || isEliminated}
+        activeOpacity={isEliminated ? 1 : 0.8}
       >
         <View style={styles.choiceContent}>
           <View style={[
@@ -161,12 +314,14 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
             isSelected && styles.choiceIdContainerSelected,
             showCorrectAnswer && styles.choiceIdContainerCorrect,
             showIncorrectAnswer && styles.choiceIdContainerIncorrect,
+            isEliminated && styles.choiceIdContainerEliminated,
           ]}>
             <Text style={[
               styles.choiceIdText,
               isSelected && styles.choiceIdTextSelected,
               showCorrectAnswer && styles.choiceIdTextCorrect,
               showIncorrectAnswer && styles.choiceIdTextIncorrect,
+              isEliminated && styles.choiceIdTextEliminated,
             ]}>
               {choice.id}
             </Text>
@@ -176,6 +331,7 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
             isSelected && styles.choiceTextSelected,
             showCorrectAnswer && styles.choiceTextCorrect,
             showIncorrectAnswer && styles.choiceTextIncorrect,
+            isEliminated && styles.choiceTextEliminated,
           ]}>
             {choice.text}
           </Text>
@@ -355,25 +511,44 @@ const Lv2MultipleChoiceProblemScreen: React.FC<Lv2MultipleChoiceProblemScreenPro
         </View>
       </View>
 
-      <ScrollView
-        style={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        {/* Problem Content */}
-        <View style={styles.problemContainer}>
-          <Text style={styles.problemTitle}>{currentProblemData?.title || ''}</Text>
-          <Text style={styles.problemSubtitle}>{currentProblemData?.subtitle || ''}</Text>
-        </View>
+      {/* Main Content Area */}
+      <View style={styles.mainContent}>
+        <ScrollView
+          style={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Problem Content */}
+          <View style={styles.problemContainer}>
+            <Text style={styles.problemTitle}>{currentProblemData?.title || ''}</Text>
+            <Text style={styles.problemSubtitle}>{currentProblemData?.subtitle || ''}</Text>
+          </View>
 
-        {/* Multiple Choice Options */}
-        <View style={styles.choicesContainer}>
-          {currentProblemData?.choices.map(renderChoice)}
-        </View>
-      </ScrollView>
+          {/* Multiple Choice Options */}
+          <View style={styles.choicesContainer}>
+            {currentProblemData?.choices.map(renderChoice)}
+          </View>
+        </ScrollView>
 
-      {/* Bottom Submit Section */}
+        {/* Hint Card */}
+        {renderHintCard()}
+      </View>
+
+      {/* Bottom Submit Section - Fixed Position */}
       <View style={styles.bottomSection}>
+        <View style={styles.buttonRow}>
+          <TouchableOpacity
+            style={styles.hintButton}
+            onPress={handleHintRequest}
+            disabled={resultState !== 'ANSWERING'}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.hintButtonText}>
+              💡 힌트 {hintState.usedSteps > 0 ? `${hintState.usedSteps}/${hintConfig.maxSteps}` : '보기'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity
           style={[
             styles.submitButton,

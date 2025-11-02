@@ -1,3 +1,11 @@
+// ========================================
+// TESTING MODE: ALL LEVELS FORCE UNLOCKED
+// ========================================
+// WARNING: This file has been temporarily modified for testing purposes.
+// All difficulty levels are forced to be unlocked, bypassing normal progression logic.
+// Remember to restore original logic before production deployment.
+// ========================================
+
 import React, { useState, useEffect } from 'react';
 import {
   View,
@@ -47,6 +55,11 @@ interface DifficultySelectionModalProps {
   selectedLanguage?: string;
   userProgressionState?: UserProgressionState;
   onUpdateProgression?: (state: UserProgressionState) => void;
+  /**
+   * Callback function to handle level completion
+   * This will be called by PracticeContainer when a session is completed
+   */
+  onLevelCompletion?: (completedLevelId: string) => void;
   navigation?: {
     navigate: (screen: string, params?: any) => void;
     goBack: () => void;
@@ -60,15 +73,16 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   selectedLanguage = 'Python',
   userProgressionState,
   onUpdateProgression,
+  onLevelCompletion,
   navigation,
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<DifficultyLevel | null>(null);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [selectedLockedLevel, setSelectedLockedLevel] = useState<DifficultyLevel | null>(null);
 
-  // Default progression state - both 입문 and 초급 unlocked initially
+  // Default progression state - ALL LEVELS UNLOCKED FOR TESTING
   const defaultProgressionState: UserProgressionState = {
-    unlockedLevels: ['beginner', 'elementary'],
+    unlockedLevels: ['beginner', 'elementary', 'intermediate', 'advanced', 'challenge'], // TESTING: All levels unlocked
     completedLevels: [],
     currentLevel: null,
     levelStats: {
@@ -80,7 +94,178 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     },
   };
 
-  const currentProgressionState = userProgressionState || defaultProgressionState;
+  // CRITICAL FIX: Force all levels unlocked for testing - overrides any incoming props
+  const currentProgressionState = userProgressionState ? {
+    ...userProgressionState,
+    unlockedLevels: ['beginner', 'elementary', 'intermediate', 'advanced', 'challenge'], // FORCE UNLOCK ALL
+  } : {
+    ...defaultProgressionState,
+    unlockedLevels: ['beginner', 'elementary', 'intermediate', 'advanced', 'challenge'], // FORCE UNLOCK ALL
+  };
+
+  // Level ordering for sequential progression
+  const LEVEL_ORDER = ['beginner', 'elementary', 'intermediate', 'advanced', 'challenge'] as const;
+  type LevelId = typeof LEVEL_ORDER[number];
+
+  /**
+   * Determines if a level should be unlocked based on sequential progression rules
+   * TESTING OVERRIDE: Currently forcing all levels to be unlocked for testing purposes
+   * @param levelId - The level to check unlock status for
+   * @param progressionState - Current user progression state
+   * @returns Object containing unlock status and condition message
+   */
+  const getLevelUnlockStatus = (levelId: LevelId, progressionState: UserProgressionState) => {
+    // CRITICAL FIX: Force all levels unlocked for testing - bypasses sequential progression
+    return { isUnlocked: true, unlockCondition: '' };
+
+    /* ORIGINAL LOGIC - TEMPORARILY COMMENTED OUT FOR TESTING
+    const levelIndex = LEVEL_ORDER.indexOf(levelId);
+
+    // First level (beginner) is always unlocked
+    if (levelIndex === 0) {
+      return { isUnlocked: true, unlockCondition: '' };
+    }
+
+    // Check if previous level is completed for sequential progression
+    const previousLevelId = LEVEL_ORDER[levelIndex - 1];
+    const isPreviousCompleted = progressionState.completedLevels.includes(previousLevelId);
+
+    // Level is unlocked only if previous level is completed
+    const isUnlocked = isPreviousCompleted;
+
+    const unlockConditionMap: Record<LevelId, string> = {
+      beginner: '', // Always unlocked
+      elementary: '입문 단계를 완료해야 합니다',
+      intermediate: '초급 단계를 완료해야 합니다',
+      advanced: '중급 단계를 완료해야 합니다',
+      challenge: '고급 단계를 완료해야 합니다'
+    };
+
+    return {
+      isUnlocked,
+      unlockCondition: isUnlocked ? '' : unlockConditionMap[levelId]
+    };
+    END ORIGINAL LOGIC */
+  };
+
+  /**
+   * Handles level completion and automatically unlocks the next level
+   * @param completedLevelId - The level that was just completed
+   * @returns Updated progression state
+   */
+  const handleLevelCompletion = (completedLevelId: LevelId): UserProgressionState => {
+    const levelIndex = LEVEL_ORDER.indexOf(completedLevelId);
+    const nextLevelId = levelIndex < LEVEL_ORDER.length - 1 ? LEVEL_ORDER[levelIndex + 1] : null;
+
+    // Update completed levels (avoid duplicates)
+    const updatedCompletedLevels = currentProgressionState.completedLevels.includes(completedLevelId)
+      ? currentProgressionState.completedLevels
+      : [...currentProgressionState.completedLevels, completedLevelId];
+
+    // Update unlocked levels (automatically unlock next level if exists)
+    let updatedUnlockedLevels = [...currentProgressionState.unlockedLevels];
+    if (nextLevelId && !updatedUnlockedLevels.includes(nextLevelId)) {
+      updatedUnlockedLevels = [...updatedUnlockedLevels, nextLevelId];
+    }
+
+    // Update level stats to mark as completed
+    const updatedLevelStats = {
+      ...currentProgressionState.levelStats,
+      [completedLevelId]: {
+        ...currentProgressionState.levelStats[completedLevelId],
+        isCompleted: true,
+        completionRate: 100
+      }
+    };
+
+    const updatedState: UserProgressionState = {
+      ...currentProgressionState,
+      completedLevels: updatedCompletedLevels,
+      unlockedLevels: updatedUnlockedLevels,
+      levelStats: updatedLevelStats
+    };
+
+    // Notify parent component of state change
+    if (onUpdateProgression) {
+      onUpdateProgression(updatedState);
+    }
+
+    return updatedState;
+  };
+
+  // Expose level completion handler to parent component
+  React.useEffect(() => {
+    if (onLevelCompletion) {
+      // Create a wrapper function that uses the current state
+      const completionWrapper = (completedLevelId: string) => {
+        if (LEVEL_ORDER.includes(completedLevelId as LevelId)) {
+          handleLevelCompletion(completedLevelId as LevelId);
+        } else {
+          console.warn(`Invalid level ID for completion: ${completedLevelId}`);
+        }
+      };
+
+      // Store the completion handler reference (this could be enhanced with ref forwarding)
+      (onLevelCompletion as any).handleCompletion = completionWrapper;
+    }
+  }, [onLevelCompletion, currentProgressionState]);
+
+  /**
+   * Validates the current progression state for consistency
+   * @param state - The progression state to validate
+   * @returns Object containing validation result and any error messages
+   */
+  const validateProgressionState = (state: UserProgressionState) => {
+    const errors: string[] = [];
+
+    // Check if all unlocked levels are valid
+    const invalidUnlockedLevels = state.unlockedLevels.filter(levelId =>
+      !LEVEL_ORDER.includes(levelId as LevelId)
+    );
+    if (invalidUnlockedLevels.length > 0) {
+      errors.push(`Invalid unlocked levels: ${invalidUnlockedLevels.join(', ')}`);
+    }
+
+    // Check if all completed levels are valid
+    const invalidCompletedLevels = state.completedLevels.filter(levelId =>
+      !LEVEL_ORDER.includes(levelId as LevelId)
+    );
+    if (invalidCompletedLevels.length > 0) {
+      errors.push(`Invalid completed levels: ${invalidCompletedLevels.join(', ')}`);
+    }
+
+    // Check sequential progression: all completed levels should be unlocked
+    const unlockedButNotCompleted = state.completedLevels.filter(levelId =>
+      !state.unlockedLevels.includes(levelId)
+    );
+    if (unlockedButNotCompleted.length > 0) {
+      errors.push(`Completed levels should be unlocked: ${unlockedButNotCompleted.join(', ')}`);
+    }
+
+    // Check sequential order: no gaps in progression
+    for (let i = 1; i < LEVEL_ORDER.length; i++) {
+      const currentLevel = LEVEL_ORDER[i];
+      const previousLevel = LEVEL_ORDER[i - 1];
+
+      if (state.unlockedLevels.includes(currentLevel) &&
+          !state.completedLevels.includes(previousLevel)) {
+        errors.push(`Level ${currentLevel} is unlocked but previous level ${previousLevel} is not completed`);
+      }
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  };
+
+  // Validate progression state on mount and state changes
+  React.useEffect(() => {
+    const validation = validateProgressionState(currentProgressionState);
+    if (!validation.isValid) {
+      console.warn('Invalid progression state detected:', validation.errors);
+    }
+  }, [currentProgressionState]);
 
   const baseDifficultyLevels: Omit<DifficultyLevel, 'isUnlocked' | 'unlockCondition' | 'completionRate' | 'attemptsRemaining'>[] = [
     {
@@ -145,28 +330,12 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     },
   ];
 
-  // Enhanced difficulty levels with dynamic unlock conditions
+  // Enhanced difficulty levels with sequential unlock logic
+  // TESTING: Using overridden unlock logic that forces all levels unlocked
   const difficultyLevels: DifficultyLevel[] = baseDifficultyLevels.map((level) => {
-    const isUnlocked = currentProgressionState.unlockedLevels.includes(level.id);
+    // TESTING: getLevelUnlockStatus now returns { isUnlocked: true } for all levels
+    const { isUnlocked, unlockCondition } = getLevelUnlockStatus(level.id as LevelId, currentProgressionState);
     const stats = currentProgressionState.levelStats[level.id];
-
-    let unlockCondition = '';
-    if (!isUnlocked) {
-      switch (level.id) {
-        case 'elementary':
-          unlockCondition = '입문 단계를 완료해야 합니다';
-          break;
-        case 'intermediate':
-          unlockCondition = '초급 단계를 완료해야 합니다';
-          break;
-        case 'advanced':
-          unlockCondition = '중급 단계를 완료해야 합니다';
-          break;
-        case 'challenge':
-          unlockCondition = '고급 단계를 완료해야 합니다';
-          break;
-      }
-    }
 
     return {
       ...level,
@@ -200,7 +369,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
     if (selectedLevel) {
       onSelectLevel(selectedLevel);
 
-      // Fixed navigation mapping: 입문→OX, 초급→Multiple Choice
+      // Fixed navigation mapping: 입문→OX, 초급→Multiple Choice, 중급→Fill-in-Blank
       if (navigation) {
         let targetRoute = '';
 
@@ -212,6 +381,10 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
           case 'elementary':
             // 초급: LV2 문제 세트 (객관식 문제)
             targetRoute = 'MultipleChoiceProblem';
+            break;
+          case 'intermediate':
+            // 중급: LV3 문제 세트 (빈칸 채우기 문제)
+            targetRoute = 'FillInBlankProblem';
             break;
           default:
             // For other difficulty levels, can be extended later

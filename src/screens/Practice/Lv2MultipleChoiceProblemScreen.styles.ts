@@ -248,14 +248,20 @@ export const styles = StyleSheet.create({
     fontWeight: FONTS.weights.semiBold.toString(),
   },
 
+  // Main Content Container
+  mainContent: {
+    flex: 1,
+    position: 'relative' as const,
+  },
+
   // Bottom Submit Section
   bottomSection: {
-    height: 124, // layout_168MWC
     backgroundColor: 'rgba(255, 255, 255, 0.9)', // fill_K6RHLU
     borderTopWidth: 1,
     borderTopColor: 'rgba(253, 206, 223, 0.3)', // stroke_F76GNU
     paddingHorizontal: 26, // layout_G0GT1R
     paddingVertical: 20,
+    paddingBottom: 40, // Extra padding for safe area
   },
 
   submitButton: {
@@ -541,5 +547,181 @@ export const styles = StyleSheet.create({
     fontWeight: FONTS.weights.bold.toString(),
     color: '#FFFFFF',
     textAlign: 'center',
+  },
+
+  // Hint System Styles for LV2
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  hintButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#F8E8EE',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    minWidth: 120,
+  },
+
+  hintButtonText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#BE185D',
+    textAlign: 'center',
+  },
+
+  hintCard: {
+    position: 'absolute',
+    bottom: 180,
+    left: 20,
+    right: 20,
+    backgroundColor: '#F8E8EE',
+    borderRadius: 15,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#FDCEDF',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 10,
+  },
+
+  hintCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  hintCardTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#8B5A6B',
+  },
+
+  hintCardClose: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FDCEDF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  hintCardCloseText: {
+    fontSize: 14,
+    color: '#8B5A6B',
+    fontWeight: 'bold',
+  },
+
+  hintCardContent: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#5D4E75',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+
+  eliminationNotice: {
+    backgroundColor: '#FFF8E1',
+    borderWidth: 1,
+    borderColor: '#FFE082',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+
+  eliminationText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#F57C00',
+    textAlign: 'center',
+  },
+
+  xpNotice: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+
+  xpNoticeText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#DC2626',
+    textAlign: 'center',
+  },
+
+  hintCardActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  hintStepText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#8B5A6B',
+  },
+
+  hintNextButton: {
+    backgroundColor: '#BE185D',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+
+  hintNextButtonText: {
+    fontSize: 13,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.white,
+  },
+
+  hintNextButtonDisabled: {
+    backgroundColor: '#E5E7EB',
+  },
+
+  hintNextButtonTextDisabled: {
+    color: '#9CA3AF',
+  },
+
+  // Eliminated option styles
+  choiceContainerEliminated: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#E0E0E0',
+    opacity: 0.5,
+  },
+
+  choiceIdContainerEliminated: {
+    backgroundColor: '#E0E0E0',
+  },
+
+  choiceIdTextEliminated: {
+    color: '#9E9E9E',
+  },
+
+  choiceTextEliminated: {
+    color: '#9E9E9E',
+    textDecorationLine: 'line-through',
   },
 });
