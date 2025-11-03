@@ -320,10 +320,10 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       id: 'challenge',
       emoji: '🏆',
       title: '챌린저',
-      subtitle: '실전 문제 도전',
-      description: '코드 리뷰와 라이브 코딩으로 실전 감각을 완성해보아요.',
-      problemCount: '15문제',
-      timeEstimate: '10분',
+      subtitle: 'LV5 Expert Mode',
+      description: 'AI 프롬프팅(Vibe Coding)과 PR 검토(Code Review) 모듈로 실전 능력을 테스트하세요.',
+      problemCount: '2개 모듈',
+      timeEstimate: '30분',
       difficulty: '최고난이도',
       gradient: ['rgba(248, 232, 238, 1)', 'rgba(253, 206, 223, 1)'],
       borderColor: '#F2BED1',
@@ -390,6 +390,46 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
             // 고급: LV4 문제 세트 (디버깅 문제)
             targetRoute = 'DebuggingProblem';
             break;
+          case 'challenge':
+            // 챌린저: LV5 모듈 선택 (Vibe Coding 또는 PR Review)
+            Alert.alert(
+              '🏆 챌린저 모드 선택',
+              'LV5 Expert Mode에서 도전할 모듈을 선택하세요:',
+              [
+                {
+                  text: '취소',
+                  style: 'cancel',
+                  onPress: () => {},
+                },
+                {
+                  text: '🤖 Vibe Coding',
+                  onPress: () => {
+                    onClose();
+                    navigation.navigate('VibeSession', {
+                      problemId: 'vibe_problem_challenger_001',
+                      sessionId: 'challenger_session_' + Date.now(),
+                      difficulty: 'hard',
+                      timeLimit: 1800,
+                      returnRoute: 'Practice',
+                    });
+                  },
+                },
+                {
+                  text: '📋 PR Review',
+                  onPress: () => {
+                    onClose();
+                    navigation.navigate('PRInbox', {
+                      sessionId: 'pr_session_' + Date.now(),
+                      scenarioId: 'pr_scenario_challenger_001',
+                      difficulty: 'hard',
+                      timeLimit: 1800,
+                      returnRoute: 'Practice',
+                    });
+                  },
+                },
+              ]
+            );
+            return; // Early return to prevent further processing
           default:
             // For other difficulty levels, can be extended later
             console.log('Navigation for level', selectedLevel.id, 'not yet implemented');
@@ -401,10 +441,23 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
 
         // Close modal first, then navigate
         onClose();
-        navigation.navigate(targetRoute, {
-          difficulty: selectedLevel,
-          language: selectedLanguage,
-        });
+
+        // Special handling for VibeSession (LV5 Challenger)
+        if (targetRoute === 'VibeSession') {
+          navigation.navigate(targetRoute, {
+            problemId: 'vibe_problem_challenger_001',
+            sessionId: 'challenger_session_' + Date.now(),
+            difficulty: 'hard', // Challenger level maps to hard difficulty
+            timeLimit: 1800, // 30 minutes for challenger mode
+            returnRoute: 'Practice',
+          });
+        } else {
+          // Standard navigation for other levels
+          navigation.navigate(targetRoute, {
+            difficulty: selectedLevel,
+            language: selectedLanguage,
+          });
+        }
       } else {
         // For when navigation is not available, use existing logic
         onClose();

@@ -11,10 +11,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from '../screens/Home/HomeScreen';
 import PracticeScreen from '../screens/Practice/PracticeScreen';
 import PracticeContainer from '../screens/Practice/PracticeContainer';
+import VibeSessionScreen from '../screens/Practice/Challenger/VibeSessionScreen';
+import PRInboxScreen from '../screens/Practice/Challenger/PRInboxScreen';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox';
 
 interface AppNavigatorProps {}
 
@@ -137,6 +139,38 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
             navigation={mockNavigation}
             route={mockRoute}
             problemType="DEBUGGING"
+          />
+        );
+      case 'VibeSession':
+        return (
+          <VibeSessionScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                problemId: 'vibe_problem_001',
+                sessionId: 'session_' + Date.now(),
+                difficulty: 'hard',
+                timeLimit: 1800, // 30분
+                returnRoute: 'Practice',
+              },
+            }}
+          />
+        );
+      case 'PRInbox':
+        return (
+          <PRInboxScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                sessionId: 'session_' + Date.now(),
+                scenarioId: 'pr_scenario_001',
+                difficulty: 'hard',
+                timeLimit: 1800, // 30분
+                returnRoute: 'Practice',
+              },
+            }}
           />
         );
       default:
