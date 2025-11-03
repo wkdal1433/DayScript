@@ -51,7 +51,6 @@ const TokenMonitor: React.FC<TokenMonitorProps> = ({
   return (
     <View
       style={styles.tokenMonitor}
-      accessibilityRole="group"
       accessibilityLabel="토큰 사용량 모니터"
     >
       {/* Current Usage */}

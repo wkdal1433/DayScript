@@ -161,7 +161,6 @@ const ResultPreviewPanel: React.FC<ResultPreviewPanelProps> = ({
   return (
     <View
       style={styles.previewPanel}
-      accessibilityRole="group"
       accessibilityLabel="결과 미리보기 패널"
     >
       {/* Panel Header */}

@@ -24,41 +24,23 @@ import {
   VibeProblem,
   ConversationMessage,
   GenerationResult,
-  GenerationRequest,
   TokenUsage,
-  UserActionType,
-  PanelDimensions,
 } from './VibeSessionScreen.types';
 
 // Style imports
-import { styles, gradientConfigs, animations, layout } from './VibeSessionScreen.styles';
-
-// Component imports
-import ConversationPanel from './components/ConversationPanel';
-import ResultPreviewPanel from './components/ResultPreviewPanel';
-import TokenMonitor from './components/TokenMonitor';
-import CodeEditor from './components/CodeEditor';
+import { styles } from './VibeSessionScreen.styles';
 
 const { width: screenWidth } = Dimensions.get('window');
 
 /**
- * VibeSessionScreen Component
+ * VibeSessionScreen Component - 3-Tier Architecture
  *
- * LV5 Vibe Coding 세션의 메인 화면으로, AI와의 대화를 통한 코드 생성 및 평가를 담당합니다.
- * Figma 디자인의 Live Coding 화면을 기반으로 하되, Vibe Coding에 최적화된 UI를 제공합니다.
+ * 새로운 3단 논리 구조:
+ * 1️⃣ 상단: 진행 상태 (프로그레스, 타이머, AI 면접관)
+ * 2️⃣ 중단: 질문 & 코드 (60% 질문/대화 : 40% 코드 편집)
+ * 3️⃣ 하단: 대화 기록 및 입력 컨트롤
  *
- * 주요 기능:
- * - 좌우 분할 레이아웃 (대화 히스토리 + 결과 미리보기)
- * - AI 프롬프트 입력 및 응답 생성
- * - 실시간 토큰 사용량 모니터링
- * - 코드 편집 및 결과 관리
- * - 접근성 및 반응형 디자인 지원
- *
- * SOLID 원칙 적용:
- * - Single Responsibility: 세션 관리와 UI 조정에만 집중
- * - Open/Closed: 새로운 AI 프로바이더나 평가 방식 확장 가능
- * - Interface Segregation: 각 하위 컴포넌트별 독립적인 props
- * - Dependency Inversion: 추상화된 서비스 인터페이스 사용
+ * UX 목표: 시각적 과밀 해소, 학습 루프 명확화
  */
 
 // State reducer for complex state management
@@ -120,7 +102,7 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
   const {
     problemId,
     sessionId,
-    timeLimit = 1800, // 30분 기본값
+    timeLimit = 1800,
     difficulty,
     returnRoute = 'Practice',
   } = route.params;
@@ -149,19 +131,14 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
   // Local UI state
   const [promptText, setPromptText] = useState('');
   const [timeRemaining, setTimeRemaining] = useState(timeLimit);
-  const [isInputFocused, setIsInputFocused] = useState(false);
-  const [panelDimensions, setPanelDimensions] = useState<PanelDimensions>({
-    conversationWidth: screenWidth * 0.5,
-    previewWidth: screenWidth * 0.5,
-    headerHeight: layout.headerHeight,
-    inputHeight: layout.promptInputMinHeight,
-    availableHeight: 600, // 초기값
-  });
+  const [codeContent, setCodeContent] = useState('');
+  const [codeEfficiency, setCodeEfficiency] = useState(85);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(1);
 
   // Refs
   const promptInputRef = useRef<TextInput>(null);
   const timerIntervalRef = useRef<NodeJS.Timeout>();
-  const generationTimeoutRef = useRef<NodeJS.Timeout>();
+  const codeEditorRef = useRef<TextInput>(null);
 
   // Initialize session
   useEffect(() => {
@@ -178,11 +155,10 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
 
-      // TODO: Replace with actual API calls
       const mockProblem: VibeProblem = {
         id: problemId,
-        title: '한 모델을 학습시켰는데 Validation Loss가 계속 줄지 않고 있습니다. 이 경우 어떤 조치를 취하시겠습니까?',
-        description: 'ML 모델의 Validation Loss 개선을 위한 실전 솔루션을 AI와 협업하여 구현하세요.',
+        title: 'ML 모델 성능 최적화 문제',
+        description: 'ML 모델의 Validation Loss가 계속 줄지 않고 있습니다. 이 경우 어떤 조치를 취하시겠습니까?',
         requirements: [
           'Validation Loss 분석 방법 제시',
           '구체적인 해결책 코드 구현',
@@ -228,11 +204,11 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
       dispatch({ type: 'SET_PROBLEM', payload: mockProblem });
       dispatch({ type: 'SET_SESSION', payload: mockSession });
 
-      // 초기 AI 인사 메시지 추가
+      // 초기 AI 메시지
       const initialMessage: ConversationMessage = {
         id: 'initial_' + Date.now(),
         role: 'ai',
-        content: '안녕하세요! 저는 AI 면접관입니다. 주어진 문제를 함께 해결해보겠습니다. 어떤 접근 방식으로 시작하고 싶으신가요?',
+        content: '안녕하세요! 저는 AI 면접관입니다. ML 모델의 성능 최적화 문제를 함께 해결해보겠습니다. 먼저 현재 상황을 어떻게 분석하시겠습니까?',
         timestamp: new Date(),
         metadata: {
           promptType: 'initial',
@@ -270,7 +246,7 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
         return prev - 1;
       });
     }, 1000);
-  }, []);
+  }, [handleTimeUp]);
 
   const handleTimeUp = useCallback(() => {
     if (timerIntervalRef.current) {
@@ -284,7 +260,7 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
         {
           text: '계속 작업',
           style: 'cancel',
-          onPress: () => setTimeRemaining(300), // 5분 추가
+          onPress: () => setTimeRemaining(300),
         },
         {
           text: '제출하기',
@@ -324,8 +300,8 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
 
       dispatch({ type: 'ADD_MESSAGE', payload: userMessage });
 
-      // Simulate AI generation process
-      await simulateAIGeneration(trimmedPrompt, userMessage.id);
+      // Simulate AI generation
+      await simulateAIGeneration(trimmedPrompt);
 
       AccessibilityInfo.announceForAccessibility('AI 응답이 생성되었습니다');
 
@@ -342,145 +318,26 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
     }
   }, [promptText, state.isGenerating]);
 
-  // Simulate AI generation (mock implementation)
-  const simulateAIGeneration = async (prompt: string, userMessageId: string) => {
+  // Simulate AI generation
+  const simulateAIGeneration = async (prompt: string) => {
     return new Promise<void>((resolve, reject) => {
-      generationTimeoutRef.current = setTimeout(async () => {
+      setTimeout(() => {
         try {
-          // Mock token calculation
           const estimatedTokens = Math.floor(prompt.length * 1.5) + Math.floor(Math.random() * 200) + 100;
 
-          // Create AI response
           const aiMessage: ConversationMessage = {
             id: 'ai_' + Date.now(),
             role: 'ai',
-            content: `좋은 질문입니다! Validation Loss가 개선되지 않는 문제에 대해 단계별로 접근해보겠습니다.
-
-먼저 다음 체크리스트를 확인해보세요:
-
-1. **과적합 여부 확인**
-   - Training Loss vs Validation Loss 그래프 분석
-   - Early stopping 적용 여부
-
-2. **학습률 조정**
-   - Learning rate scheduling 적용
-   - Adaptive optimizers 사용 (Adam, AdamW)
-
-다음은 실제 구현 코드입니다:`,
+            content: `좋은 접근입니다! 다음과 같은 방향으로 코드를 작성해보세요:\n\n1. Training Loss vs Validation Loss 그래프 분석\n2. Early stopping 적용\n3. Learning rate scheduling\n\n우측 코드 편집기에서 구현해보시겠습니까?`,
             timestamp: new Date(),
             tokensUsed: estimatedTokens,
-            generationId: 'gen_' + Date.now(),
             metadata: {
               promptType: 'clarification',
               confidence: 0.87,
-              processingTime: 2500,
             },
           };
 
-          // Create generation result
-          const generationResult: GenerationResult = {
-            id: aiMessage.generationId!,
-            sessionId: state.session!.id,
-            conversationMessageId: aiMessage.id,
-            generatedContent: aiMessage.content,
-            extractedCode: `
-import tensorflow as tf
-from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau
-
-# Early Stopping으로 과적합 방지
-early_stopping = EarlyStopping(
-    monitor='val_loss',
-    patience=10,
-    restore_best_weights=True
-)
-
-# 학습률 스케줄링
-lr_scheduler = ReduceLROnPlateau(
-    monitor='val_loss',
-    factor=0.5,
-    patience=5,
-    min_lr=1e-7
-)
-
-# 모델 컴파일 (AdamW 옵티마이저 사용)
-model.compile(
-    optimizer=tf.keras.optimizers.AdamW(learning_rate=0.001),
-    loss='categorical_crossentropy',
-    metrics=['accuracy']
-)
-
-# 학습 실행
-history = model.fit(
-    train_data,
-    epochs=100,
-    validation_data=val_data,
-    callbacks=[early_stopping, lr_scheduler],
-    verbose=1
-)
-
-# 학습 곡선 시각화
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(12, 4))
-
-plt.subplot(1, 2, 1)
-plt.plot(history.history['loss'], label='Training Loss')
-plt.plot(history.history['val_loss'], label='Validation Loss')
-plt.title('Model Loss')
-plt.legend()
-
-plt.subplot(1, 2, 2)
-plt.plot(history.history['accuracy'], label='Training Accuracy')
-plt.plot(history.history['val_accuracy'], label='Validation Accuracy')
-plt.title('Model Accuracy')
-plt.legend()
-
-plt.show()
-            `.trim(),
-            language: 'python',
-            tokensUsed: estimatedTokens,
-            processingTime: 2500,
-            confidence: 0.87,
-            status: 'success',
-            metadata: {
-              aiProvider: 'openai',
-              model: 'gpt-4',
-              requestParameters: {
-                maxTokens: 1000,
-                temperature: 0.7,
-                includeExplanation: true,
-                codeStyle: 'documented',
-                outputFormat: 'mixed',
-              },
-              qualityMetrics: {
-                relevanceScore: 88,
-                completenessScore: 85,
-                clarityScore: 90,
-                codeQualityScore: 87,
-                estimatedAccuracy: 87,
-              },
-              extractionResults: {
-                codeBlocks: [
-                  {
-                    id: 'code_1',
-                    language: 'python',
-                    code: aiMessage.content,
-                    isMainSolution: true,
-                    isExecutable: true,
-                  },
-                ],
-                explanations: ['Early stopping과 learning rate scheduling을 활용한 과적합 방지 솔루션'],
-                suggestions: ['데이터 증강 기법 추가 고려', '모델 아키텍처 최적화 검토'],
-                warnings: ['대용량 데이터셋에서는 배치 크기 조정 필요'],
-              },
-            },
-            userActions: [],
-            createdAt: new Date(),
-          };
-
-          // Update state
           dispatch({ type: 'ADD_MESSAGE', payload: aiMessage });
-          dispatch({ type: 'ADD_GENERATION', payload: generationResult });
 
           // Update token usage
           const newTokenUsage = state.tokenUsage.currentSession + estimatedTokens;
@@ -488,7 +345,7 @@ plt.show()
             type: 'UPDATE_TOKEN_USAGE',
             payload: {
               currentSession: newTokenUsage,
-              averagePerPrompt: Math.round(newTokenUsage / (state.session!.conversations.length + 1)),
+              averagePerPrompt: Math.round(newTokenUsage / (state.session?.conversations.length || 1)),
               estimatedRemaining: Math.max(0, state.tokenUsage.sessionLimit - newTokenUsage),
               efficiencyScore: Math.max(20, 100 - (newTokenUsage / state.tokenUsage.sessionLimit) * 100),
             },
@@ -500,33 +357,11 @@ plt.show()
         } finally {
           dispatch({ type: 'SET_GENERATING', payload: false });
         }
-      }, 2000 + Math.random() * 2000); // 2-4초 시뮬레이션
+      }, 2000);
     });
   };
 
-  // Handle various user actions
-  const handleRetry = useCallback(() => {
-    const lastUserMessage = state.session?.conversations
-      .filter(msg => msg.role === 'user')
-      .pop();
-
-    if (lastUserMessage) {
-      setPromptText(lastUserMessage.content);
-      promptInputRef.current?.focus();
-    }
-  }, [state.session?.conversations]);
-
-  const handlePin = useCallback(() => {
-    if (state.currentGeneration) {
-      Alert.alert('결과 고정', '현재 결과를 고정하시겠습니까?', [
-        { text: '취소', style: 'cancel' },
-        { text: '고정', onPress: () => {
-          AccessibilityInfo.announceForAccessibility('결과가 고정되었습니다');
-        }},
-      ]);
-    }
-  }, [state.currentGeneration]);
-
+  // Handle session completion
   const handleSessionSubmit = useCallback(() => {
     Alert.alert(
       '세션 제출',
@@ -536,7 +371,6 @@ plt.show()
         {
           text: '제출',
           onPress: () => {
-            // TODO: Implement session submission
             navigation.navigate(returnRoute as never);
             AccessibilityInfo.announceForAccessibility('세션이 제출되었습니다');
           },
@@ -545,24 +379,30 @@ plt.show()
     );
   }, [navigation, returnRoute]);
 
-  const handleSkip = useCallback(() => {
+  // Handle back navigation
+  const handleBackPress = useCallback(() => {
     Alert.alert(
-      '문제 건너뛰기',
-      '현재 문제를 건너뛰시겠습니까?',
+      '세션 종료',
+      '정말로 세션을 종료하시겠습니까? 진행상황이 저장되지 않을 수 있습니다.',
       [
-        { text: '취소', style: 'cancel' },
-        { text: '건너뛰기', onPress: () => navigation.goBack() },
+        { text: '계속하기', style: 'cancel' },
+        { text: '종료', onPress: () => navigation.navigate(returnRoute as never) },
       ]
     );
-  }, [navigation]);
+  }, [navigation, returnRoute]);
+
+  // Code editor change handler
+  const handleCodeChange = useCallback((code: string) => {
+    setCodeContent(code);
+    // Mock efficiency calculation
+    const efficiency = Math.min(100, Math.max(0, 85 + Math.floor((code.length - 100) / 50)));
+    setCodeEfficiency(efficiency);
+  }, []);
 
   // Cleanup function
   const cleanup = useCallback(() => {
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
-    }
-    if (generationTimeoutRef.current) {
-      clearTimeout(generationTimeoutRef.current);
     }
   }, []);
 
@@ -585,13 +425,13 @@ plt.show()
         <View style={styles.loadingContainer}>
           <Text style={styles.errorText}>오류가 발생했습니다: {state.error.message}</Text>
           <TouchableOpacity
-            style={styles.controlButton}
+            style={styles.retryButton}
             onPress={() => {
               dispatch({ type: 'SET_ERROR', payload: null });
               initializeSession();
             }}
           >
-            <Text style={styles.controlButtonText}>다시 시도</Text>
+            <Text style={styles.retryButtonText}>다시 시도</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -600,237 +440,186 @@ plt.show()
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <LinearGradient
-        colors={gradientConfigs.header.colors}
-        start={gradientConfigs.header.start}
-        end={gradientConfigs.header.end}
-        style={styles.container}
-      >
-        {/* Header Section */}
-        <View style={styles.header}>
+      <View style={styles.container}>
+        {/* 1️⃣ 상단 영역 - 진행 상태 */}
+        <View style={styles.topSection}>
           {/* Progress Bar */}
-          <View style={styles.progressBar}>
-            <LinearGradient
-              colors={gradientConfigs.progress.colors}
-              start={gradientConfigs.progress.start}
-              end={gradientConfigs.progress.end}
-              style={styles.progressFill}
-            />
-          </View>
-
-          {/* Header Content */}
-          <View style={styles.headerContent}>
-            <View style={styles.headerLeft}>
-              <Text style={styles.levelText}>LV5 진행률</Text>
-              <Text style={styles.problemCountText}>문제 1/5</Text>
-            </View>
-
-            <View style={styles.headerCenter}>
-              <View style={styles.timerContainer}>
-                <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
-              </View>
-            </View>
-
-            <View style={styles.headerRight}>
-              <View style={styles.difficultyBadge}>
-                <Text style={styles.difficultyText}>
-                  {difficulty === 'hard' ? 'Hard' : difficulty === 'medium' ? 'Medium' : 'Easy'}
-                </Text>
-              </View>
-              <Text style={styles.difficultyLabel}>난이도</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* AI Interviewer Section */}
-        <View style={styles.aiInterviewerSection}>
-          <View style={styles.aiInterviewerCard}>
-            <LinearGradient
-              colors={gradientConfigs.aiAvatar.colors}
-              start={gradientConfigs.aiAvatar.start}
-              end={gradientConfigs.aiAvatar.end}
-              style={styles.aiAvatarContainer}
-            >
-              <Text style={styles.aiAvatarEmoji}>🤖</Text>
-            </LinearGradient>
-            <View style={styles.aiInterviewerInfo}>
-              <Text style={styles.aiInterviewerName}>AI 면접관</Text>
-              <Text style={styles.aiInterviewerRole}>Senior Technical Interviewer</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Main Content - Split Layout */}
-        <View style={styles.mainContent}>
-          {/* Left Panel - Conversation History */}
-          <View style={[styles.conversationPanel, { width: panelDimensions.conversationWidth }]}>
-            {/* Problem Section */}
-            {state.problem && (
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
               <LinearGradient
-                colors={gradientConfigs.questionCard.colors}
-                start={gradientConfigs.questionCard.start}
-                end={gradientConfigs.questionCard.end}
-                style={styles.problemSection}
+                colors={['#10B981', '#F97316']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={[styles.progressFill, { width: `${(currentQuestionIndex / 5) * 100}%` }]}
+              />
+            </View>
+            <Text style={styles.progressText}>문제 {currentQuestionIndex}/5</Text>
+          </View>
+
+          {/* Timer and AI Interviewer Row */}
+          <View style={styles.statusRow}>
+            {/* AI Interviewer Profile */}
+            <View style={styles.aiInterviewerContainer}>
+              <LinearGradient
+                colors={['#3B82F6', '#1D4ED8']}
+                style={styles.aiAvatar}
               >
-                <View style={styles.problemBadge}>
-                  <View style={styles.problemBadgeIcon} />
-                  <Text style={styles.problemBadgeText}>질문 #1</Text>
-                </View>
-                <Text style={styles.problemTitle}>{state.problem.title}</Text>
-
-                {state.problem.hints.length > 0 && (
-                  <View style={styles.problemHint}>
-                    <Text style={styles.problemHintText}>
-                      {state.problem.hints[0].content}
-                    </Text>
-                  </View>
-                )}
+                <Text style={styles.aiAvatarEmoji}>🤖</Text>
               </LinearGradient>
-            )}
+              <View style={styles.aiInfo}>
+                <Text style={styles.aiName}>AI 면접관</Text>
+                <Text style={styles.aiRole}>Senior Technical Interviewer</Text>
+              </View>
+            </View>
 
-            {/* Conversation Messages */}
-            <ScrollView style={styles.conversationList} showsVerticalScrollIndicator={false}>
-              {state.session?.conversations.map((message) => (
-                <View key={message.id} style={styles.messageItem}>
-                  <View style={message.role === 'user' ? styles.userMessage : styles.aiMessage}>
-                    <Text style={styles.messageText}>{message.content}</Text>
-                    <Text style={styles.messageTimestamp}>
-                      {message.timestamp.toLocaleTimeString()}
-                      {message.tokensUsed && ` • ${message.tokensUsed} tokens`}
-                    </Text>
-                  </View>
-                </View>
-              ))}
+            {/* Timer */}
+            <View style={styles.timerContainer}>
+              <Text style={styles.timerLabel}>남은 시간</Text>
+              <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
+            </View>
+          </View>
+        </View>
 
-              {state.isGenerating && (
-                <View style={styles.messageItem}>
-                  <View style={styles.aiMessage}>
-                    <ActivityIndicator size="small" color="#3B82F6" />
-                    <Text style={styles.messageText}>AI가 응답을 생성하고 있습니다...</Text>
+        {/* 2️⃣ 중단 영역 - 질문 & 코드 (60:40 분할) */}
+        <View style={styles.middleSection}>
+          {/* 좌측 - AI 질문 박스 (60%) */}
+          <View style={styles.questionSection}>
+            <View style={styles.questionCard}>
+              <View style={styles.questionHeader}>
+                <Text style={styles.questionBadge}>질문 #{currentQuestionIndex}</Text>
+                <Text style={styles.questionCategory}>ML 성능 최적화</Text>
+              </View>
+
+              {state.problem && (
+                <View style={styles.questionContent}>
+                  <Text style={styles.questionTitle}>{state.problem.title}</Text>
+                  <Text style={styles.questionDescription}>{state.problem.description}</Text>
+
+                  <View style={styles.requirementsList}>
+                    <Text style={styles.requirementsTitle}>요구사항:</Text>
+                    {state.problem.requirements.map((req, index) => (
+                      <Text key={index} style={styles.requirementItem}>• {req}</Text>
+                    ))}
                   </View>
                 </View>
               )}
-            </ScrollView>
+            </View>
           </View>
 
-          {/* Right Panel - Result Preview */}
-          <View style={[styles.previewPanel, { width: panelDimensions.previewWidth }]}>
-            <View style={styles.previewHeader}>
-              <Text style={styles.previewTitle}>생성된 코드</Text>
-              <Text style={styles.previewSubtitle}>
-                {state.currentGeneration?.language || 'Python'} • 편집 가능
-              </Text>
-            </View>
-
-            {state.currentGeneration?.extractedCode ? (
-              <CodeEditor
-                code={state.currentGeneration.extractedCode}
-                language={state.currentGeneration.language || 'python'}
-                onCodeChange={(code) => {
-                  // TODO: Handle code changes
-                }}
-                showLineNumbers={true}
-                theme="light"
-              />
-            ) : (
-              <View style={styles.loadingContainer}>
-                <Text style={styles.loadingText}>
-                  {state.isGenerating ? 'AI가 코드를 생성하고 있습니다...' : '프롬프트를 입력하여 코드를 생성하세요'}
-                </Text>
+          {/* 우측 - 코드 편집 영역 (40%) */}
+          <View style={styles.codeSection}>
+            <View style={styles.codeHeader}>
+              <Text style={styles.codeTitle}>코드 편집기</Text>
+              <View style={styles.codeMetrics}>
+                <Text style={styles.codeMetric}>효율성: {codeEfficiency}%</Text>
+                <Text style={styles.codeMetric}>토큰: {state.tokenUsage.currentSession}/{state.tokenUsage.sessionLimit}</Text>
               </View>
-            )}
-          </View>
-        </View>
-
-        {/* Bottom Section */}
-        <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.bottomSection}
-        >
-          {/* Token Monitor */}
-          <TokenMonitor
-            usage={state.tokenUsage}
-            onRecommendationPress={(recommendation) => {
-              Alert.alert('토큰 효율성 팁', recommendation.message);
-            }}
-          />
-
-          {/* Prompt Input Section */}
-          <View style={styles.promptInputSection}>
-            <View style={styles.promptAnnouncementContainer}>
-              <Text style={styles.promptAnnouncementText}>📢 답변을 시작해주세요</Text>
             </View>
 
-            <View style={[
-              styles.promptInputContainer,
-              isInputFocused && styles.promptInputFocused,
-            ]}>
+            <View style={styles.codeEditorContainer}>
               <TextInput
-                ref={promptInputRef}
-                style={styles.promptTextInput}
-                value={promptText}
-                onChangeText={setPromptText}
-                onFocus={() => setIsInputFocused(true)}
-                onBlur={() => setIsInputFocused(false)}
-                placeholder="텍스트로 답변을 입력해주세요..."
-                placeholderTextColor="#9CA3AF"
+                ref={codeEditorRef}
+                style={styles.codeEditor}
+                value={codeContent}
+                onChangeText={handleCodeChange}
+                placeholder="# Python 코드를 작성하세요&#10;import tensorflow as tf&#10;&#10;# 여기에 코드를 입력하세요..."
+                placeholderTextColor="#94A3B8"
                 multiline
                 textAlignVertical="top"
-                maxLength={2000}
-                accessibilityLabel="AI 프롬프트 입력창"
-                accessibilityHint="AI에게 전달할 메시지를 입력하세요"
+                scrollEnabled
+                accessibilityLabel="코드 편집기"
+                accessibilityHint="Python 코드를 작성할 수 있습니다"
               />
-
-              {!promptText && (
-                <View style={styles.promptSuggestions}>
-                  <Text style={styles.suggestionText}>
-                    예: Validation Loss가 감소하지 않는 경우,
-                  </Text>
-                  <Text style={styles.suggestionText}>
-                    먼저 과적합 여부를 확인하고...
-                  </Text>
-                </View>
-              )}
             </View>
+          </View>
+        </View>
 
-            {/* Control Buttons */}
-            <View style={styles.controlButtonsContainer}>
-              <TouchableOpacity
-                style={[styles.controlButton, styles.skipButton]}
-                onPress={handleSkip}
-                accessibilityRole="button"
-                accessibilityLabel="건너뛰기"
+        {/* 3️⃣ 하단 영역 - 대화 기록 및 입력 */}
+        <View style={styles.bottomSection}>
+          {/* 대화 기록 */}
+          <ScrollView style={styles.conversationHistory} showsVerticalScrollIndicator={false}>
+            {state.session?.conversations.map((message) => (
+              <View
+                key={message.id}
+                style={[
+                  styles.messageCard,
+                  message.role === 'ai' ? styles.aiMessageCard : styles.userMessageCard,
+                ]}
               >
-                <Text style={[styles.controlButtonText, styles.skipButtonText]}>건너뛰기</Text>
-              </TouchableOpacity>
+                <Text style={styles.messageContent}>{message.content}</Text>
+                <Text style={styles.messageTimestamp}>
+                  {message.timestamp.toLocaleTimeString()}
+                  {message.tokensUsed && ` • ${message.tokensUsed} tokens`}
+                </Text>
+              </View>
+            ))}
+
+            {state.isGenerating && (
+              <View style={[styles.messageCard, styles.aiMessageCard]}>
+                <ActivityIndicator size="small" color="#3B82F6" />
+                <Text style={styles.messageContent}>AI가 응답을 생성하고 있습니다...</Text>
+              </View>
+            )}
+          </ScrollView>
+
+          {/* 입력 컨트롤 */}
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            style={styles.inputSection}
+          >
+            <View style={styles.inputContainer}>
+              <TextInput
+                ref={promptInputRef}
+                style={styles.promptInput}
+                value={promptText}
+                onChangeText={setPromptText}
+                placeholder="AI에게 질문하거나 답변을 입력하세요..."
+                placeholderTextColor="#9CA3AF"
+                multiline
+                maxLength={1000}
+                accessibilityLabel="프롬프트 입력창"
+                accessibilityHint="AI에게 질문이나 답변을 입력할 수 있습니다"
+              />
 
               <TouchableOpacity
                 style={[
-                  styles.controlButton,
                   styles.submitButton,
-                  (!promptText.trim() || state.isGenerating) && styles.controlButtonDisabled,
+                  (!promptText.trim() || state.isGenerating) && styles.submitButtonDisabled,
                 ]}
                 onPress={handlePromptSubmit}
                 disabled={!promptText.trim() || state.isGenerating}
                 accessibilityRole="button"
-                accessibilityLabel={state.isGenerating ? "생성 중" : "답변 제출"}
+                accessibilityLabel="답변 제출"
               >
-                <Text style={[styles.controlButtonText, styles.submitButtonText]}>
-                  {state.isGenerating ? '생성 중...' : '답변 제출'}
+                <Text style={styles.submitButtonText}>
+                  {state.isGenerating ? '생성중...' : '제출'}
                 </Text>
               </TouchableOpacity>
             </View>
-          </View>
-        </KeyboardAvoidingView>
 
-        {/* Generating Overlay */}
-        {state.isGenerating && (
-          <View style={styles.generatingOverlay}>
-            <ActivityIndicator size="large" color="#FFFFFF" />
-            <Text style={styles.generatingText}>AI가 응답을 생성하고 있습니다...</Text>
-          </View>
-        )}
-      </LinearGradient>
+            {/* Control Buttons */}
+            <View style={styles.controlButtons}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={handleBackPress}
+                accessibilityRole="button"
+                accessibilityLabel="세션 종료"
+              >
+                <Text style={styles.backButtonText}>← 종료</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.completeButton}
+                onPress={handleSessionSubmit}
+                accessibilityRole="button"
+                accessibilityLabel="세션 완료"
+              >
+                <Text style={styles.completeButtonText}>완료</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        </View>
+      </View>
     </SafeAreaView>
   );
 };

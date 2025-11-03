@@ -169,7 +169,6 @@ const CodeEditor: React.FC<CodeEditorProps> = ({
   return (
     <View
       style={styles.codeEditorContainer}
-      accessibilityRole="group"
       accessibilityLabel={`${getLanguageDisplayName(language)} 코드 에디터`}
     >
       {/* Editor Header */}

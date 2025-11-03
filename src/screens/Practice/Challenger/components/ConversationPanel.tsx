@@ -86,7 +86,6 @@ const ConversationPanel: React.FC<ConversationPanelProps> = ({
   return (
     <View
       style={styles.conversationPanel}
-      accessibilityRole="group"
       accessibilityLabel="대화 히스토리 패널"
     >
       {/* Problem Section - Fixed at top */}

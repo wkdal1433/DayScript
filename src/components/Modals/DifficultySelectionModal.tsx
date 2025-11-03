@@ -16,6 +16,7 @@ import {
   Pressable,
 } from 'react-native';
 import { styles } from './DifficultySelectionModal.styles';
+import Lv5ModeSelectModal, { Lv5Module } from './Lv5ModeSelectModal';
 
 export interface DifficultyLevel {
   id: string;
@@ -79,6 +80,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
   const [selectedLevel, setSelectedLevel] = useState<DifficultyLevel | null>(null);
   const [showUnlockModal, setShowUnlockModal] = useState(false);
   const [selectedLockedLevel, setSelectedLockedLevel] = useState<DifficultyLevel | null>(null);
+  const [showLv5ModeModal, setShowLv5ModeModal] = useState(false);
 
   // Default progression state - ALL LEVELS UNLOCKED FOR TESTING
   const defaultProgressionState: UserProgressionState = {
@@ -391,44 +393,8 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
             targetRoute = 'DebuggingProblem';
             break;
           case 'challenge':
-            // 챌린저: LV5 모듈 선택 (Vibe Coding 또는 PR Review)
-            Alert.alert(
-              '🏆 챌린저 모드 선택',
-              'LV5 Expert Mode에서 도전할 모듈을 선택하세요:',
-              [
-                {
-                  text: '취소',
-                  style: 'cancel',
-                  onPress: () => {},
-                },
-                {
-                  text: '🤖 Vibe Coding',
-                  onPress: () => {
-                    onClose();
-                    navigation.navigate('VibeSession', {
-                      problemId: 'vibe_problem_challenger_001',
-                      sessionId: 'challenger_session_' + Date.now(),
-                      difficulty: 'hard',
-                      timeLimit: 1800,
-                      returnRoute: 'Practice',
-                    });
-                  },
-                },
-                {
-                  text: '📋 PR Review',
-                  onPress: () => {
-                    onClose();
-                    navigation.navigate('PRInbox', {
-                      sessionId: 'pr_session_' + Date.now(),
-                      scenarioId: 'pr_scenario_challenger_001',
-                      difficulty: 'hard',
-                      timeLimit: 1800,
-                      returnRoute: 'Practice',
-                    });
-                  },
-                },
-              ]
-            );
+            // 챌린저: LV5 모듈 선택 (새로운 카드형 모달 사용)
+            setShowLv5ModeModal(true);
             return; // Early return to prevent further processing
           default:
             // For other difficulty levels, can be extended later
@@ -702,6 +668,78 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
           </Pressable>
         </Modal>
       )}
+
+      {/* LV5 모드 선택 모달 */}
+      <Lv5ModeSelectModal
+        isVisible={showLv5ModeModal}
+        onClose={() => setShowLv5ModeModal(false)}
+        onModuleSelect={(module: Lv5Module) => {
+          console.log(`🎯 ${module} module selected in parent`);
+
+          // 1. 즉시 LV5 모달 닫기
+          setShowLv5ModeModal(false);
+
+          // 2. 부모 모달도 즉시 닫기 (화면 어두워짐 해결)
+          onClose();
+
+          // 3. 내비게이션 실행 (모달이 닫힌 후)
+          console.log(`🚀 Navigating to ${module} module`);
+
+          try {
+            if (module === 'vibe_coding') {
+              // 기본 내비게이션 시도
+              navigation.navigate('VibeSession', {
+                problemId: 'vibe_problem_challenger_001',
+                sessionId: 'challenger_session_' + Date.now(),
+                difficulty: 'hard',
+                timeLimit: 1800,
+                returnRoute: 'Practice',
+              });
+            } else if (module === 'code_review') {
+              navigation.navigate('PRInboxScreen', {
+                sessionId: 'pr_session_' + Date.now(),
+                scenarioId: 'pr_scenario_challenger_001',
+                difficulty: 'hard',
+                timeLimit: 1800,
+                returnRoute: 'Practice',
+              });
+            }
+            console.log(`✅ Navigation to ${module} completed successfully`);
+          } catch (error) {
+            console.error(`❌ Standard navigation failed, trying reset method:`, error);
+
+            // 대체 방안: navigation.reset 사용
+            try {
+              const targetScreen = module === 'vibe_coding' ? 'VibeSession' : 'PRInboxScreen';
+              const params = module === 'vibe_coding'
+                ? {
+                    problemId: 'vibe_problem_challenger_001',
+                    sessionId: 'challenger_session_' + Date.now(),
+                    difficulty: 'hard',
+                    timeLimit: 1800,
+                    returnRoute: 'Practice',
+                  }
+                : {
+                    sessionId: 'pr_session_' + Date.now(),
+                    scenarioId: 'pr_scenario_challenger_001',
+                    difficulty: 'hard',
+                    timeLimit: 1800,
+                    returnRoute: 'Practice',
+                  };
+
+              navigation.reset({
+                index: 0,
+                routes: [{ name: targetScreen, params }],
+              });
+              console.log(`✅ Navigation reset to ${module} completed successfully`);
+            } catch (resetError) {
+              console.error(`❌ Reset navigation also failed:`, resetError);
+              // 최종 실패 시 모달 다시 열기
+              setShowLv5ModeModal(true);
+            }
+          }
+        }}
+      />
     </Modal>
   );
 };
