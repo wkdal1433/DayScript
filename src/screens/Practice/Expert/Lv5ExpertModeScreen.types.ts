@@ -418,17 +418,78 @@ export interface CodeReviewState {
   gitStatus: GitStatus;
   isLoading: boolean;
   error: string | null;
+  // New Hunk-level review state
+  reviewSession: PRReviewSession | null;
+  currentFileIndex: number;
+  currentHunkIndex: number;
+}
+
+export interface PRReviewSession {
+  id: string;
+  prId: string;
+  files: FileReviewState[];
+  currentFileIndex: number;
+  totalHunks: number;
+  reviewedHunks: number;
+  sessionProgress: SessionProgress;
+  startedAt: Date;
+  isComplete: boolean;
+}
+
+export interface SessionProgress {
+  currentPhase: 'file_selection' | 'hunk_review' | 'final_review' | 'completed';
+  completionPercentage: number;
+  estimatedTimeRemaining?: number;
 }
 
 export interface DiffData {
   fileName: string;
   changes: DiffChange[];
+  hunks: HunkInfo[];
 }
 
 export interface DiffChange {
   lineNumber: number;
   type: 'add' | 'delete' | 'modify';
   content: string;
+}
+
+// Hunk-level review system types
+export interface HunkInfo {
+  id: string;
+  fileId: string;
+  fileName: string;
+  hunkIndex: number;
+  startLineOld: number;
+  startLineNew: number;
+  linesOld: number;
+  linesNew: number;
+  originalCode: string[];
+  modifiedCode: string[];
+  changeType: 'addition' | 'deletion' | 'modification' | 'mixed';
+  reviewStatus: 'pending' | 'accepted' | 'rejected' | 'edited';
+  userDecision?: HunkDecision;
+  context: {
+    beforeLines: string[];
+    afterLines: string[];
+  };
+}
+
+export interface HunkDecision {
+  action: 'accept' | 'reject' | 'edit';
+  editedCode?: string[];
+  comment?: string;
+  timestamp: Date;
+}
+
+export interface FileReviewState {
+  fileId: string;
+  fileName: string;
+  hunks: HunkInfo[];
+  currentHunkIndex: number;
+  totalHunks: number;
+  isComplete: boolean;
+  reviewedHunks: number;
 }
 
 export interface ReviewProgress {
@@ -453,7 +514,14 @@ export type CodeReviewAction =
   | { type: 'ADD_REVIEW_COMMENT'; payload: ReviewComment }
   | { type: 'UPDATE_REVIEW_PROGRESS'; payload: Partial<ReviewProgress> }
   | { type: 'UPDATE_GIT_STATUS'; payload: Partial<GitStatus> }
-  | { type: 'SET_DIFF_DATA'; payload: DiffData[] };
+  | { type: 'SET_DIFF_DATA'; payload: DiffData[] }
+  // New Hunk-level review actions
+  | { type: 'INITIALIZE_REVIEW_SESSION'; payload: PRReviewSession }
+  | { type: 'UPDATE_REVIEW_SESSION'; payload: Partial<PRReviewSession> }
+  | { type: 'HUNK_DECISION'; payload: { fileIndex: number; hunkIndex: number; decision: HunkDecision } }
+  | { type: 'NAVIGATE_TO_HUNK'; payload: { fileIndex: number; hunkIndex: number } }
+  | { type: 'COMPLETE_FILE_REVIEW'; payload: { fileIndex: number } }
+  | { type: 'COMPLETE_REVIEW_SESSION'; payload: { finalDecisions: HunkDecision[] } };
 
 export interface VibeCodingModuleProps {
   sessionId: string;
@@ -485,6 +553,41 @@ export interface ScoreUpdate {
   category: string;
   score: number;
   details: string;
+}
+
+// New Hunk-level review component types
+export interface HunkDiffViewProps {
+  hunk: HunkInfo;
+  isActive: boolean;
+  onHunkDecision: (decision: HunkDecision) => void;
+  showLineNumbers?: boolean;
+  enableInlineEdit?: boolean;
+}
+
+export interface ProgressIndicatorProps {
+  currentFileIndex: number;
+  totalFiles: number;
+  currentHunkIndex: number;
+  totalHunks: number;
+  reviewedHunks: number;
+  completionPercentage: number;
+}
+
+export interface HunkActionBarProps {
+  hunk: HunkInfo;
+  onAccept: () => void;
+  onReject: () => void;
+  onEdit: () => void;
+  isProcessing: boolean;
+  disabled?: boolean;
+}
+
+export interface InlineEditorProps {
+  code: string[];
+  onSave: (editedCode: string[]) => void;
+  onCancel: () => void;
+  language?: string;
+  readOnly?: boolean;
 }
 
 // Events and Actions Types

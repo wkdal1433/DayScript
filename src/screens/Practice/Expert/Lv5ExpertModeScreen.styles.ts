@@ -738,6 +738,187 @@ export const styles = StyleSheet.create({
     width: (width - SIZES.padding * 4) * 0.48,
   },
 
+  // Hunk-level Review Navigation Styles
+  hunkNavigation: {
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.lightGray,
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: SIZES.padding * 0.75,
+  },
+
+  navigationInfo: {
+    alignItems: 'center',
+    marginBottom: SIZES.margin * 0.5,
+  },
+
+  navigationText: {
+    fontSize: FONTS.sizes.body,
+    fontWeight: '600',
+    color: COLORS.textPrimary,
+  },
+
+  navigationActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  navigationButton: {
+    paddingHorizontal: SIZES.padding * 0.75,
+    paddingVertical: SIZES.padding * 0.5,
+    borderRadius: SIZES.radius,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 80,
+  },
+
+  primaryButton: {
+    backgroundColor: COLORS.primary,
+  },
+
+  secondaryButton: {
+    backgroundColor: COLORS.lightGray,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+  },
+
+  warningButton: {
+    backgroundColor: '#F59E0B',
+  },
+
+  disabledButton: {
+    backgroundColor: COLORS.lightGray,
+    opacity: 0.5,
+  },
+
+  navigationButtonText: {
+    fontSize: FONTS.sizes.body,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+
+  // Final Review Actions
+  finalActions: {
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.lightGray,
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: SIZES.padding,
+  },
+
+  completionMessage: {
+    alignItems: 'center',
+    marginBottom: SIZES.margin,
+  },
+
+  completionTitle: {
+    fontSize: FONTS.sizes.h3,
+    fontWeight: 'bold',
+    color: COLORS.success,
+    marginBottom: SIZES.margin * 0.25,
+  },
+
+  completionSubtitle: {
+    fontSize: FONTS.sizes.body,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+
+  finalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+
+  finalActionButton: {
+    paddingHorizontal: SIZES.padding,
+    paddingVertical: SIZES.padding * 0.75,
+    borderRadius: SIZES.radius,
+    alignItems: 'center',
+    minWidth: 120,
+  },
+
+  approveButton: {
+    backgroundColor: COLORS.success,
+  },
+
+  changesButton: {
+    backgroundColor: '#F59E0B',
+  },
+
+  finalActionButtonText: {
+    fontSize: FONTS.sizes.body,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+
+  // Review Summary Styles
+  reviewSummary: {
+    backgroundColor: COLORS.lightBackground,
+    borderRadius: SIZES.radius,
+    padding: SIZES.padding * 0.75,
+    marginTop: SIZES.margin,
+  },
+
+  summaryTitle: {
+    fontSize: FONTS.sizes.h4,
+    fontWeight: 'bold',
+    color: COLORS.textPrimary,
+    marginBottom: SIZES.margin * 0.5,
+  },
+
+  summaryItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: SIZES.padding * 0.25,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.lightGray,
+  },
+
+  summaryHunk: {
+    fontSize: FONTS.sizes.small,
+    color: COLORS.textSecondary,
+    flex: 1,
+  },
+
+  summaryStatus: {
+    fontSize: FONTS.sizes.small,
+    fontWeight: '600',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 4,
+  },
+
+  acceptedStatus: {
+    backgroundColor: COLORS.success + '20',
+    color: COLORS.success,
+  },
+
+  rejectedStatus: {
+    backgroundColor: COLORS.error + '20',
+    color: COLORS.error,
+  },
+
+  editedStatus: {
+    backgroundColor: '#F59E0B20',
+    color: '#F59E0B',
+  },
+
+  // No Hunk Container
+  noHunkContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: SIZES.padding * 2,
+  },
+
+  noHunkText: {
+    fontSize: FONTS.sizes.h4,
+    fontWeight: '600',
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+  },
+
   // Dark Mode Support (if implemented)
   darkModeContainer: {
     backgroundColor: '#1a1a1a',

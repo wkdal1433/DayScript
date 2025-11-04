@@ -116,7 +116,7 @@ const Lv5ModeSelectModal: React.FC<Lv5ModeSelectModalProps> = ({
           isSelected && styles.moduleCardSelected,
         ]}
         onPress={() => handleModuleSelect(module.id)}
-        activeOpacity={0.8}
+        activeOpacity={1}
         accessibilityRole="button"
         accessibilityLabel={`${module.title} 모듈 선택`}
         accessibilityHint={module.description}

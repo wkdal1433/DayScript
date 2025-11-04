@@ -6,25 +6,30 @@ const { height } = Dimensions.get('window');
 export const styles = StyleSheet.create({
   // 오버레이 배경
   overlay: {
-    flex: 1,
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.35)',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
     paddingHorizontal: 20,
+    paddingTop: 60,
   },
 
   // 모달 컨테이너
   modalContainer: {
     width: '100%',
-    maxWidth: 400,
-    maxHeight: height * 0.9,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
   },
 
   // 모달 카드
   modalCard: {
     backgroundColor: '#F9F5F6',
     borderRadius: 16,
-    padding: 24,
+    padding: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -33,26 +38,28 @@ export const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 16,
     elevation: 12,
+    width: '100%',
+    maxHeight: '100%',
   },
 
   // 헤더 영역
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
     position: 'relative',
   },
 
   title: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#F2BED1',
     fontFamily: FONTS.primary,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
   },
 
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#333333AA',
     fontFamily: FONTS.primary,
     textAlign: 'center',
@@ -78,27 +85,27 @@ export const styles = StyleSheet.create({
 
   // 모듈 선택 영역
   moduleSelection: {
-    marginBottom: 24,
+    marginBottom: 16,
   },
 
   selectionTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     color: '#333333',
     fontFamily: FONTS.primary,
-    marginBottom: 16,
+    marginBottom: 12,
     textAlign: 'center',
   },
 
   moduleCards: {
-    gap: 16,
+    gap: 12,
   },
 
   // 모듈 카드
   moduleCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 20,
+    padding: 14,
     borderWidth: 2,
     borderColor: 'transparent',
     position: 'relative',
@@ -149,31 +156,31 @@ export const styles = StyleSheet.create({
   },
 
   moduleTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#333333',
     fontFamily: FONTS.primary,
   },
 
   moduleSubtitle: {
-    fontSize: 12,
+    fontSize: 10,
     color: '#F2BED1',
     fontFamily: FONTS.primary,
     fontWeight: '600',
   },
 
   moduleDescription: {
-    fontSize: 13,
+    fontSize: 11,
     color: '#666666',
     fontFamily: FONTS.primary,
-    lineHeight: 18,
-    marginBottom: 8,
+    lineHeight: 15,
+    marginBottom: 6,
   },
 
   // 기능 목록
   featuresList: {
-    gap: 4,
-    marginBottom: 12,
+    gap: 3,
+    marginBottom: 8,
   },
 
   featureItem: {
@@ -190,19 +197,19 @@ export const styles = StyleSheet.create({
   },
 
   featureText: {
-    fontSize: 11,
+    fontSize: 9,
     color: '#555555',
     fontFamily: FONTS.primary,
     flex: 1,
-    lineHeight: 15,
+    lineHeight: 13,
   },
 
   // 메타 정보
   moduleMetaInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 8,
-    paddingTop: 8,
+    marginTop: 6,
+    paddingTop: 6,
     borderTopWidth: 1,
     borderTopColor: '#F0F0F0',
   },
@@ -214,13 +221,13 @@ export const styles = StyleSheet.create({
   },
 
   metaLabel: {
-    fontSize: 10,
+    fontSize: 8,
     color: '#888888',
     fontFamily: FONTS.primary,
   },
 
   metaValue: {
-    fontSize: 10,
+    fontSize: 8,
     color: '#F2BED1',
     fontFamily: FONTS.primary,
     fontWeight: '600',
@@ -229,15 +236,15 @@ export const styles = StyleSheet.create({
   // 하단 버튼 영역
   bottomSection: {
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
 
   confirmButton: {
     backgroundColor: '#F2BED1',
-    paddingHorizontal: 32,
-    paddingVertical: 14,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
     borderRadius: 25,
-    minWidth: 140,
+    minWidth: 120,
     alignItems: 'center',
   },
 
@@ -246,7 +253,7 @@ export const styles = StyleSheet.create({
   },
 
   confirmButtonText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '600',
     color: '#FFFFFF',
     fontFamily: FONTS.primary,
@@ -257,7 +264,7 @@ export const styles = StyleSheet.create({
   },
 
   helpText: {
-    fontSize: 11,
+    fontSize: 9,
     color: '#888888',
     fontFamily: FONTS.primary,
     textAlign: 'center',

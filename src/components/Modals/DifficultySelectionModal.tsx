@@ -696,7 +696,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
                 returnRoute: 'Practice',
               });
             } else if (module === 'code_review') {
-              navigation.navigate('PRInboxScreen', {
+              navigation.navigate('PRInbox', {
                 sessionId: 'pr_session_' + Date.now(),
                 scenarioId: 'pr_scenario_challenger_001',
                 difficulty: 'hard',
@@ -710,7 +710,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
 
             // 대체 방안: navigation.reset 사용
             try {
-              const targetScreen = module === 'vibe_coding' ? 'VibeSession' : 'PRInboxScreen';
+              const targetScreen = module === 'vibe_coding' ? 'VibeSession' : 'PRInbox';
               const params = module === 'vibe_coding'
                 ? {
                     problemId: 'vibe_problem_challenger_001',
