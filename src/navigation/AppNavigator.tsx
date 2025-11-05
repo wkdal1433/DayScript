@@ -13,10 +13,11 @@ import PracticeScreen from '../screens/Practice/PracticeScreen';
 import PracticeContainer from '../screens/Practice/PracticeContainer';
 import VibeSessionScreen from '../screens/Practice/Challenger/VibeSessionScreen';
 import PRInboxScreen from '../screens/Practice/Challenger/PRInboxScreen';
+import DiffHunkScreen from '../screens/Practice/Challenger/DiffHunkScreen';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff';
 
 interface AppNavigatorProps {}
 
@@ -169,6 +170,24 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
                 difficulty: 'hard',
                 timeLimit: 1800, // 30분
                 returnRoute: 'Practice',
+              },
+            }}
+          />
+        );
+      case 'CodeReviewDiff':
+        return (
+          <DiffHunkScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                sessionId: 'code_review_session_' + Date.now(),
+                commitHash: 'abc123def456',
+                fileIndex: 0,
+                fileName: 'src/components/UserValidation.js',
+                returnRoute: 'PRInbox',
+                totalFiles: 3,
+                currentFileIndex: 0,
               },
             }}
           />

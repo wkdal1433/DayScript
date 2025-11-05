@@ -696,12 +696,14 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
                 returnRoute: 'Practice',
               });
             } else if (module === 'code_review') {
-              navigation.navigate('PRInbox', {
-                sessionId: 'pr_session_' + Date.now(),
-                scenarioId: 'pr_scenario_challenger_001',
-                difficulty: 'hard',
-                timeLimit: 1800,
+              navigation.navigate('CodeReviewDiff', {
+                sessionId: 'code_review_session_' + Date.now(),
+                commitHash: 'challenger_commit_' + Date.now(),
+                fileIndex: 0,
+                fileName: 'src/utils/dataProcessor.js',
                 returnRoute: 'Practice',
+                totalFiles: 3,
+                currentFileIndex: 0,
               });
             }
             console.log(`✅ Navigation to ${module} completed successfully`);
@@ -710,7 +712,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
 
             // 대체 방안: navigation.reset 사용
             try {
-              const targetScreen = module === 'vibe_coding' ? 'VibeSession' : 'PRInbox';
+              const targetScreen = module === 'vibe_coding' ? 'VibeSession' : 'CodeReviewDiff';
               const params = module === 'vibe_coding'
                 ? {
                     problemId: 'vibe_problem_challenger_001',
@@ -720,11 +722,13 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
                     returnRoute: 'Practice',
                   }
                 : {
-                    sessionId: 'pr_session_' + Date.now(),
-                    scenarioId: 'pr_scenario_challenger_001',
-                    difficulty: 'hard',
-                    timeLimit: 1800,
+                    sessionId: 'code_review_session_' + Date.now(),
+                    commitHash: 'challenger_commit_' + Date.now(),
+                    fileIndex: 0,
+                    fileName: 'src/utils/dataProcessor.js',
                     returnRoute: 'Practice',
+                    totalFiles: 3,
+                    currentFileIndex: 0,
                   };
 
               navigation.reset({
