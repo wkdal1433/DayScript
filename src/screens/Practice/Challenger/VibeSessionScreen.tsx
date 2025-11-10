@@ -6,7 +6,6 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
@@ -29,6 +28,9 @@ import {
 
 // Style imports
 import { styles } from './VibeSessionScreen.styles';
+
+// Common components
+import { ExitConfirmModal } from '../../../modules/common';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -134,6 +136,11 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
   const [codeContent, setCodeContent] = useState('');
   const [codeEfficiency, setCodeEfficiency] = useState(85);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(1);
+
+  // Modal states
+  const [showExitModal, setShowExitModal] = useState(false);
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showTimeUpModal, setShowTimeUpModal] = useState(false);
 
   // Refs
   const promptInputRef = useRef<TextInput>(null);
@@ -252,22 +259,18 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
     if (timerIntervalRef.current) {
       clearInterval(timerIntervalRef.current);
     }
+    setShowTimeUpModal(true);
+  }, []);
 
-    Alert.alert(
-      '⏰ 시간 종료',
-      '세션 시간이 만료되었습니다. 현재까지의 결과를 제출하시겠습니까?',
-      [
-        {
-          text: '계속 작업',
-          style: 'cancel',
-          onPress: () => setTimeRemaining(300),
-        },
-        {
-          text: '제출하기',
-          onPress: handleSessionSubmit,
-        },
-      ]
-    );
+  const handleTimeUpContinue = useCallback(() => {
+    setTimeRemaining(300); // 5분 추가
+    setShowTimeUpModal(false);
+    startTimer(); // 타이머 재시작
+  }, [startTimer]);
+
+  const handleTimeUpSubmit = useCallback(() => {
+    setShowTimeUpModal(false);
+    handleSessionComplete();
   }, []);
 
   // Format timer display
@@ -363,33 +366,28 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
 
   // Handle session completion
   const handleSessionSubmit = useCallback(() => {
-    Alert.alert(
-      '세션 제출',
-      '현재 세션을 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.',
-      [
-        { text: '취소', style: 'cancel' },
-        {
-          text: '제출',
-          onPress: () => {
-            navigation.navigate(returnRoute as never);
-            AccessibilityInfo.announceForAccessibility('세션이 제출되었습니다');
-          },
-        },
-      ]
-    );
+    setShowSubmitModal(true);
+  }, []);
+
+  const handleSessionComplete = useCallback(() => {
+    setShowSubmitModal(false);
+    navigation.navigate(returnRoute as never);
+    AccessibilityInfo.announceForAccessibility('세션이 제출되었습니다');
   }, [navigation, returnRoute]);
 
   // Handle back navigation
   const handleBackPress = useCallback(() => {
-    Alert.alert(
-      '세션 종료',
-      '정말로 세션을 종료하시겠습니까? 진행상황이 저장되지 않을 수 있습니다.',
-      [
-        { text: '계속하기', style: 'cancel' },
-        { text: '종료', onPress: () => navigation.navigate(returnRoute as never) },
-      ]
-    );
+    setShowExitModal(true);
+  }, []);
+
+  const handleExitConfirm = useCallback(() => {
+    setShowExitModal(false);
+    navigation.navigate(returnRoute as never);
   }, [navigation, returnRoute]);
+
+  const handleExitCancel = useCallback(() => {
+    setShowExitModal(false);
+  }, []);
 
   // Code editor change handler
   const handleCodeChange = useCallback((code: string) => {
@@ -620,6 +618,45 @@ const VibeSessionScreen: React.FC<VibeSessionScreenProps> = ({
           </KeyboardAvoidingView>
         </View>
       </View>
+
+      {/* Exit Confirmation Modal */}
+      <ExitConfirmModal
+        visible={showExitModal}
+        title="세션 종료"
+        message="정말로 세션을 종료하시겠습니까? 진행상황이 저장되지 않을 수 있습니다."
+        confirmText="종료"
+        cancelText="계속하기"
+        onConfirm={handleExitConfirm}
+        onCancel={handleExitCancel}
+        type="warning"
+        icon="🚪"
+      />
+
+      {/* Submit Confirmation Modal */}
+      <ExitConfirmModal
+        visible={showSubmitModal}
+        title="세션 제출"
+        message="현재 세션을 제출하시겠습니까? 제출 후에는 수정할 수 없습니다."
+        confirmText="제출"
+        cancelText="취소"
+        onConfirm={handleSessionComplete}
+        onCancel={() => setShowSubmitModal(false)}
+        type="info"
+        icon="📝"
+      />
+
+      {/* Time Up Modal */}
+      <ExitConfirmModal
+        visible={showTimeUpModal}
+        title="⏰ 시간 종료"
+        message="세션 시간이 만료되었습니다. 현재까지의 결과를 제출하시겠습니까?"
+        confirmText="제출하기"
+        cancelText="계속 작업"
+        onConfirm={handleTimeUpSubmit}
+        onCancel={handleTimeUpContinue}
+        type="warning"
+        icon="⏰"
+      />
     </SafeAreaView>
   );
 };

@@ -19,7 +19,9 @@
       "Bash(netstat:*)",
       "Bash(findstr:*)",
       "Bash(tree:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(claude mcp:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

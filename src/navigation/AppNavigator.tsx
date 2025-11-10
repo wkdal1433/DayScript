@@ -14,22 +14,38 @@ import PracticeContainer from '../screens/Practice/PracticeContainer';
 import VibeSessionScreen from '../screens/Practice/Challenger/VibeSessionScreen';
 import PRInboxScreen from '../screens/Practice/Challenger/PRInboxScreen';
 import DiffHunkScreen from '../screens/Practice/Challenger/DiffHunkScreen';
+import UserPageScreen from '../screens/Profile/UserPageScreen';
+
+// New modular quiz screens
+import { Lv1OXProblemScreen } from '../modules/quiz';
+
+// Navigation bridge for smooth integration
+import { resolveNavigation, transformNavigationParams } from './ModuleNavigationBridge';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem';
 
 interface AppNavigatorProps {}
 
 const AppNavigator: React.FC<AppNavigatorProps> = () => {
   const [activeTab, setActiveTab] = useState<TabName>('Home');
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('Home');
+  const [previousScreen, setPreviousScreen] = useState<ScreenName>('Home');
 
-  // Enhanced navigation object with problem screen support
+  // Enhanced navigation object with problem screen support and module bridge integration
   const mockNavigation = {
     navigate: (screen: string, params?: any) => {
-      console.log('Navigate to:', screen, params);
-      setCurrentScreen(screen as ScreenName);
+      // Use navigation bridge to resolve screen
+      const resolvedScreen = resolveNavigation(screen as ScreenName);
+      const transformedParams = transformNavigationParams(screen as ScreenName, params);
+
+      console.log('Navigate to:', resolvedScreen, 'with params:', transformedParams);
+      console.log('Original screen:', screen, '→ Resolved screen:', resolvedScreen);
+
+      // Track previous screen for proper return navigation
+      setPreviousScreen(currentScreen);
+      setCurrentScreen(resolvedScreen);
 
       // Update activeTab for tab screens
       if (screen === 'Home' || screen === 'Practice' || screen === 'Community' || screen === 'Profile') {
@@ -101,9 +117,8 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
           />
         );
       case 'Profile':
-        // 향후 Profile 화면 구현
         return (
-          <HomeScreen
+          <UserPageScreen
             navigation={mockNavigation}
             route={{ ...mockRoute, name: 'Profile' }}
             activeTab={activeTab}
@@ -116,6 +131,20 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
             navigation={mockNavigation}
             route={mockRoute}
             problemType="OX"
+          />
+        );
+      case 'Lv1OXProblem':
+        return (
+          <Lv1OXProblemScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                level: 1,
+                quizId: 'lv1_ox_001',
+                returnRoute: 'Practice',
+              },
+            }}
           />
         );
       case 'MultipleChoiceProblem':
@@ -153,7 +182,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
                 sessionId: 'session_' + Date.now(),
                 difficulty: 'hard',
                 timeLimit: 1800, // 30분
-                returnRoute: 'Practice',
+                returnRoute: previousScreen, // 이전 화면으로 돌아가기
               },
             }}
           />
@@ -169,7 +198,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
                 scenarioId: 'pr_scenario_001',
                 difficulty: 'hard',
                 timeLimit: 1800, // 30분
-                returnRoute: 'Practice',
+                returnRoute: previousScreen, // 이전 화면으로 돌아가기
               },
             }}
           />
