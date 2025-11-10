@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { View, Text, Image } from 'react-native';
+import { View, Text, Image, TouchableOpacity } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { styles } from './UserSummaryHeader.styles';
 import type { UserProfile } from '../../screens/Profile/UserPageScreen.types';
@@ -22,14 +22,22 @@ const MOCK_USER_DATA: UserProfile = {
   profileImage: undefined, // 목업용으로 undefined 사용
 };
 
-export const UserSummaryHeader: React.FC = () => {
+interface UserSummaryHeaderProps {
+  onProfileClick?: () => void;
+}
+
+export const UserSummaryHeader: React.FC<UserSummaryHeaderProps> = ({ onProfileClick }) => {
   const { name, level, currentExp, maxExp, streakDays } = MOCK_USER_DATA;
   const expPercentage = (currentExp / maxExp) * 100;
 
   return (
     <View style={styles.container}>
-      {/* Profile Section */}
-      <View style={styles.profileSection}>
+      {/* Profile Section (클릭 가능) */}
+      <TouchableOpacity
+        style={styles.profileSection}
+        onPress={onProfileClick}
+        activeOpacity={0.7}
+      >
         {/* Profile Image */}
         <View style={styles.profileImageContainer}>
           <View style={styles.profileImagePlaceholder}>
@@ -47,7 +55,12 @@ export const UserSummaryHeader: React.FC = () => {
           <Text style={styles.userName}>{name}</Text>
           <Text style={styles.streakText}>연속 학습 {streakDays}일차 🔥</Text>
         </View>
-      </View>
+
+        {/* 클릭 힌트 아이콘 */}
+        <View style={styles.clickHintContainer}>
+          <Text style={styles.clickHintText}>›</Text>
+        </View>
+      </TouchableOpacity>
 
       {/* Experience Progress */}
       <View style={styles.progressSection}>

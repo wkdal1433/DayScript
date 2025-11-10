@@ -5,13 +5,11 @@
  */
 
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS, SIZES } from '../../constants';
 
 export const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginTop: 32,
-    marginBottom: 40,
+    marginBottom: SIZES.spacing.xl,
   },
 
   // 섹션 제목
@@ -23,10 +21,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 
-  // 설정 컨테이너
-  settingsContainer: {
-    marginBottom: 32,
-  },
+  // 설정 컨테이너 (제거되었음 - TerminalHeader로 이동)
   legalContainer: {
     marginBottom: 32,
   },
@@ -50,7 +45,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#F1F5F9',
   },
@@ -60,13 +55,13 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   settingIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: COLORS.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
   },
   settingIcon: {
     fontSize: 18,
@@ -94,7 +89,7 @@ export const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    paddingVertical: 16,
+    paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 20,
     borderWidth: 1,
@@ -117,7 +112,7 @@ export const styles = StyleSheet.create({
   // 버전 정보
   versionContainer: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   versionText: {
     fontSize: 12,

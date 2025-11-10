@@ -5,12 +5,11 @@
  */
 
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS, SIZES } from '../../constants';
 
 export const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginTop: 32,
+    marginBottom: SIZES.spacing.lg,
   },
   sectionTitle: {
     fontSize: 20,
@@ -25,7 +24,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    padding: 6,
+    padding: 4,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: {
@@ -38,7 +37,7 @@ export const styles = StyleSheet.create({
   },
   tabItem: {
     flex: 1,
-    paddingVertical: 10,
+    paddingVertical: 8,
     paddingHorizontal: 8,
     borderRadius: 8,
     alignItems: 'center',
@@ -63,8 +62,8 @@ export const styles = StyleSheet.create({
   mistakeCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    padding: 20,
-    marginBottom: 12,
+    padding: 16,
+    marginBottom: 10,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -78,7 +77,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   mistakeTypeContainer: {
     flexDirection: 'row',
@@ -115,7 +114,7 @@ export const styles = StyleSheet.create({
     fontSize: 14,
     color: COLORS.textMuted,
     lineHeight: 20,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   mistakeFooter: {
     flexDirection: 'row',
@@ -147,5 +146,35 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     color: COLORS.textMuted,
     textAlign: 'center',
+  },
+
+  // 전체보기 버튼 스타일
+  viewAllButton: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    marginTop: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  viewAllText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  viewAllArrow: {
+    fontSize: 18,
+    color: COLORS.primary,
+    fontWeight: '300',
   },
 });

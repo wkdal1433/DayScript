@@ -63,6 +63,7 @@ interface MistakeNoteSectionProps {
   navigation: {
     navigate: (screen: string, params?: any) => void;
   };
+  limitItems?: number; // 표시할 아이템 수 제한
 }
 
 const PROBLEM_TYPE_ICONS = {
@@ -116,12 +117,20 @@ const MistakeCard: React.FC<{
 
 export const MistakeNoteSection: React.FC<MistakeNoteSectionProps> = ({
   navigation,
+  limitItems,
 }) => {
   const [selectedLevel, setSelectedLevel] = useState<number | 'all'>('all');
 
   const filteredMistakes = MOCK_MISTAKE_NOTES.filter(mistake =>
     selectedLevel === 'all' ? true : mistake.level === selectedLevel
   );
+
+  // limitItems가 설정되어 있으면 해당 개수만큼만 표시
+  const displayedMistakes = limitItems
+    ? filteredMistakes.slice(0, limitItems)
+    : filteredMistakes;
+
+  const hasMoreItems = limitItems && filteredMistakes.length > limitItems;
 
   const handleReview = (mistake: MistakeNote) => {
     console.log('Navigate to review:', mistake.id);
@@ -143,6 +152,12 @@ export const MistakeNoteSection: React.FC<MistakeNoteSectionProps> = ({
         navigation.navigate('VibeSession', { mistakeReview: true, problemId: mistake.id });
         break;
     }
+  };
+
+  const handleViewAllPress = () => {
+    console.log('오답노트 전체보기 클릭');
+    // TODO: 오답노트 전체보기 화면으로 이동
+    // navigation.navigate('MistakeNoteFullScreen');
   };
 
   const renderTabItem = (level: number | 'all', title: string) => (
@@ -170,19 +185,21 @@ export const MistakeNoteSection: React.FC<MistakeNoteSectionProps> = ({
       {/* 섹션 제목 */}
       <Text style={styles.sectionTitle}>오답노트</Text>
 
-      {/* 레벨별 필터 탭 */}
-      <View style={styles.tabContainer}>
-        {renderTabItem('all', '전체')}
-        {renderTabItem(1, 'LV1')}
-        {renderTabItem(2, 'LV2')}
-        {renderTabItem(3, 'LV3')}
-        {renderTabItem(4, 'LV4')}
-        {renderTabItem(5, 'LV5')}
-      </View>
+      {/* 레벨별 필터 탭 (limitItems가 있을 때만 표시) */}
+      {!limitItems && (
+        <View style={styles.tabContainer}>
+          {renderTabItem('all', '전체')}
+          {renderTabItem(1, 'LV1')}
+          {renderTabItem(2, 'LV2')}
+          {renderTabItem(3, 'LV3')}
+          {renderTabItem(4, 'LV4')}
+          {renderTabItem(5, 'LV5')}
+        </View>
+      )}
 
       {/* 오답 문제 리스트 */}
       <FlatList
-        data={filteredMistakes}
+        data={displayedMistakes}
         renderItem={({ item }) => (
           <MistakeCard
             mistake={item}
@@ -203,6 +220,16 @@ export const MistakeNoteSection: React.FC<MistakeNoteSectionProps> = ({
           </View>
         }
       />
+
+      {/* 전체보기 버튼 (3개 초과 시 표시) */}
+      {hasMoreItems && (
+        <TouchableOpacity style={styles.viewAllButton} onPress={handleViewAllPress}>
+          <Text style={styles.viewAllText}>
+            오답노트 전체보기 ({filteredMistakes.length}개)
+          </Text>
+          <Text style={styles.viewAllArrow}>›</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

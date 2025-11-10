@@ -5,12 +5,11 @@
  */
 
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS, SIZES } from '../../constants';
 
 export const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginTop: 24,
+    marginBottom: SIZES.spacing.lg,
   },
   sectionTitle: {
     fontSize: 20,
@@ -24,7 +23,7 @@ export const styles = StyleSheet.create({
   chartContainer: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    padding: 20,
+    padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: {
@@ -39,7 +38,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: COLORS.textPrimary,
-    marginBottom: 20,
+    marginBottom: 12,
     textAlign: 'center',
   },
   chartWrapper: {
@@ -50,7 +49,7 @@ export const styles = StyleSheet.create({
     alignItems: 'flex-end',
     justifyContent: 'space-between',
     width: '100%',
-    height: 160,
+    height: 140,
     paddingHorizontal: 8,
   },
   barWrapper: {
@@ -58,9 +57,9 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   barContainer: {
-    height: 120,
+    height: 100,
     justifyContent: 'flex-end',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   bar: {
     width: 24,
@@ -89,7 +88,7 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    padding: 16,
+    padding: 12,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: {
@@ -101,10 +100,10 @@ export const styles = StyleSheet.create({
     elevation: 2,
   },
   statsIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginBottom: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    marginBottom: 6,
     opacity: 0.8,
   },
   statsTitle: {
@@ -112,7 +111,7 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.textMuted,
     textAlign: 'center',
-    marginBottom: 8,
+    marginBottom: 6,
     lineHeight: 16,
   },
   statsValueContainer: {

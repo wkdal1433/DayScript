@@ -41,25 +41,7 @@ const SettingItem: React.FC<{
 );
 
 export const BottomSection: React.FC<BottomSectionProps> = ({ navigation }) => {
-  const handleNotificationSettings = () => {
-    console.log('Navigate to notification settings');
-    Alert.alert('알림 설정', '알림 설정 화면으로 이동합니다.');
-  };
-
-  const handleLanguageSettings = () => {
-    console.log('Navigate to language settings');
-    Alert.alert('언어 설정', '언어 설정 화면으로 이동합니다.');
-  };
-
-  const handleDataManagement = () => {
-    console.log('Navigate to data management');
-    Alert.alert('데이터 관리', '데이터 관리 화면으로 이동합니다.');
-  };
-
-  const handleHelp = () => {
-    console.log('Navigate to help');
-    Alert.alert('도움말', '도움말 화면으로 이동합니다.');
-  };
+  // 설정 관련 함수들 제거 - TerminalHeader 설정 버튼으로 이동
 
   const handlePrivacyPolicy = () => {
     console.log('Navigate to privacy policy');
@@ -92,40 +74,7 @@ export const BottomSection: React.FC<BottomSectionProps> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* 설정 섹션 */}
-      <View style={styles.settingsContainer}>
-        <Text style={styles.sectionTitle}>설정</Text>
-
-        <View style={styles.settingsList}>
-          <SettingItem
-            icon="🔔"
-            title="알림 설정"
-            subtitle="학습 알림, 목표 달성 알림"
-            onPress={handleNotificationSettings}
-          />
-
-          <SettingItem
-            icon="🌐"
-            title="언어 설정"
-            subtitle="한국어"
-            onPress={handleLanguageSettings}
-          />
-
-          <SettingItem
-            icon="📊"
-            title="데이터 관리"
-            subtitle="학습 데이터 백업 및 복원"
-            onPress={handleDataManagement}
-          />
-
-          <SettingItem
-            icon="❓"
-            title="도움말"
-            subtitle="자주 묻는 질문, 사용법"
-            onPress={handleHelp}
-          />
-        </View>
-      </View>
+      {/* 설정 섹션 제거 - TerminalHeader 설정 버튼을 통해 접근 */}
 
       {/* 약관 및 정책 섹션 */}
       <View style={styles.legalContainer}>

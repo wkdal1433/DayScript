@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
     paddingHorizontal: 26,
-    paddingVertical: 32,
+    paddingVertical: 20,
     marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 20,
@@ -27,16 +27,16 @@ export const styles = StyleSheet.create({
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 16,
   },
   profileImageContainer: {
     position: 'relative',
     marginRight: 16,
   },
   profileImagePlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     backgroundColor: COLORS.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
@@ -44,8 +44,8 @@ export const styles = StyleSheet.create({
     borderColor: COLORS.primary,
   },
   profileImageText: {
-    fontSize: 32,
-    lineHeight: 40,
+    fontSize: 28,
+    lineHeight: 35,
   },
   levelBadge: {
     position: 'absolute',
@@ -110,5 +110,17 @@ export const styles = StyleSheet.create({
     fontWeight: '500',
     color: COLORS.textMuted,
     textAlign: 'right',
+  },
+
+  // 클릭 힌트 스타일
+  clickHintContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingLeft: 8,
+  },
+  clickHintText: {
+    fontSize: 20,
+    color: COLORS.textMuted,
+    fontWeight: '300',
   },
 });

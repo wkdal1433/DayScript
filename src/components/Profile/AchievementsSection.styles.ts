@@ -5,12 +5,11 @@
  */
 
 import { StyleSheet } from 'react-native';
-import { COLORS } from '../../constants/colors';
+import { COLORS, SIZES } from '../../constants';
 
 export const styles = StyleSheet.create({
   container: {
-    marginHorizontal: 16,
-    marginTop: 32,
+    marginBottom: SIZES.spacing.lg,
   },
 
   // 헤더 스타일
@@ -40,8 +39,8 @@ export const styles = StyleSheet.create({
   progressContainer: {
     backgroundColor: COLORS.white,
     borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
+    padding: 12,
+    marginBottom: 14,
     flexDirection: 'row',
     alignItems: 'center',
     shadowColor: '#000',
@@ -85,7 +84,7 @@ export const styles = StyleSheet.create({
   achievementCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
-    padding: 16,
+    padding: 12,
     flex: 1,
     marginHorizontal: 6,
     shadowColor: '#000',
@@ -105,13 +104,13 @@ export const styles = StyleSheet.create({
 
   // 아이콘 스타일
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     backgroundColor: COLORS.primaryLight,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
     alignSelf: 'center',
   },
   iconContainerLocked: {
@@ -144,7 +143,7 @@ export const styles = StyleSheet.create({
     color: COLORS.textMuted,
     textAlign: 'center',
     lineHeight: 16,
-    marginBottom: 8,
+    marginBottom: 6,
   },
   unlockedDate: {
     fontSize: 10,
