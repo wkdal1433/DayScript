@@ -24,6 +24,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: COLORS.white,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     padding: 4,
     marginBottom: 16,
     shadowColor: '#000',
@@ -62,6 +64,8 @@ export const styles = StyleSheet.create({
   mistakeCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     padding: 16,
     marginBottom: 10,
     shadowColor: '#000',

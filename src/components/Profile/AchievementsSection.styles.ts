@@ -39,6 +39,8 @@ export const styles = StyleSheet.create({
   progressContainer: {
     backgroundColor: COLORS.white,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     padding: 12,
     marginBottom: 14,
     flexDirection: 'row',
@@ -84,6 +86,8 @@ export const styles = StyleSheet.create({
   achievementCard: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     padding: 12,
     flex: 1,
     marginHorizontal: 6,

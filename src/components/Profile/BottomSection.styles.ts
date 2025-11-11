@@ -28,6 +28,8 @@ export const styles = StyleSheet.create({
   settingsList: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: {
@@ -89,6 +91,8 @@ export const styles = StyleSheet.create({
   logoutButton: {
     backgroundColor: COLORS.white,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     paddingVertical: 12,
     alignItems: 'center',
     marginBottom: 20,

@@ -12,9 +12,10 @@ export const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     paddingHorizontal: 26,
     paddingVertical: 20,
-    marginHorizontal: 16,
     marginTop: 16,
     borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     shadowColor: '#000',
     shadowOffset: {
       width: 0,

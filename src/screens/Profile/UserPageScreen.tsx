@@ -41,13 +41,8 @@ const UserPageScreen: React.FC<UserPageScreenProps> = ({
   };
 
   return (
-    <View style={styles.container}>
-      {/* Terminal Header (HomeScreen과 동일) */}
-      <View style={styles.headerContainer}>
-        <SafeAreaView style={styles.headerContentContainer}>
-          <TerminalHeader />
-        </SafeAreaView>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <TerminalHeader />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -91,7 +86,7 @@ const UserPageScreen: React.FC<UserPageScreenProps> = ({
         activeTab={activeTab}
         onTabPress={onTabPress}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

@@ -17,35 +17,14 @@ const scaleFactor = isSmallScreen ? screenWidth / 390 : 1;
 const scaleSize = (size: number) => Math.round(size * scaleFactor);
 
 export const styles = StyleSheet.create({
-  // 메인 컨테이너 (HomeScreen과 일관성)
+  // 메인 컨테이너 (HomeScreen과 동일한 구조)
   container: {
     flex: 1,
     backgroundColor: '#FCE7F3', // HomeScreen과 동일한 배경색
     minHeight: screenHeight,
   },
 
-  // 헤더 컨테이너 (TerminalHeader를 위한 공간)
-  headerContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    backgroundColor: '#FCE7F3',
-    paddingBottom: 10,
-  },
-
-  // 헤더 내용 컨테이너 (HomeScreen과 동일)
-  headerContentContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginHorizontal: SIZES.figma.terminalMargin,
-    marginTop: SIZES.figma.terminalTopMargin,
-    height: scaleSize(SIZES.figma.terminalHeight),
-  },
-
-  // 스크롤 컨테이너 (HomeScreen 패딩 시스템 적용)
+  // 스크롤 컨테이너 (HomeScreen과 동일한 패딩 시스템)
   scrollContainer: {
     paddingTop: scaleSize(SIZES.figma.terminalHeight) + SIZES.figma.terminalTopMargin + 47,
     paddingBottom: SIZES.figma.bottomNavHeight + SIZES.spacing.xl + 30,

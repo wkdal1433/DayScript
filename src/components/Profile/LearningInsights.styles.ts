@@ -23,6 +23,8 @@ export const styles = StyleSheet.create({
   chartContainer: {
     backgroundColor: COLORS.white,
     borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     padding: 16,
     marginBottom: 16,
     shadowColor: '#000',
@@ -88,6 +90,8 @@ export const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.white,
     borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
     padding: 12,
     alignItems: 'center',
     shadowColor: '#000',
