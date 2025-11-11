@@ -656,4 +656,67 @@ export const styles = StyleSheet.create({
   answerSectionHinted: {
     backgroundColor: 'rgba(253, 206, 223, 0.1)',
   },
+
+  // Community Action Styles
+  communityActionContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    gap: 12,
+  },
+
+  communityActionButton: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+
+  communityActionSuccess: {
+    backgroundColor: 'rgba(76, 175, 80, 0.05)',
+    borderColor: '#4CAF50',
+  },
+
+  communityActionWarning: {
+    backgroundColor: 'rgba(255, 152, 0, 0.05)',
+    borderColor: '#FF9800',
+  },
+
+  communityActionInfo: {
+    backgroundColor: 'rgba(33, 150, 243, 0.05)',
+    borderColor: '#2196F3',
+  },
+
+  communityActionTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary,
+    marginBottom: 4,
+  },
+
+  communityActionTitleSuccess: {
+    color: '#4CAF50',
+  },
+
+  communityActionTitleWarning: {
+    color: '#FF9800',
+  },
+
+  communityActionTitleInfo: {
+    color: '#2196F3',
+  },
+
+  communityActionSubtitle: {
+    fontSize: 13,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted,
+    lineHeight: 18,
+  },
 });

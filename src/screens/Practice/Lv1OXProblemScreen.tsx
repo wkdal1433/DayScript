@@ -20,6 +20,7 @@ import {
   isSessionCompleted,
   clearCurrentSession
 } from '../../data/sessionManager';
+import { useCommunityIntegration } from './hooks/useCommunityIntegration';
 
 const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   onAnswerSelect = (answer) => console.log('Answer selected:', answer),
@@ -36,6 +37,41 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   const [currentProblemData, setCurrentProblemData] = useState<ProblemData | null>(null);
   const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
   const [showReviewModal, setShowReviewModal] = useState(false);
+
+  // Community integration
+  const {
+    showCommunityPrompt,
+    getCommunityActions,
+    getCommunityHeaderButton,
+    handleCommunityNavigation,
+    trackEngagement
+  } = useCommunityIntegration({
+    navigation: {
+      navigate: (screen: string, params?: any) => {
+        if (screen === 'ProblemDiscussion') {
+          // TODO: This should integrate with AppNavigator's mockNavigation
+          console.log('Navigate to ProblemDiscussion with params:', params);
+          // For now, just log - actual navigation will be implemented when integrated with the main navigator
+        } else {
+          console.log('Navigate:', screen, params);
+        }
+      }
+    },
+    screenType: 'Lv1OXProblem',
+    screenData: {
+      problemId: `lv1_ox_${sessionProgress.current}`,
+      problemTitle: currentProblemData?.title,
+      level: 1,
+      category: currentProblemData?.category,
+    },
+    onCommunityNavigation: () => {
+      trackEngagement({
+        type: 'navigation',
+        source: 'Lv1OXProblem',
+        action: 'community_access',
+      });
+    },
+  });
 
   // Hint system integration
   const hintConfig = { maxSteps: 2, xpDeductionPerStep: 5 };
@@ -133,6 +169,14 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
 
     setResultData(result);
     setResultState(newResultState);
+
+    // Show community prompt after answer submission
+    showCommunityPrompt({
+      isCorrect,
+      userAnswer: answer,
+      explanation: currentProblemData.explanation,
+      hintUsage: hintState.usedSteps,
+    });
   };
 
   const handleNextProblem = () => {
@@ -370,6 +414,29 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
                 />
               </View>
             </View>
+          </View>
+
+          {/* Community Actions */}
+          <View style={styles.communityActionContainer}>
+            {getCommunityActions({ isCorrect, userAnswer: resultData?.userAnswer }).map((action, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.communityActionButton,
+                        action.style === 'success' && styles.communityActionSuccess,
+                        action.style === 'warning' && styles.communityActionWarning,
+                        action.style === 'info' && styles.communityActionInfo]}
+                onPress={action.onPress}
+                activeOpacity={0.8}
+              >
+                <Text style={[styles.communityActionTitle,
+                             action.style === 'success' && styles.communityActionTitleSuccess,
+                             action.style === 'warning' && styles.communityActionTitleWarning,
+                             action.style === 'info' && styles.communityActionTitleInfo]}>
+                  {action.title}
+                </Text>
+                <Text style={styles.communityActionSubtitle}>{action.subtitle}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* Action Buttons */}

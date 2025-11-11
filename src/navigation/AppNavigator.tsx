@@ -17,7 +17,12 @@ import DiffHunkScreen from '../screens/Practice/Challenger/DiffHunkScreen';
 import UserPageScreen from '../screens/Profile/UserPageScreen';
 
 // Community module integration
-import { CommunityHomeScreen } from '../modules/community';
+import {
+  CommunityHomeScreen,
+  ProblemDiscussionScreen,
+  CreatePostScreen,
+  PostDetailScreen
+} from '../modules/community';
 
 // New modular quiz screens
 import { Lv1OXProblemScreen } from '../modules/quiz';
@@ -27,7 +32,7 @@ import { resolveNavigation, transformNavigationParams } from './ModuleNavigation
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem' | 'ProblemDiscussion' | 'CreatePost' | 'PostDetail';
 
 interface AppNavigatorProps {}
 
@@ -35,6 +40,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
   const [activeTab, setActiveTab] = useState<TabName>('Home');
   const [currentScreen, setCurrentScreen] = useState<ScreenName>('Home');
   const [previousScreen, setPreviousScreen] = useState<ScreenName>('Home');
+  const [routeParams, setRouteParams] = useState<any>({});
 
   // Enhanced navigation object with problem screen support and module bridge integration
   const mockNavigation = {
@@ -49,6 +55,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
       // Track previous screen for proper return navigation
       setPreviousScreen(currentScreen);
       setCurrentScreen(resolvedScreen);
+      setRouteParams(transformedParams || {});
 
       // Update activeTab for tab screens
       if (screen === 'Home' || screen === 'Practice' || screen === 'Community' || screen === 'Profile') {
@@ -73,7 +80,7 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
   const mockRoute = {
     key: currentScreen,
     name: currentScreen,
-    params: {},
+    params: routeParams,
   };
 
   // 탭 전환 핸들러
@@ -219,6 +226,48 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
                 returnRoute: 'PRInbox',
                 totalFiles: 3,
                 currentFileIndex: 0,
+              },
+            }}
+          />
+        );
+      case 'ProblemDiscussion':
+        return (
+          <ProblemDiscussionScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                problemId: routeParams.problemId || 'default_problem_id',
+                problemTitle: routeParams.problemTitle || 'Sample Problem',
+                ...routeParams,
+              },
+            }}
+          />
+        );
+      case 'CreatePost':
+        return (
+          <CreatePostScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                problemId: routeParams.problemId,
+                category: routeParams.category || 'problems',
+                problemTitle: routeParams.problemTitle,
+                ...routeParams,
+              },
+            }}
+          />
+        );
+      case 'PostDetail':
+        return (
+          <PostDetailScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                postId: routeParams.postId || 'default_post_id',
+                ...routeParams,
               },
             }}
           />

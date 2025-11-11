@@ -5,6 +5,8 @@
 export { CommunityHomeScreen } from './screens/CommunityHomeScreen';
 export { ProblemDiscussionScreen } from './screens/ProblemDiscussionScreen';
 export { PostListScreen } from './screens/PostListScreen';
+export { CreatePostScreen } from './screens/CreatePostScreen';
+export { PostDetailScreen } from './screens/PostDetailScreen';
 
 // Components
 export { CategoryTabs } from './components/CategoryTabs';

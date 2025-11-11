@@ -236,6 +236,52 @@ export const useCommunityStore = () => {
     }
   }, [state.comments, updateState]);
 
+  const createPost = useCallback(async (postData: {
+    title: string;
+    content: string;
+    category: string;
+    tags: string[];
+    problemId?: string;
+  }) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Create new post with mock data
+      const newPost: CommunityPost = {
+        id: `post_${Date.now()}`,
+        title: postData.title,
+        content: postData.content,
+        category: postData.category as any,
+        authorId: 'current_user',
+        authorName: '현재 사용자',
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        likes: 0,
+        dislikes: 0,
+        commentCount: 0,
+        tags: postData.tags,
+        problemId: postData.problemId,
+        solved: false,
+      };
+
+      // Add to the beginning of posts array
+      updateState({
+        posts: [newPost, ...state.posts]
+      });
+
+      return newPost;
+    } catch (error) {
+      setError('게시글 작성에 실패했습니다.');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  }, [state.posts, updateState, setLoading, setError]);
+
   const resetStore = useCallback(() => {
     setState(initialState);
   }, []);
@@ -251,6 +297,7 @@ export const useCommunityStore = () => {
     refreshPosts,
     loadPost,
     loadComments,
+    createPost,
     votePost,
     voteComment,
     resetStore,
