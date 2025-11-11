@@ -21,9 +21,16 @@ export const terminalHeaderStyles = StyleSheet.create({
     paddingBottom: 10, // 헤더 하단 여백 10px 유지
   },
 
-  // 헤더 컨테이너 (동적 그림자 활성화 상태)
+  // 헤더 컨테이너 (동적 그림자 활성화 상태) - 통일된 디자인 시스템
   headerContainerWithShadow: {
-    ...SIZES.shadow.medium,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // 헤더 내용 컨테이너 (Safe Area 아래 실제 컨텐츠 영역)
@@ -36,7 +43,7 @@ export const terminalHeaderStyles = StyleSheet.create({
     height: scaleSize(SIZES.figma.terminalHeight),
   },
 
-  // 터미널 헤더 (자연스러운 콘텐츠 기반 동적 너비) - ORIGINAL DESIGN RESTORED
+  // 터미널 헤더 (자연스러운 콘텐츠 기반 동적 너비) - UNIFIED DESIGN SYSTEM
   terminalHeader: {
     backgroundColor: COLORS.white,
     borderWidth: SIZES.borderWidth.thin,
@@ -49,6 +56,15 @@ export const terminalHeaderStyles = StyleSheet.create({
     alignSelf: 'flex-start', // 콘텐츠 크기 기반 자동 조정
     maxWidth: 280, // 최대 너비 제한으로 레이아웃 보호
     height: scaleSize(SIZES.figma.terminalHeight), // 원래 높이 복원
+    // 통일된 그림자 적용
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // 터미널 텍스트 (기본) - ORIGINAL DESIGN RESTORED
@@ -80,7 +96,7 @@ export const terminalHeaderStyles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // 헤더 버튼 (공통 스타일) - ORIGINAL DESIGN RESTORED
+  // 헤더 버튼 (공통 스타일) - UNIFIED DESIGN SYSTEM
   headerButton: {
     width: 36,
     height: 36,
@@ -91,6 +107,15 @@ export const terminalHeaderStyles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: SIZES.spacing.sm, // 버튼 간 간격
+    // 통일된 그림자 적용
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // 문구별 색상 스타일 - ORIGINAL DESIGN RESTORED
