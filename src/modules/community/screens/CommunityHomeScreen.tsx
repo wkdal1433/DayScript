@@ -53,7 +53,7 @@ export const CommunityHomeScreen: React.FC<CommunityHomeScreenProps> = ({
 
   const [activeCategory, setActiveCategory] = useState<PostCategory>('problems');
   const [isFabExpanded, setIsFabExpanded] = useState(false);
-  const fabAnimation = new Animated.Value(0);
+  const [fabAnimation] = useState(new Animated.Value(0)); // useState로 감싸서 재초기화 방지
 
   useEffect(() => {
     setFilter({
@@ -106,30 +106,38 @@ export const CommunityHomeScreen: React.FC<CommunityHomeScreenProps> = ({
     const toValue = isFabExpanded ? 0 : 1;
     setIsFabExpanded(!isFabExpanded);
 
+    // 더 부드러운 스프링 애니메이션으로 업그레이드
     Animated.spring(fabAnimation, {
       toValue,
       tension: 100,
       friction: 8,
-      useNativeDriver: false,
+      useNativeDriver: false, // backgroundColor와 레이아웃 속성 때문에 필요
     }).start();
   };
 
-  const handleQuestionPress = () => {
+  // 검색 기능 핸들러 (추후 검색 화면 구현 시 연결)
+  const handleSearchPress = () => {
     toggleFab();
     Alert.alert(
-      '질문 작성',
-      '문제 관련 질문을 작성하는 화면으로 이동합니다.',
+      '검색 기능',
+      '커뮤니티 검색 기능은 추후 구현 예정입니다.',
       [{ text: '확인', style: 'default' }]
     );
   };
 
-  const handleGeneralPostPress = () => {
+  // 글쓰기 화면으로 내비게이션
+  const handleCreatePostPress = () => {
     toggleFab();
-    Alert.alert(
-      '일반 글 작성',
-      '커뮤니티 일반 게시글을 작성하는 화면으로 이동합니다.',
-      [{ text: '확인', style: 'default' }]
-    );
+    navigation.navigate('CreatePost', {
+      category: 'general'
+    });
+  };
+
+  // FAB 닫기 전용 핸들러
+  const handleCloseFab = () => {
+    if (isFabExpanded) {
+      toggleFab();
+    }
   };
 
   const handleRefresh = async () => {
@@ -233,7 +241,7 @@ export const CommunityHomeScreen: React.FC<CommunityHomeScreenProps> = ({
   // }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.background }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#FCE7F3' }}>
       <TerminalHeader
         onAlarmPress={() => console.log('Community notifications')}
         onSettingsPress={() => console.log('Community settings')}
@@ -267,74 +275,251 @@ export const CommunityHomeScreen: React.FC<CommunityHomeScreenProps> = ({
           />
         </View>
 
-        {/* Expandable Floating Action Button */}
+        {/* Enhanced Expandable Floating Action Button */}
         <View style={communityStyles.fabContainer}>
-          {/* Sub Action Buttons */}
-          <Animated.View
-            style={[
-              communityStyles.subFabButton,
-              {
-                transform: [{
-                  translateY: fabAnimation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -70],
-                  })
-                }],
-                opacity: fabAnimation,
-              }
-            ]}
-          >
-            <TouchableOpacity
-              style={[communityStyles.subFab, { backgroundColor: '#10B981' }]}
-              onPress={handleQuestionPress}
-              activeOpacity={0.8}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}>
-                ❓
-              </Text>
-            </TouchableOpacity>
-            <Text style={communityStyles.subFabLabel}>질문하기</Text>
-          </Animated.View>
+          {/* 배경 오버레이 제거 - 더 깔끔한 UX */}
 
-          <Animated.View
-            style={[
-              communityStyles.subFabButton,
-              {
-                transform: [{
-                  translateY: fabAnimation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0, -130],
-                  })
-                }],
-                opacity: fabAnimation,
-              }
-            ]}
-          >
-            <TouchableOpacity
-              style={[communityStyles.subFab, { backgroundColor: '#8B5CF6' }]}
-              onPress={handleGeneralPostPress}
-              activeOpacity={0.8}
-            >
-              <Text style={{ color: COLORS.white, fontSize: 16, fontWeight: '600' }}>
-                ✏️
-              </Text>
-            </TouchableOpacity>
-            <Text style={communityStyles.subFabLabel}>일반글</Text>
-          </Animated.View>
+          {/* 액션 버튼 1: 검색하기 (맨 위) - 버튼과 레이블 분리 */}
+          {isFabExpanded && (
+            <>
+              {/* 검색 버튼 - 절대 위치로 중앙 고정 */}
+              <Animated.View
+                style={[
+                  communityStyles.subFabButtonOnly,
+                  {
+                    transform: [
+                      {
+                        translateY: fabAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, -140], // 일정한 70px 간격 (56px + 14px 여백)
+                          extrapolate: 'clamp',
+                        })
+                      },
+                      {
+                        scale: fabAnimation.interpolate({
+                          inputRange: [0, 0.3, 1],
+                          outputRange: [0.5, 0.8, 1],
+                          extrapolate: 'clamp',
+                        })
+                      }
+                    ],
+                    opacity: fabAnimation.interpolate({
+                      inputRange: [0, 0.3, 1],
+                      outputRange: [0, 0.6, 1],
+                      extrapolate: 'clamp',
+                    }),
+                  }
+                ]}
+              >
+                <TouchableOpacity
+                  style={[communityStyles.subFab, { backgroundColor: '#A7C7F9' }]}
+                  onPress={handleSearchPress}
+                  activeOpacity={0.8}
+                  disabled={!isFabExpanded}
+                >
+                  <Text style={{ color: '#2563EB', fontSize: 18, fontWeight: '600' }}>
+                    🔍
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
 
-          {/* Main FAB */}
+              {/* 검색 레이블 - 독립적 위치 */}
+              <Animated.View
+                style={[
+                  communityStyles.subFabLabelOnly,
+                  {
+                    transform: [
+                      {
+                        translateY: fabAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, -140], // 버튼과 동일한 Y축
+                          extrapolate: 'clamp',
+                        })
+                      }
+                    ],
+                    opacity: fabAnimation.interpolate({
+                      inputRange: [0, 0.3, 1],
+                      outputRange: [0, 0.6, 1],
+                      extrapolate: 'clamp',
+                    }),
+                  }
+                ]}
+              >
+                <Text style={communityStyles.subFabLabel} numberOfLines={1}>검색하기</Text>
+              </Animated.View>
+            </>
+          )}
+
+          {/* 액션 버튼 2: 글쓰기 (중간) - 버튼과 레이블 분리 */}
+          {isFabExpanded && (
+            <>
+              {/* 글쓰기 버튼 - 절대 위치로 중앙 고정 */}
+              <Animated.View
+                style={[
+                  communityStyles.subFabButtonOnly,
+                  {
+                    transform: [
+                      {
+                        translateY: fabAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, -70], // 일정한 70px 간격 유지
+                          extrapolate: 'clamp',
+                        })
+                      },
+                      {
+                        scale: fabAnimation.interpolate({
+                          inputRange: [0, 0.5, 1],
+                          outputRange: [0.5, 0.9, 1],
+                          extrapolate: 'clamp',
+                        })
+                      }
+                    ],
+                    opacity: fabAnimation.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0, 0.8, 1],
+                      extrapolate: 'clamp',
+                    }),
+                  }
+                ]}
+              >
+                <TouchableOpacity
+                  style={[communityStyles.subFab, { backgroundColor: '#A6E3B0' }]}
+                  onPress={handleCreatePostPress}
+                  activeOpacity={0.8}
+                  disabled={!isFabExpanded}
+                >
+                  <Text style={{ color: '#059669', fontSize: 18, fontWeight: '600' }}>
+                    ✏️
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+
+              {/* 글쓰기 레이블 - 독립적 위치 */}
+              <Animated.View
+                style={[
+                  communityStyles.subFabLabelOnly,
+                  {
+                    transform: [
+                      {
+                        translateY: fabAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, -70], // 버튼과 동일한 Y축
+                          extrapolate: 'clamp',
+                        })
+                      }
+                    ],
+                    opacity: fabAnimation.interpolate({
+                      inputRange: [0, 0.5, 1],
+                      outputRange: [0, 0.8, 1],
+                      extrapolate: 'clamp',
+                    }),
+                  }
+                ]}
+              >
+                <Text style={communityStyles.subFabLabel} numberOfLines={1}>글쓰기</Text>
+              </Animated.View>
+            </>
+          )}
+
+          {/* 액션 버튼 3: 닫기 (맨 아래) - 버튼과 레이블 분리 */}
+          {isFabExpanded && (
+            <>
+              {/* 닫기 버튼 - 메인 FAB과 완벽히 겹치는 위치 */}
+              <Animated.View
+                style={[
+                  communityStyles.subFabButtonOnly,
+                  {
+                    transform: [
+                      {
+                        translateY: fabAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, 0], // 메인 FAB과 완벽하게 겹치는 위치 (동일한 Y축)
+                          extrapolate: 'clamp',
+                        })
+                      },
+                      {
+                        scale: fabAnimation.interpolate({
+                          inputRange: [0, 0.7, 1],
+                          outputRange: [0.5, 0.95, 1],
+                          extrapolate: 'clamp',
+                        })
+                      }
+                    ],
+                    opacity: fabAnimation.interpolate({
+                      inputRange: [0, 0.7, 1],
+                      outputRange: [0, 0.9, 1],
+                      extrapolate: 'clamp',
+                    }),
+                  }
+                ]}
+              >
+                <TouchableOpacity
+                  style={[communityStyles.subFab, { backgroundColor: '#F6C177' }]}
+                  onPress={handleCloseFab}
+                  activeOpacity={0.8}
+                  disabled={!isFabExpanded}
+                >
+                  <Text style={{ color: '#EA580C', fontSize: 18, fontWeight: '600' }}>
+                    ✕
+                  </Text>
+                </TouchableOpacity>
+              </Animated.View>
+
+              {/* 닫기 레이블 - 독립적 위치 */}
+              <Animated.View
+                style={[
+                  communityStyles.subFabLabelOnly,
+                  {
+                    transform: [
+                      {
+                        translateY: fabAnimation.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [0, 0], // 버튼과 동일한 Y축
+                          extrapolate: 'clamp',
+                        })
+                      }
+                    ],
+                    opacity: fabAnimation.interpolate({
+                      inputRange: [0, 0.7, 1],
+                      outputRange: [0, 0.9, 1],
+                      extrapolate: 'clamp',
+                    }),
+                  }
+                ]}
+              >
+                <Text style={communityStyles.subFabLabel} numberOfLines={1}>닫기</Text>
+              </Animated.View>
+            </>
+          )}
+
+          {/* 메인 FAB - 향상된 애니메이션 */}
           <Animated.View
             style={{
-              transform: [{
-                rotate: fabAnimation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0deg', '45deg'],
-                })
-              }]
+              transform: [
+                {
+                  rotate: fabAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ['0deg', '135deg'],
+                    extrapolate: 'clamp',
+                  })
+                },
+                {
+                  scale: fabAnimation.interpolate({
+                    inputRange: [0, 0.2, 1],
+                    outputRange: [1, 1.1, 0.95],
+                    extrapolate: 'clamp',
+                  })
+                }
+              ],
             }}
           >
             <TouchableOpacity
-              style={communityStyles.fabButton}
+              style={[
+                communityStyles.fabButton,
+                {
+                  backgroundColor: isFabExpanded ? '#6B7280' : COLORS.primary,
+                }
+              ]}
               onPress={toggleFab}
               activeOpacity={0.8}
             >
