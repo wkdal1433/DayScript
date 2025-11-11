@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavigationBar from '../../components/BottomNavigation/BottomNavigationBar';
-import { TerminalHeader } from '../../components/Home';
+import { TerminalHeader } from '../../modules/common';
 import { UserSummaryHeader } from '../../components/Profile/UserSummaryHeader';
 import { LearningInsights } from '../../components/Profile/LearningInsights';
 import { MistakeNoteSection } from '../../components/Profile/MistakeNoteSection';

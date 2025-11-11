@@ -7,12 +7,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavigationBar from '../../components/BottomNavigation';
 import {
-  TerminalHeader,
   TodayQuests,
   QuickActions,
   LearningStatus,
   Ranking
 } from '../../components/Home';
+import { TerminalHeader } from '../../modules/common';
 import { DifficultySelectionModal, DifficultyLevel } from '../../components/Modals';
 
 import { HomeScreenProps } from './Home.types';

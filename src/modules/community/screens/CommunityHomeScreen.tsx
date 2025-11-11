@@ -17,7 +17,7 @@ import { PostCategory } from '../types/community.types';
 import { communityStyles } from '../constants/community.styles';
 import { COLORS } from '../../../constants/colors';
 import BottomNavigationBar from '../../../components/BottomNavigation/BottomNavigationBar';
-import TerminalHeader from '../../../components/Home/TerminalHeader';
+import { TerminalHeader } from '../../common';
 import { MOCK_POSTS } from '../services/mockData';
 
 interface CommunityHomeScreenProps {

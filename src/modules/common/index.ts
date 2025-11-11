@@ -11,6 +11,9 @@ export * from './core/utils';
 // UI exports
 export * from './ui/components';
 
+// Common reusable components
+export { default as TerminalHeader } from './components/TerminalHeader';
+
 // Re-export commonly used items for convenience
 export {
   COLORS,
