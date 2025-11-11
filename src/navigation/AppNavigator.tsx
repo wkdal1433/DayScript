@@ -16,6 +16,9 @@ import PRInboxScreen from '../screens/Practice/Challenger/PRInboxScreen';
 import DiffHunkScreen from '../screens/Practice/Challenger/DiffHunkScreen';
 import UserPageScreen from '../screens/Profile/UserPageScreen';
 
+// Community module integration
+import { CommunityHomeScreen } from '../modules/community';
+
 // New modular quiz screens
 import { Lv1OXProblemScreen } from '../modules/quiz';
 
@@ -107,9 +110,8 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
           />
         );
       case 'Community':
-        // 향후 Community 화면 구현
         return (
-          <HomeScreen
+          <CommunityHomeScreen
             navigation={mockNavigation}
             route={{ ...mockRoute, name: 'Community' }}
             activeTab={activeTab}
