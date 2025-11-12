@@ -14,6 +14,7 @@ import {
   Modal,
   ScrollView,
   Pressable,
+  Alert,
 } from 'react-native';
 import { styles } from './DifficultySelectionModal.styles';
 import Lv5ModeSelectModal, { Lv5Module } from './Lv5ModeSelectModal';
@@ -377,8 +378,8 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
 
         switch (selectedLevel.id) {
           case 'beginner':
-            // 입문: LV1 문제 세트 (O/X 문제)
-            targetRoute = 'OXProblem';
+            // 입문: LV1 문제 세트 (O/X 문제) - Direct route to dedicated screen
+            targetRoute = 'Lv1OXProblem';
             break;
           case 'elementary':
             // 초급: LV2 문제 세트 (객관식 문제)
@@ -416,6 +417,15 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
             difficulty: 'hard', // Challenger level maps to hard difficulty
             timeLimit: 1800, // 30 minutes for challenger mode
             returnRoute: 'Practice',
+          });
+        } else if (targetRoute === 'Lv1OXProblem') {
+          // Special handling for LV1 OX Problems - use the same format as AppNavigator
+          navigation.navigate(targetRoute, {
+            level: 1,
+            quizId: 'lv1_ox_001',
+            returnRoute: 'Practice',
+            difficulty: selectedLevel,
+            language: selectedLanguage,
           });
         } else {
           // Standard navigation for other levels
@@ -584,6 +594,7 @@ const DifficultySelectionModal: React.FC<DifficultySelectionModalProps> = ({
       </View>
     );
   };
+
 
   return (
     <Modal

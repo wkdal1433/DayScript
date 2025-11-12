@@ -55,6 +55,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
   const [internalActiveTab, setInternalActiveTab] = useState('Home');
   const [isDifficultyModalVisible, setIsDifficultyModalVisible] = useState(false);
 
+
   // Use external activeTab if provided, otherwise use internal state
   const activeTab = externalActiveTab || internalActiveTab;
   const [headerShadowVisible, setHeaderShadowVisible] = useState(false);

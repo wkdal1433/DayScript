@@ -38,83 +38,52 @@ export class QuizRepositoryImpl implements IQuizRepository {
 
   // Quiz 조회 메서드들
   async getQuizById(id: string): Promise<QuizBase | null> {
-    // 캐시에서 먼저 확인
-    const cacheKey = `quiz:${id}`;
-    const cachedQuiz = await this.cache.get<any>(cacheKey);
+    console.log(`🔍 [OFFLINE MODE] Getting quiz by ID: ${id}`);
 
-    if (cachedQuiz) {
-      return QuizFactory.createQuiz(cachedQuiz.type, cachedQuiz);
+    // CRITICAL FIX: 네트워크 요청 제거, Mock 데이터에서 검색
+    const allMockQuizzes = [
+      ...this.getMockQuizData('LV1'),
+      ...this.getMockQuizData('LV2'),
+      ...this.getMockQuizData('LV3')
+    ];
+
+    const foundQuiz = allMockQuizzes.find(quiz => quiz.id === id);
+    if (!foundQuiz) {
+      console.log(`❌ Quiz with ID ${id} not found in mock data`);
+      return null;
     }
 
     try {
-      const response = await fetch(`${this.apiBaseUrl}/quizzes/${id}`);
-      if (!response.ok) {
-        if (response.status === 404) return null;
-        throw new Error(`Failed to fetch quiz: ${response.statusText}`);
-      }
-
-      const quizData = await response.json();
-
-      // 캐시에 저장 (1시간)
-      await this.cache.set(cacheKey, quizData, 3600);
-
-      return QuizFactory.createQuiz(quizData.type, quizData);
+      return QuizFactory.createQuiz(foundQuiz.type, foundQuiz);
     } catch (error) {
-      console.error('Error fetching quiz by ID:', error);
+      console.error('Error creating quiz object:', error);
       return null;
     }
   }
 
   async getQuizzesByLevel(level: QuizLevel): Promise<QuizBase[]> {
-    const cacheKey = `quizzes:level:${level}`;
-    const cachedQuizzes = await this.cache.get<any[]>(cacheKey);
+    console.log(`🎯 [OFFLINE MODE] Loading quizzes for level: ${level}`);
 
-    if (cachedQuizzes) {
-      return cachedQuizzes.map(data => QuizFactory.createQuiz(data.type, data));
-    }
-
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/quizzes?level=${level}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch quizzes by level: ${response.statusText}`);
-      }
-
-      const quizzesData = await response.json();
-
-      // 캐시에 저장 (30분)
-      await this.cache.set(cacheKey, quizzesData, 1800);
-
-      return quizzesData.map((data: any) => QuizFactory.createQuiz(data.type, data));
-    } catch (error) {
-      console.error('Error fetching quizzes by level:', error);
-
-      // 오프라인 모드: 로컬 목업 데이터 사용
-      return this.getOfflineQuizzes(level);
-    }
+    // CRITICAL FIX: 네트워크 요청 완전 비활성화, 무조건 Mock 데이터 사용
+    return this.getOfflineQuizzes(level);
   }
 
   async getQuizzesByType(type: QuizType): Promise<QuizBase[]> {
-    const cacheKey = `quizzes:type:${type}`;
-    const cachedQuizzes = await this.cache.get<any[]>(cacheKey);
+    console.log(`🏷️ [OFFLINE MODE] Getting quizzes by type: ${type}`);
 
-    if (cachedQuizzes) {
-      return cachedQuizzes.map(data => QuizFactory.createQuiz(data.type, data));
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, Mock 데이터에서 타입별 필터링
+    const allMockQuizzes = [
+      ...this.getMockQuizData('LV1'),
+      ...this.getMockQuizData('LV2'),
+      ...this.getMockQuizData('LV3')
+    ];
+
+    const filteredQuizzes = allMockQuizzes.filter(quiz => quiz.type === type);
 
     try {
-      const response = await fetch(`${this.apiBaseUrl}/quizzes?type=${type}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch quizzes by type: ${response.statusText}`);
-      }
-
-      const quizzesData = await response.json();
-
-      // 캐시에 저장 (30분)
-      await this.cache.set(cacheKey, quizzesData, 1800);
-
-      return quizzesData.map((data: any) => QuizFactory.createQuiz(data.type, data));
+      return filteredQuizzes.map((data: any) => QuizFactory.createQuiz(data.type, data));
     } catch (error) {
-      console.error('Error fetching quizzes by type:', error);
+      console.error('Error creating quiz objects:', error);
       return [];
     }
   }
@@ -141,29 +110,37 @@ export class QuizRepositoryImpl implements IQuizRepository {
   }
 
   async searchQuizzes(query: QuizSearchQuery): Promise<QuizBase[]> {
+    console.log(`🔍 [OFFLINE MODE] Searching quizzes:`, query);
+
+    // CRITICAL FIX: 네트워크 요청 제거, Mock 데이터에서 검색
+    const allMockQuizzes = [
+      ...this.getMockQuizData('LV1'),
+      ...this.getMockQuizData('LV2'),
+      ...this.getMockQuizData('LV3')
+    ];
+
+    let filteredQuizzes = allMockQuizzes;
+
+    // 간단한 필터링 로직
+    if (query.level) {
+      filteredQuizzes = filteredQuizzes.filter(quiz => quiz.level === query.level);
+    }
+    if (query.type) {
+      filteredQuizzes = filteredQuizzes.filter(quiz => quiz.type === query.type);
+    }
+    if (query.category) {
+      filteredQuizzes = filteredQuizzes.filter(quiz => quiz.category?.includes(query.category));
+    }
+
+    // 제한 적용
+    if (query.limit) {
+      filteredQuizzes = filteredQuizzes.slice(query.offset || 0, (query.offset || 0) + query.limit);
+    }
+
     try {
-      const params = new URLSearchParams();
-
-      if (query.level) params.append('level', query.level);
-      if (query.type) params.append('type', query.type);
-      if (query.category) params.append('category', query.category);
-      if (query.keyword) params.append('keyword', query.keyword);
-      if (query.limit) params.append('limit', query.limit.toString());
-      if (query.offset) params.append('offset', query.offset.toString());
-
-      if (query.tags && query.tags.length > 0) {
-        query.tags.forEach(tag => params.append('tags', tag));
-      }
-
-      const response = await fetch(`${this.apiBaseUrl}/quizzes/search?${params}`);
-      if (!response.ok) {
-        throw new Error(`Search failed: ${response.statusText}`);
-      }
-
-      const searchResults = await response.json();
-      return searchResults.map((data: any) => QuizFactory.createQuiz(data.type, data));
+      return filteredQuizzes.map((data: any) => QuizFactory.createQuiz(data.type, data));
     } catch (error) {
-      console.error('Error searching quizzes:', error);
+      console.error('Error creating quiz objects:', error);
       return [];
     }
   }
@@ -178,198 +155,61 @@ export class QuizRepositoryImpl implements IQuizRepository {
 
   // 결과 관리 메서드들
   async saveQuizResult(result: QuizResult): Promise<void> {
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/quiz-results`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(result),
-      });
+    console.log(`💾 [OFFLINE MODE] Saving quiz result for userId: ${result.userId}`);
 
-      if (!response.ok) {
-        throw new Error(`Failed to save quiz result: ${response.statusText}`);
-      }
-
-      // 사용자 관련 캐시 무효화
-      await this.cache.invalidate(`results:${result.userId}:*`);
-      await this.cache.invalidate(`progress:${result.userId}:*`);
-    } catch (error) {
-      console.error('Error saving quiz result:', error);
-
-      // 오프라인 모드: 로컬 스토리지에 저장
-      this.saveToLocalStorage('quiz_results', result);
-    }
+    // CRITICAL FIX: localStorage 제거, 단순 로깅으로 대체 (서버 구현 전까지)
+    console.log('Quiz result saved (mock):', result);
   }
 
   async getQuizResults(userId: string, quizId?: string): Promise<QuizResult[]> {
-    const cacheKey = quizId ? `results:${userId}:${quizId}` : `results:${userId}:all`;
-    const cachedResults = await this.cache.get<QuizResult[]>(cacheKey);
+    console.log(`📊 [OFFLINE MODE] Getting quiz results for userId: ${userId}`);
 
-    if (cachedResults) {
-      return cachedResults;
-    }
-
-    try {
-      const params = new URLSearchParams({ userId });
-      if (quizId) params.append('quizId', quizId);
-
-      const response = await fetch(`${this.apiBaseUrl}/quiz-results?${params}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch quiz results: ${response.statusText}`);
-      }
-
-      const results = await response.json();
-
-      // 캐시에 저장 (15분)
-      await this.cache.set(cacheKey, results, 900);
-
-      return results;
-    } catch (error) {
-      console.error('Error fetching quiz results:', error);
-
-      // 오프라인 모드: 로컬 스토리지에서 가져오기
-      return this.getFromLocalStorage('quiz_results', []);
-    }
+    // CRITICAL FIX: localStorage 제거, 빈 배열 반환 (서버 구현 전까지)
+    return [];
   }
 
   async getQuizResultsByLevel(userId: string, level: QuizLevel): Promise<QuizResult[]> {
-    const cacheKey = `results:${userId}:level:${level}`;
-    const cachedResults = await this.cache.get<QuizResult[]>(cacheKey);
+    console.log(`📊 [OFFLINE MODE] Getting quiz results for userId: ${userId}, level: ${level}`);
 
-    if (cachedResults) {
-      return cachedResults;
-    }
-
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/quiz-results?userId=${userId}&level=${level}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch quiz results by level: ${response.statusText}`);
-      }
-
-      const results = await response.json();
-
-      // 캐시에 저장 (15분)
-      await this.cache.set(cacheKey, results, 900);
-
-      return results;
-    } catch (error) {
-      console.error('Error fetching quiz results by level:', error);
-      return [];
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, 빈 배열 반환
+    return [];
   }
 
   // 진행 상황 관리
   async getQuizProgress(userId: string): Promise<QuizProgress[]> {
-    const cacheKey = `progress:${userId}`;
-    const cachedProgress = await this.cache.get<QuizProgress[]>(cacheKey);
+    console.log(`📋 [OFFLINE MODE] Getting quiz progress for userId: ${userId}`);
 
-    if (cachedProgress) {
-      return cachedProgress;
-    }
-
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/quiz-progress/${userId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch quiz progress: ${response.statusText}`);
-      }
-
-      const progress = await response.json();
-
-      // 캐시에 저장 (10분)
-      await this.cache.set(cacheKey, progress, 600);
-
-      return progress;
-    } catch (error) {
-      console.error('Error fetching quiz progress:', error);
-      return [];
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, 빈 배열 반환
+    return [];
   }
 
   async updateQuizProgress(progress: QuizProgress): Promise<void> {
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/quiz-progress`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(progress),
-      });
+    console.log(`🔄 [OFFLINE MODE] Updating quiz progress:`, progress);
 
-      if (!response.ok) {
-        throw new Error(`Failed to update quiz progress: ${response.statusText}`);
-      }
-
-      // 캐시 무효화
-      await this.cache.invalidate(`progress:${progress.userId}:*`);
-    } catch (error) {
-      console.error('Error updating quiz progress:', error);
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, 단순 로깅으로 대체
+    console.log('Quiz progress updated (mock):', progress);
   }
 
   // 오답노트 관리
   async getWrongAnswers(userId: string): Promise<QuizResult[]> {
-    const cacheKey = `wrong:${userId}`;
-    const cachedWrong = await this.cache.get<QuizResult[]>(cacheKey);
+    console.log(`🚫 [OFFLINE MODE] Getting wrong answers for userId: ${userId}`);
 
-    if (cachedWrong) {
-      return cachedWrong;
-    }
-
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/wrong-answers/${userId}`);
-      if (!response.ok) {
-        throw new Error(`Failed to fetch wrong answers: ${response.statusText}`);
-      }
-
-      const wrongAnswers = await response.json();
-
-      // 캐시에 저장 (5분)
-      await this.cache.set(cacheKey, wrongAnswers, 300);
-
-      return wrongAnswers;
-    } catch (error) {
-      console.error('Error fetching wrong answers:', error);
-      return [];
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, 빈 배열 반환
+    return [];
   }
 
   async addToWrongAnswers(result: QuizResult): Promise<void> {
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/wrong-answers`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(result),
-      });
+    console.log(`➕ [OFFLINE MODE] Adding to wrong answers:`, result);
 
-      if (!response.ok) {
-        throw new Error(`Failed to add to wrong answers: ${response.statusText}`);
-      }
-
-      // 캐시 무효화
-      await this.cache.invalidate(`wrong:${result.userId}:*`);
-    } catch (error) {
-      console.error('Error adding to wrong answers:', error);
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, 단순 로깅으로 대체
+    console.log('Added to wrong answers (mock):', result);
   }
 
   async removeFromWrongAnswers(userId: string, quizId: string): Promise<void> {
-    try {
-      const response = await fetch(`${this.apiBaseUrl}/wrong-answers/${userId}/${quizId}`, {
-        method: 'DELETE',
-      });
+    console.log(`➖ [OFFLINE MODE] Removing from wrong answers - userId: ${userId}, quizId: ${quizId}`);
 
-      if (!response.ok) {
-        throw new Error(`Failed to remove from wrong answers: ${response.statusText}`);
-      }
-
-      // 캐시 무효화
-      await this.cache.invalidate(`wrong:${userId}:*`);
-    } catch (error) {
-      console.error('Error removing from wrong answers:', error);
-    }
+    // CRITICAL FIX: 네트워크 요청 제거, 단순 로깅으로 대체
+    console.log('Removed from wrong answers (mock):', { userId, quizId });
   }
 
   // 복습 시스템
@@ -401,28 +241,100 @@ export class QuizRepositoryImpl implements IQuizRepository {
 
   // 유틸리티 메서드들
   private async getOfflineQuizzes(level: QuizLevel): Promise<QuizBase[]> {
-    // 오프라인 모드에서 사용할 목업 데이터
-    const mockQuizzes = this.getFromLocalStorage(`offline_quizzes_${level}`, []);
-    return mockQuizzes.map((data: any) => QuizFactory.createQuiz(data.type, data));
-  }
+    console.log(`🎲 [MOCK DATA] Loading mock quizzes for level: ${level}`);
 
-  private saveToLocalStorage(key: string, data: any): void {
+    // CRITICAL FIX: localStorage 완전 제거, 하드코딩된 Mock 데이터 사용
+    const mockQuizzesData = this.getMockQuizData(level);
+
     try {
-      const existingData = this.getFromLocalStorage(key, []);
-      existingData.push(data);
-      localStorage.setItem(key, JSON.stringify(existingData));
+      return mockQuizzesData.map((data: any) => QuizFactory.createQuiz(data.type, data));
     } catch (error) {
-      console.error('Error saving to localStorage:', error);
+      console.error('Error creating quiz objects from mock data:', error);
+      return [];
     }
   }
 
-  private getFromLocalStorage(key: string, defaultValue: any = null): any {
-    try {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : defaultValue;
-    } catch (error) {
-      console.error('Error getting from localStorage:', error);
-      return defaultValue;
-    }
+  private getMockQuizData(level: QuizLevel): any[] {
+    console.log(`🔧 Generating mock quiz data for level: ${level}`);
+
+    // React Native 환경에서 안전한 Mock 데이터 반환
+    const mockData = {
+      'LV1': [
+        {
+          id: 'mock_ox_001',
+          type: 'OX',
+          title: 'Python에서 리스트는',
+          subtitle: '가변(mutable) 자료형이다.',
+          correctAnswer: 'O',
+          explanation: '리스트는 생성 후에도 요소를 추가, 삭제, 수정할 수 있는 가변 자료형입니다.',
+          category: 'Python 기초',
+          level: 'LV1',
+          difficulty: 'easy',
+          tags: ['python', 'basic'],
+          timeLimit: 30000,
+          points: 10,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'mock_ox_002',
+          type: 'OX',
+          title: 'JavaScript에서 var 키워드는',
+          subtitle: '블록 스코프를 갖는다.',
+          correctAnswer: 'X',
+          explanation: 'var 키워드는 함수 스코프를 가지며, let과 const가 블록 스코프를 갖습니다.',
+          category: 'JavaScript 기초',
+          level: 'LV1',
+          difficulty: 'easy',
+          tags: ['javascript', 'basic'],
+          timeLimit: 30000,
+          points: 10,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: 'mock_ox_003',
+          type: 'OX',
+          title: 'HTML에서 <div> 태그는',
+          subtitle: '인라인 요소이다.',
+          correctAnswer: 'X',
+          explanation: '<div> 태그는 블록 레벨 요소로, 전체 너비를 차지하고 새 줄에서 시작합니다.',
+          category: 'HTML 기초',
+          level: 'LV1',
+          difficulty: 'easy',
+          tags: ['html', 'basic'],
+          timeLimit: 30000,
+          points: 10,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ],
+      'LV2': [
+        {
+          id: 'mock_mc_001',
+          type: 'MULTIPLE_CHOICE',
+          question: 'Python에서 가변 자료형은?',
+          choices: [
+            { id: 'a', text: 'tuple' },
+            { id: 'b', text: 'string' },
+            { id: 'c', text: 'list' },
+            { id: 'd', text: 'int' }
+          ],
+          correctAnswer: 'c',
+          explanation: 'list는 가변 자료형으로 요소를 추가, 삭제, 수정할 수 있습니다.',
+          category: 'Python 심화',
+          level: 'LV2',
+          difficulty: 'medium',
+          tags: ['python', 'intermediate'],
+          timeLimit: 45000,
+          points: 15,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ],
+      'LV3': []
+    };
+
+    return mockData[level] || [];
   }
 }

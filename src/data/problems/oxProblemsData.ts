@@ -141,8 +141,21 @@ export const OX_PROBLEMS_POOL: ProblemData[] = [
 
 // Utility function to get random problems from the pool
 export const getRandomOXProblems = (count: number = 10): ProblemData[] => {
+  console.log(`🎲 getRandomOXProblems called with count: ${count}`);
+  console.log(`📚 OX_PROBLEMS_POOL size: ${OX_PROBLEMS_POOL.length}`);
+
+  if (!OX_PROBLEMS_POOL || OX_PROBLEMS_POOL.length === 0) {
+    console.error('❌ OX_PROBLEMS_POOL is empty or undefined!');
+    return [];
+  }
+
   const shuffled = [...OX_PROBLEMS_POOL].sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, Math.min(count, OX_PROBLEMS_POOL.length));
+  const result = shuffled.slice(0, Math.min(count, OX_PROBLEMS_POOL.length));
+
+  console.log(`✅ Returning ${result.length} problems`);
+  console.log('First problem:', result[0]?.id, result[0]?.title);
+
+  return result;
 };
 
 // Function to get a specific problem by ID

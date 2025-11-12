@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { View, Text } from 'react-native';
-import { progressBarStyles } from '../styles/QuizProgressBar.styles';
+import { quizProgressBarStyles as progressBarStyles } from '../styles/QuizProgressBar.styles';
 
 export interface QuizProgressBarProps {
   current: number;

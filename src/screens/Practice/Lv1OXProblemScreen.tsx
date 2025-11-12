@@ -105,22 +105,40 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
 
   // Initialize session and get current problem
   useEffect(() => {
-    let currentSession = sessionManager.getCurrentSession();
+    try {
+      console.log('🔄 Initializing LV1 OX Problem session...');
+      let currentSession = sessionManager.getCurrentSession();
 
-    // Create new session if none exists
-    if (!currentSession) {
-      currentSession = createNewSession('OX', 10);
+      // Create new session if none exists
+      if (!currentSession) {
+        console.log('📝 Creating new OX session...');
+        currentSession = createNewSession('OX', 10);
+        console.log('✅ New session created:', currentSession?.id);
+      } else {
+        console.log('♻️ Using existing session:', currentSession?.id);
+      }
+
+      // Load current problem
+      const problem = getCurrentProblem() as ProblemData;
+      if (problem) {
+        console.log('📖 Problem loaded successfully:', problem.id, problem.title);
+        setCurrentProblemData(problem);
+      } else {
+        console.error('❌ CRITICAL: No problem data available!');
+        console.log('Session state:', currentSession);
+        console.log('Available problems:', currentSession?.problems?.length || 0);
+        // Set a fallback error state or message
+        setCurrentProblemData(null);
+      }
+
+      // Update progress
+      const progress = getSessionProgress();
+      console.log('📊 Session progress:', progress);
+      setSessionProgress(progress);
+    } catch (error) {
+      console.error('💥 Error initializing LV1 OX session:', error);
+      setCurrentProblemData(null);
     }
-
-    // Load current problem
-    const problem = getCurrentProblem() as ProblemData;
-    if (problem) {
-      setCurrentProblemData(problem);
-    }
-
-    // Update progress
-    const progress = getSessionProgress();
-    setSessionProgress(progress);
   }, []);
 
   useEffect(() => {
@@ -603,10 +621,63 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
     </SafeAreaView>
   );
 
+  // Error state render
+  const renderErrorState = () => (
+    <SafeAreaView style={styles.container}>
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center', padding: 20 }]}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', color: '#FF4D4D', marginBottom: 10 }}>
+          ❌ 문제를 불러올 수 없습니다
+        </Text>
+        <Text style={{ fontSize: 14, color: '#666', textAlign: 'center', marginBottom: 20 }}>
+          문제 데이터를 로딩하는 중 오류가 발생했습니다.{'\n'}
+          앱을 다시 시작하거나 잠시 후 다시 시도해주세요.
+        </Text>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#F2BED1',
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 8,
+            marginBottom: 10,
+          }}
+          onPress={() => {
+            console.log('🔄 Retrying problem load...');
+            // Clear any existing session and retry
+            clearCurrentSession();
+            // Trigger re-initialization
+            let currentSession = createNewSession('OX', 10);
+            const problem = getCurrentProblem() as ProblemData;
+            if (problem) {
+              setCurrentProblemData(problem);
+              const progress = getSessionProgress();
+              setSessionProgress(progress);
+            }
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold' }}>다시 시도</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{
+            backgroundColor: '#666',
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 8,
+          }}
+          onPress={handleClose}
+        >
+          <Text style={{ color: 'white' }}>뒤로 가기</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
+  );
+
   // Main render based on current state
   return (
     <>
-      {(resultState === 'CORRECT' || resultState === 'INCORRECT') ? renderResultView() : renderProblemView()}
+      {!currentProblemData ?
+        renderErrorState() :
+        (resultState === 'CORRECT' || resultState === 'INCORRECT') ? renderResultView() : renderProblemView()
+      }
 
       <ProblemReviewModal
         visible={showReviewModal}

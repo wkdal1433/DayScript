@@ -35,33 +35,55 @@ class SessionManager {
 
   // Create a new test session
   createSession(type: ProblemType, problemCount: number = 10): TestSession {
+    console.log(`🎮 SessionManager: Creating session for type '${type}' with ${problemCount} problems`);
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
     let problems: (ProblemData | MultipleChoiceProblemData)[];
 
-    switch (type) {
-      case 'OX':
-        problems = getRandomOXProblems(problemCount);
-        break;
-      case 'MULTIPLE_CHOICE':
-        problems = getRandomMultipleChoiceProblems(problemCount);
-        break;
-      default:
-        throw new Error(`Unsupported problem type: ${type}`);
+    try {
+      switch (type) {
+        case 'OX':
+          console.log('📝 Loading OX problems...');
+          problems = getRandomOXProblems(problemCount);
+          console.log(`✅ Loaded ${problems.length} OX problems`);
+          break;
+        case 'MULTIPLE_CHOICE':
+          console.log('📝 Loading Multiple Choice problems...');
+          problems = getRandomMultipleChoiceProblems(problemCount);
+          console.log(`✅ Loaded ${problems.length} Multiple Choice problems`);
+          break;
+        default:
+          throw new Error(`Unsupported problem type: ${type}`);
+      }
+
+      if (!problems || problems.length === 0) {
+        console.error(`❌ No problems loaded for type: ${type}`);
+        throw new Error(`No problems available for type: ${type}`);
+      }
+
+      this.currentSession = {
+        id: sessionId,
+        type,
+        problems,
+        currentProblemIndex: 0,
+        totalProblems: problems.length,
+        startTime: Date.now(),
+        answers: [],
+        isCompleted: false,
+      };
+
+      console.log(`🎯 Session created successfully:`, {
+        id: sessionId,
+        type,
+        problemCount: problems.length,
+        firstProblem: problems[0]?.id
+      });
+
+      return this.currentSession;
+    } catch (error) {
+      console.error('💥 Error creating session:', error);
+      throw error;
     }
-
-    this.currentSession = {
-      id: sessionId,
-      type,
-      problems,
-      currentProblemIndex: 0,
-      totalProblems: problems.length,
-      startTime: Date.now(),
-      answers: [],
-      isCompleted: false,
-    };
-
-    return this.currentSession;
   }
 
   // Get current session

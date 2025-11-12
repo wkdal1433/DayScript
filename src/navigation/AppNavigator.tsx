@@ -27,18 +27,21 @@ import {
 // New modular quiz screens
 import { Lv1OXProblemScreen } from '../modules/quiz';
 
+// Onboarding Flow
+import { OnboardingFlow } from '../screens/Onboarding';
+
 // Navigation bridge for smooth integration
 import { resolveNavigation, transformNavigationParams } from './ModuleNavigationBridge';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem' | 'ProblemDiscussion' | 'CreatePost' | 'PostDetail';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem' | 'ProblemDiscussion' | 'CreatePost' | 'PostDetail' | 'Onboarding';
 
 interface AppNavigatorProps {}
 
 const AppNavigator: React.FC<AppNavigatorProps> = () => {
   const [activeTab, setActiveTab] = useState<TabName>('Home');
-  const [currentScreen, setCurrentScreen] = useState<ScreenName>('Home');
+  const [currentScreen, setCurrentScreen] = useState<ScreenName>('Onboarding'); // Start with onboarding
   const [previousScreen, setPreviousScreen] = useState<ScreenName>('Home');
   const [routeParams, setRouteParams] = useState<any>({});
 
@@ -75,6 +78,16 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
       console.log('Replace:', screen, params);
       setCurrentScreen(screen as ScreenName);
     },
+    reset: (config: any) => {
+      console.log('Reset navigation:', config);
+      if (config.routes && config.routes.length > 0) {
+        const targetScreen = config.routes[config.index || 0].name;
+        setCurrentScreen(targetScreen as ScreenName);
+        if (targetScreen === 'Home' || targetScreen === 'Practice' || targetScreen === 'Community' || targetScreen === 'Profile') {
+          setActiveTab(targetScreen as TabName);
+        }
+      }
+    },
   };
 
   const mockRoute = {
@@ -99,6 +112,16 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
   // 현재 활성화된 화면 렌더링
   const renderActiveScreen = () => {
     switch (currentScreen) {
+      case 'Onboarding':
+        return (
+          <OnboardingFlow
+            navigation={mockNavigation}
+            onComplete={() => {
+              setCurrentScreen('Home');
+              setActiveTab('Home');
+            }}
+          />
+        );
       case 'Home':
         return (
           <HomeScreen

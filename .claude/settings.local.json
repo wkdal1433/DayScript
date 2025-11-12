@@ -22,7 +22,8 @@
       "Bash(grep:*)",
       "Bash(claude mcp:*)",
       "Bash(mkdir:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(npm start:*)"
     ],
     "deny": [],
     "ask": []
