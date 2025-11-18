@@ -108,11 +108,11 @@ export const styles = StyleSheet.create({
     color: '#4B72FF',
   },
 
-  // 카드 공통 스타일 (Figma Auto Layout)
+  // 카드 공통 스타일 (UserPageScreen과 완전히 통일된 디자인)
   card: {
-    backgroundColor: '#F9F5F6', // Figma card background
-    borderWidth: SIZES.borderWidth.thin,
-    borderColor: '#FDCEDF', // Figma border color
+    backgroundColor: COLORS.white, // UserPageScreen과 동일한 흰색 배경
+    borderWidth: 1, // Profile 컴포넌트와 동일한 보더 두께
+    borderColor: '#FDCEDF', // Profile 컴포넌트와 동일한 핑크 보더
     borderRadius: SIZES.figma.cardBorderRadius,
     marginHorizontal: cardMargin,
     paddingHorizontal: SIZES.figma.cardPadding,
@@ -121,6 +121,15 @@ export const styles = StyleSheet.create({
     marginBottom: SIZES.spacing.xl,
     width: cardWidth,
     alignSelf: 'center',
+    // UserPageScreen과 동일한 그림자 효과 적용
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // 오늘의 할일 섹션 (Figma 정확 위치)

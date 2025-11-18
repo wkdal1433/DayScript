@@ -10,37 +10,96 @@ import { StatusBar } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from '../screens/Home/HomeScreen';
 import PracticeScreen from '../screens/Practice/PracticeScreen';
+import PracticeContainer from '../screens/Practice/PracticeContainer';
+import VibeSessionScreen from '../screens/Practice/Challenger/VibeSessionScreen';
+import PRInboxScreen from '../screens/Practice/Challenger/PRInboxScreen';
+import DiffHunkScreen from '../screens/Practice/Challenger/DiffHunkScreen';
+import UserPageScreen from '../screens/Profile/UserPageScreen';
+
+// Community module integration
+import {
+  CommunityHomeScreen,
+  ProblemDiscussionScreen,
+  CreatePostScreen,
+  PostDetailScreen
+} from '../modules/community';
+
+// Practice screens
+import Lv1OXProblemScreen from '../screens/Practice/Lv1OXProblemScreen';
+
+// Onboarding Flow
+import { OnboardingFlow } from '../screens/Onboarding';
+
+// Navigation bridge for smooth integration
+import { resolveNavigation, transformNavigationParams } from './ModuleNavigationBridge';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem' | 'ProblemDiscussion' | 'CreatePost' | 'PostDetail' | 'Onboarding';
 
 interface AppNavigatorProps {}
 
 const AppNavigator: React.FC<AppNavigatorProps> = () => {
   const [activeTab, setActiveTab] = useState<TabName>('Home');
+  const [currentScreen, setCurrentScreen] = useState<ScreenName>('Onboarding'); // Start with onboarding
+  const [previousScreen, setPreviousScreen] = useState<ScreenName>('Home');
+  const [routeParams, setRouteParams] = useState<any>({});
 
-  // 임시 네비게이션 객체 (React Navigation 대용)
+  // Enhanced navigation object with problem screen support and module bridge integration
   const mockNavigation = {
-    navigate: (screen: string) => {
-      console.log('Navigate to:', screen);
+    navigate: (screen: string, params?: any) => {
+      // Use navigation bridge to resolve screen
+      const resolvedScreen = resolveNavigation(screen as ScreenName);
+      const transformedParams = transformNavigationParams(screen as ScreenName, params);
+
+      console.log('Navigate to:', resolvedScreen, 'with params:', transformedParams);
+      console.log('Original screen:', screen, '→ Resolved screen:', resolvedScreen);
+
+      // Track previous screen for proper return navigation
+      setPreviousScreen(currentScreen);
+      setCurrentScreen(resolvedScreen);
+      setRouteParams(transformedParams || {});
+
+      // Update activeTab for tab screens
       if (screen === 'Home' || screen === 'Practice' || screen === 'Community' || screen === 'Profile') {
         setActiveTab(screen as TabName);
       }
     },
-    goBack: () => console.log('Go back'),
-    push: (screen: string) => console.log('Push:', screen),
-    replace: (screen: string) => console.log('Replace:', screen),
+    goBack: () => {
+      console.log('Go back');
+      // Return to the current active tab
+      setCurrentScreen(activeTab);
+    },
+    push: (screen: string, params?: any) => {
+      console.log('Push:', screen, params);
+      setCurrentScreen(screen as ScreenName);
+    },
+    replace: (screen: string, params?: any) => {
+      console.log('Replace:', screen, params);
+      setCurrentScreen(screen as ScreenName);
+    },
+    reset: (config: any) => {
+      console.log('Reset navigation:', config);
+      if (config.routes && config.routes.length > 0) {
+        const targetScreen = config.routes[config.index || 0].name;
+        setCurrentScreen(targetScreen as ScreenName);
+        if (targetScreen === 'Home' || targetScreen === 'Practice' || targetScreen === 'Community' || targetScreen === 'Profile') {
+          setActiveTab(targetScreen as TabName);
+        }
+      }
+    },
   };
 
   const mockRoute = {
-    key: activeTab,
-    name: activeTab,
-    params: {},
+    key: currentScreen,
+    name: currentScreen,
+    params: routeParams,
   };
 
   // 탭 전환 핸들러
   const handleTabPress = (tab: string) => {
     setActiveTab(tab as TabName);
+    setCurrentScreen(tab as ScreenName);
     console.log('Tab switched to:', tab);
   };
 
@@ -52,7 +111,17 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
 
   // 현재 활성화된 화면 렌더링
   const renderActiveScreen = () => {
-    switch (activeTab) {
+    switch (currentScreen) {
+      case 'Onboarding':
+        return (
+          <OnboardingFlow
+            navigation={mockNavigation}
+            onComplete={() => {
+              setCurrentScreen('Home');
+              setActiveTab('Home');
+            }}
+          />
+        );
       case 'Home':
         return (
           <HomeScreen
@@ -71,9 +140,8 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
           />
         );
       case 'Community':
-        // 향후 Community 화면 구현
         return (
-          <HomeScreen
+          <CommunityHomeScreen
             navigation={mockNavigation}
             route={{ ...mockRoute, name: 'Community' }}
             activeTab={activeTab}
@@ -81,13 +149,150 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
           />
         );
       case 'Profile':
-        // 향후 Profile 화면 구현
         return (
-          <HomeScreen
+          <UserPageScreen
             navigation={mockNavigation}
             route={{ ...mockRoute, name: 'Profile' }}
             activeTab={activeTab}
             onTabPress={handleTabPress}
+          />
+        );
+      case 'OXProblem':
+        return (
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="OX"
+          />
+        );
+      case 'Lv1OXProblem':
+        return (
+          <Lv1OXProblemScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                level: 1,
+                quizId: 'lv1_ox_001',
+                returnRoute: 'Practice',
+              },
+            }}
+          />
+        );
+      case 'MultipleChoiceProblem':
+        return (
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="MULTIPLE_CHOICE"
+          />
+        );
+      case 'FillInBlankProblem':
+        return (
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="FILL_IN_BLANK"
+          />
+        );
+      case 'DebuggingProblem':
+        return (
+          <PracticeContainer
+            navigation={mockNavigation}
+            route={mockRoute}
+            problemType="DEBUGGING"
+          />
+        );
+      case 'VibeSession':
+        return (
+          <VibeSessionScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                problemId: 'vibe_problem_001',
+                sessionId: 'session_' + Date.now(),
+                difficulty: 'hard',
+                timeLimit: 1800, // 30분
+                returnRoute: previousScreen, // 이전 화면으로 돌아가기
+              },
+            }}
+          />
+        );
+      case 'PRInbox':
+        return (
+          <PRInboxScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                sessionId: 'session_' + Date.now(),
+                scenarioId: 'pr_scenario_001',
+                difficulty: 'hard',
+                timeLimit: 1800, // 30분
+                returnRoute: previousScreen, // 이전 화면으로 돌아가기
+              },
+            }}
+          />
+        );
+      case 'CodeReviewDiff':
+        return (
+          <DiffHunkScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                sessionId: 'code_review_session_' + Date.now(),
+                commitHash: 'abc123def456',
+                fileIndex: 0,
+                fileName: 'src/components/UserValidation.js',
+                returnRoute: 'PRInbox',
+                totalFiles: 3,
+                currentFileIndex: 0,
+              },
+            }}
+          />
+        );
+      case 'ProblemDiscussion':
+        return (
+          <ProblemDiscussionScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                problemId: routeParams.problemId || 'default_problem_id',
+                problemTitle: routeParams.problemTitle || 'Sample Problem',
+                ...routeParams,
+              },
+            }}
+          />
+        );
+      case 'CreatePost':
+        return (
+          <CreatePostScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                problemId: routeParams.problemId,
+                category: routeParams.category || 'problems',
+                problemTitle: routeParams.problemTitle,
+                ...routeParams,
+              },
+            }}
+          />
+        );
+      case 'PostDetail':
+        return (
+          <PostDetailScreen
+            navigation={mockNavigation}
+            route={{
+              ...mockRoute,
+              params: {
+                postId: routeParams.postId || 'default_post_id',
+                ...routeParams,
+              },
+            }}
           />
         );
       default:

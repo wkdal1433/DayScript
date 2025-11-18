@@ -29,12 +29,20 @@ export const styles = StyleSheet.create({
 
   // 필터 섹션 컨테이너
   filterContainer: {
-    backgroundColor: COLORS.background, // #F9F5F6
+    backgroundColor: COLORS.white, // #FFFFFF - 통일된 배경색
     borderWidth: 1,
-    borderColor: COLORS.primaryBorder, // #FDCEDF
+    borderColor: '#FDCEDF',
     borderRadius: 16,
     padding: 20,
     marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // 문제 리스트 컨테이너
@@ -144,12 +152,20 @@ export const styles = StyleSheet.create({
 
   // 문제 카드 스타일
   problemCard: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.white,
     borderWidth: 1,
-    borderColor: COLORS.primaryBorder,
+    borderColor: '#FDCEDF',
     borderRadius: 16,
     padding: 17,
     marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
 
   // 문제 카드 헤더 (제목 + 난이도)

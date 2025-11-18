@@ -1,0 +1,727 @@
+import { StyleSheet } from 'react-native';
+import { COLORS } from '../../constants/colors';
+import { FONTS } from '../../constants/fonts';
+
+export const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: COLORS.white, // #FFFFFF
+  },
+
+  // Header Section
+  header: {
+    height: 80, // layout_4HCOFQ
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // fill_K6RHLU
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(253, 206, 223, 0.3)', // stroke_F76GNU
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 18,
+  },
+
+  backButton: {
+    width: 44, // layout_0SHSGU
+    height: 44,
+    backgroundColor: 'rgba(248, 232, 238, 0.8)', // fill_4UMOAZ
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder, // #FDCEDF stroke_8I53N4
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  backButtonText: {
+    fontSize: 18, // style_IH4327
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textPrimary, // #393E46 fill_K2O21T
+    textAlign: 'center',
+  },
+
+  headerCenter: {
+    alignItems: 'center',
+    flex: 1,
+  },
+
+  problemCounter: {
+    fontSize: 18, // style_R2F6SW
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary, // #393E46 fill_K2O21T
+    textAlign: 'center',
+    marginBottom: 4,
+  },
+
+  categoryBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    backgroundColor: 'rgba(248, 232, 238, 1)', // fill_IHUZBM gradient start
+    borderRadius: 10, // layout_IM9OPI
+  },
+
+  categoryText: {
+    fontSize: 11, // style_CJT6M4
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#8B5A6B', // fill_SLRQS4
+    textAlign: 'center',
+  },
+
+  timerContainer: {
+    width: 44, // layout_5REUCA
+    height: 44,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)', // fill_PJEMDG
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  timerText: {
+    fontSize: 12, // style_WS5EEC
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.primary, // #F2BED1 fill_3O931Z
+    textAlign: 'center',
+  },
+
+  // Progress Bar (Top)
+  progressContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+
+  progressBarBg: {
+    width: '100%',
+    height: 4, // layout_6RB6R6
+    backgroundColor: '#E5E7EB',
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+
+  progressBarFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary, // fill_FAR9LZ gradient
+    borderRadius: 2,
+  },
+
+  // Scroll Container
+  scrollContainer: {
+    flex: 1,
+  },
+
+  scrollContent: {
+    paddingBottom: 20,
+  },
+
+  // Problem Content Section
+  problemContainer: {
+    backgroundColor: COLORS.white, // fill_SKEBA4
+    borderWidth: 1,
+    borderColor: 'rgba(253, 206, 223, 0.3)', // stroke_F76GNU
+    borderRadius: 20,
+    marginHorizontal: 26, // layout_EZUJ6P
+    marginVertical: 20,
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  problemTitle: {
+    fontSize: 18, // style_R2F6SW
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary, // #393E46 fill_K2O21T
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+
+  problemSubtitle: {
+    fontSize: 18, // style_R2F6SW
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary, // #393E46 fill_K2O21T
+    textAlign: 'center',
+  },
+
+  // Multiple Choice Options
+  choicesContainer: {
+    paddingHorizontal: 26, // layout_EZUJ6P
+    gap: 12, // Spacing between choices
+  },
+
+  choiceContainer: {
+    width: '100%', // layout_Z385Y8
+    height: 64,
+    backgroundColor: COLORS.white, // fill_SKEBA4
+    borderWidth: 2,
+    borderColor: COLORS.primary, // #F2BED1 stroke_KRQJEO
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    justifyContent: 'center',
+  },
+
+  choiceContainerSelected: {
+    backgroundColor: 'rgba(253, 206, 223, 0.1)',
+    borderColor: COLORS.primary,
+  },
+
+  choiceContainerCorrect: {
+    backgroundColor: 'rgba(168, 230, 207, 0.1)', // Green tint
+    borderColor: '#10B981',
+  },
+
+  choiceContainerIncorrect: {
+    backgroundColor: 'rgba(255, 107, 157, 0.1)', // Red tint
+    borderColor: '#EF4444',
+  },
+
+  choiceContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+
+  choiceIdContainer: {
+    width: 24,
+    height: 24,
+    backgroundColor: 'transparent',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+
+  choiceIdContainerSelected: {
+    backgroundColor: COLORS.primary,
+  },
+
+  choiceIdContainerCorrect: {
+    backgroundColor: '#10B981',
+  },
+
+  choiceIdContainerIncorrect: {
+    backgroundColor: '#EF4444',
+  },
+
+  choiceIdText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary,
+  },
+
+  choiceIdTextSelected: {
+    color: COLORS.white,
+  },
+
+  choiceIdTextCorrect: {
+    color: COLORS.white,
+  },
+
+  choiceIdTextIncorrect: {
+    color: COLORS.white,
+  },
+
+  choiceText: {
+    fontSize: 16, // style_2NN97V
+    fontFamily: 'Fira Code', // Fira Code for code text
+    fontWeight: '500', // medium weight
+    color: COLORS.textPrimary, // #393E46 fill_K2O21T
+    flex: 1,
+  },
+
+  choiceTextSelected: {
+    color: COLORS.textPrimary,
+    fontWeight: FONTS.weights.semiBold.toString(), // style_NIW7X2 for selected
+  },
+
+  choiceTextCorrect: {
+    color: '#065F46', // Darker green for correct
+    fontWeight: FONTS.weights.semiBold.toString(),
+  },
+
+  choiceTextIncorrect: {
+    color: '#991B1B', // Darker red for incorrect
+    fontWeight: FONTS.weights.semiBold.toString(),
+  },
+
+  // Main Content Container
+  mainContent: {
+    flex: 1,
+    position: 'relative' as const,
+  },
+
+  // Bottom Submit Section
+  bottomSection: {
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // fill_K6RHLU
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(253, 206, 223, 0.3)', // stroke_F76GNU
+    paddingHorizontal: 26, // layout_G0GT1R
+    paddingVertical: 20,
+    paddingBottom: 40, // Extra padding for safe area
+  },
+
+  submitButton: {
+    width: '100%', // layout_IA0568
+    height: 56,
+    backgroundColor: 'rgba(229, 231, 235, 0.5)', // fill_8LXHDW (disabled state)
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+
+  submitButtonEnabled: {
+    backgroundColor: COLORS.primaryBorder, // #FDCEDF (enabled state)
+  },
+
+  submitButtonText: {
+    fontSize: 16, // style_PRK435
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted, // Disabled text color
+    textAlign: 'center',
+  },
+
+  submitButtonTextEnabled: {
+    color: COLORS.white, // fill_SKEBA4 with stroke_1628M3
+    fontWeight: FONTS.weights.medium.toString(),
+  },
+
+  // Bottom Progress Container
+  bottomProgressContainer: {
+    marginTop: 6, // layout_NQR0D0
+  },
+
+  bottomProgressBar: {
+    width: '100%', // layout_HUURJJ
+    height: 8,
+    backgroundColor: 'rgba(229, 231, 235, 0.5)', // fill_439EVB
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 6,
+  },
+
+  bottomProgressFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary, // fill_2KYIGP gradient
+    borderRadius: 4,
+  },
+
+  progressLabels: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  progressLabel: {
+    fontSize: 12, // style_BGLRA4
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted, // #6B7280 fill_DOCPBU
+  },
+
+  progressPercentage: {
+    fontSize: 12, // style_PQ2C0E
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted, // #6B7280 fill_DOCPBU
+  },
+
+  // Result View Styles (Based on Figma Design)
+  resultContentContainer: {
+    flex: 1,
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  achievementBadge: {
+    backgroundColor: 'rgba(76, 175, 80, 0.1)', // Success green background
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginBottom: 20,
+  },
+
+  achievementText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#4CAF50', // Success green
+    textAlign: 'center',
+  },
+
+  resultStatusContainer: {
+    marginBottom: 24,
+    alignItems: 'center',
+  },
+
+  resultStatusText: {
+    fontSize: 32,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+
+  correctText: {
+    color: '#4CAF50', // Success green
+  },
+
+  incorrectText: {
+    color: '#FF4D4D', // Error red
+  },
+
+  explanationContainer: {
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 40,
+  },
+
+  celebrationText: {
+    fontSize: 24,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+
+  explanationText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
+
+  // Result Bottom Section
+  resultBottomSection: {
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+
+  statsContainer: {
+    backgroundColor: 'rgba(245, 247, 250, 1)', // Light background
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+  },
+
+  statRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+
+  statLabel: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textPrimary,
+  },
+
+  pointsContainer: {
+    backgroundColor: 'rgba(255, 215, 0, 0.1)', // Gold background
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+  },
+
+  pointsText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#FFD700', // Gold color
+  },
+
+  expContainer: {
+    marginBottom: 8,
+  },
+
+  expLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textMuted,
+    marginBottom: 4,
+  },
+
+  expText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.textPrimary,
+  },
+
+  expBarContainer: {
+    marginTop: 8,
+  },
+
+  expBarBg: {
+    width: '100%',
+    height: 8,
+    backgroundColor: '#E5E7EB',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+
+  expBarFill: {
+    height: '100%',
+    backgroundColor: '#FFD700', // Gold for experience
+    borderRadius: 4,
+  },
+
+  // Result Action Buttons
+  resultActionButtons: {
+    gap: 12,
+  },
+
+  nextButton: {
+    backgroundColor: COLORS.primary, // #F2BED1
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  nextButtonText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.white,
+    textAlign: 'center',
+  },
+
+  retryButton: {
+    backgroundColor: 'rgba(248, 232, 238, 0.8)', // Light background
+    borderRadius: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  retryButtonText: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: COLORS.textPrimary,
+    textAlign: 'center',
+  },
+
+  goalCompleteButton: {
+    backgroundColor: '#88C7A1',
+    borderRadius: 16,
+    paddingVertical: 18,
+    paddingHorizontal: 24,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#88C7A1',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+
+  goalCompleteButtonText: {
+    fontSize: 18,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+
+  // Hint System Styles for LV2
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  hintButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#F8E8EE',
+    borderRadius: 25,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    minWidth: 120,
+  },
+
+  hintButtonText: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#BE185D',
+    textAlign: 'center',
+  },
+
+  hintCard: {
+    position: 'absolute',
+    bottom: 180,
+    left: 20,
+    right: 20,
+    backgroundColor: '#F8E8EE',
+    borderRadius: 15,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#FDCEDF',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 8,
+    zIndex: 10,
+  },
+
+  hintCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  hintCardTitle: {
+    fontSize: 16,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: '#8B5A6B',
+  },
+
+  hintCardClose: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#FDCEDF',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  hintCardCloseText: {
+    fontSize: 14,
+    color: '#8B5A6B',
+    fontWeight: 'bold',
+  },
+
+  hintCardContent: {
+    fontSize: 14,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#5D4E75',
+    lineHeight: 20,
+    marginBottom: 16,
+  },
+
+  eliminationNotice: {
+    backgroundColor: '#FFF8E1',
+    borderWidth: 1,
+    borderColor: '#FFE082',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+
+  eliminationText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#F57C00',
+    textAlign: 'center',
+  },
+
+  xpNotice: {
+    backgroundColor: '#FEF2F2',
+    borderWidth: 1,
+    borderColor: '#FECACA',
+    borderRadius: 8,
+    padding: 8,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+
+  xpNoticeText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#DC2626',
+    textAlign: 'center',
+  },
+
+  hintCardActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  hintStepText: {
+    fontSize: 12,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.regular.toString(),
+    color: '#8B5A6B',
+  },
+
+  hintNextButton: {
+    backgroundColor: '#BE185D',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+
+  hintNextButtonText: {
+    fontSize: 13,
+    fontFamily: FONTS.primary,
+    fontWeight: FONTS.weights.bold.toString(),
+    color: COLORS.white,
+  },
+
+  hintNextButtonDisabled: {
+    backgroundColor: '#E5E7EB',
+  },
+
+  hintNextButtonTextDisabled: {
+    color: '#9CA3AF',
+  },
+
+  // Eliminated option styles
+  choiceContainerEliminated: {
+    backgroundColor: '#F5F5F5',
+    borderColor: '#E0E0E0',
+    opacity: 0.5,
+  },
+
+  choiceIdContainerEliminated: {
+    backgroundColor: '#E0E0E0',
+  },
+
+  choiceIdTextEliminated: {
+    color: '#9E9E9E',
+  },
+
+  choiceTextEliminated: {
+    color: '#9E9E9E',
+    textDecorationLine: 'line-through',
+  },
+});

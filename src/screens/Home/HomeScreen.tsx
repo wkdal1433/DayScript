@@ -7,12 +7,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import BottomNavigationBar from '../../components/BottomNavigation';
 import {
-  TerminalHeader,
   TodayQuests,
   QuickActions,
   LearningStatus,
   Ranking
 } from '../../components/Home';
+import { TerminalHeader } from '../../modules/common';
+import { DifficultySelectionModal, DifficultyLevel } from '../../components/Modals';
 
 import { HomeScreenProps } from './Home.types';
 import { styles } from './Home.styles';
@@ -45,13 +46,15 @@ const mockWeeklyStats: WeeklyStats = {
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({
-  navigation: _navigation,
+  navigation,
   activeTab: externalActiveTab,
   onTabPress: externalOnTabPress
 }) => {
   const [quests, setQuests] = useState<Quest[]>(mockQuests);
   const [selectedLanguage, setSelectedLanguage] = useState<ProgrammingLanguage>('Python');
   const [internalActiveTab, setInternalActiveTab] = useState('Home');
+  const [isDifficultyModalVisible, setIsDifficultyModalVisible] = useState(false);
+
 
   // Use external activeTab if provided, otherwise use internal state
   const activeTab = externalActiveTab || internalActiveTab;
@@ -69,6 +72,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
 
   const handleActionPress = (actionType: string) => {
     console.log('Action pressed:', actionType);
+
+    // Handle shortcut button press - show difficulty selection modal
+    if (actionType === 'shortcut') {
+      setIsDifficultyModalVisible(true);
+    }
   };
 
   const handleTabPress = (tab: string) => {
@@ -86,6 +94,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
     const shouldShowShadow = scrollY > 0;
     setHeaderShadowVisible(shouldShowShadow);
   };
+
+  const handleModalClose = () => {
+    setIsDifficultyModalVisible(false);
+  };
+
+  const handleLevelSelect = (level: DifficultyLevel) => {
+    console.log('Selected difficulty level:', level);
+    // Modal will handle navigation and closing itself
+  };
+
 
 
 
@@ -133,6 +151,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({
         activeTab={activeTab}
         onTabPress={handleTabPress}
       />
+
+      {/* Difficulty Selection Modal */}
+      <DifficultySelectionModal
+        isVisible={isDifficultyModalVisible}
+        onClose={handleModalClose}
+        onSelectLevel={handleLevelSelect}
+        selectedLanguage={selectedLanguage}
+        navigation={navigation}
+      />
+
     </SafeAreaView>
   );
 };

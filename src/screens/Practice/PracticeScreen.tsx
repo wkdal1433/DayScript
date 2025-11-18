@@ -5,7 +5,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { styles } from './Practice.styles';
-import TerminalHeader from '../../components/Home/TerminalHeader';
+import { TerminalHeader } from '../../modules/common';
 import FilterSection from '../../components/Practice/FilterSection';
 import ProblemCard from '../../components/Practice/ProblemCard';
 import BottomNavigationBar from '../../components/BottomNavigation/BottomNavigationBar';

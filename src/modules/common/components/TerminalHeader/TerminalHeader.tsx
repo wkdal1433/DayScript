@@ -7,7 +7,7 @@ import {
   Platform,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import { styles } from '../../screens/Home/Home.styles';
+import { terminalHeaderStyles } from './TerminalHeader.styles';
 
 const BellIcon = () => (
   <Svg width="18" height="18" viewBox="0 0 24 24" fill="none">
@@ -281,7 +281,7 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
     if (!currentPhrase.segments) {
       // 단일 색상 렌더링 (기본)
       return (
-        <Text style={[styles.appName, { color: currentPhrase.baseColor }]}>
+        <Text style={[terminalHeaderStyles.appName, { color: currentPhrase.baseColor }]}>
           {displayedText}
         </Text>
       );
@@ -307,7 +307,7 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
           renderedSegments.push(
             <Text
               key={`segment-${i}`}
-              style={[styles.appName, { color: segment.color }]}
+              style={[terminalHeaderStyles.appName, { color: segment.color }]}
             >
               {visibleText}
             </Text>
@@ -324,7 +324,7 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
   return (
     <Text numberOfLines={1} ellipsizeMode="clip">
       {/* 고정 터미널 접두사 (항상 표시, 고정 색상: #00ADB5) */}
-      <Text style={[styles.terminalText, { color: '#00ADB5' }]}>{terminalPrefix}</Text>
+      <Text style={[terminalHeaderStyles.terminalText, { color: '#00ADB5' }]}>{terminalPrefix}</Text>
 
       {/* 애니메이션 부분 (듀얼 컬러 하이라이트 지원) */}
       {renderColoredText()}
@@ -332,8 +332,8 @@ const AdvancedTypewriterCycle: React.FC<AdvancedTypewriterCycleProps> = ({
       {/* 타이핑 커서 (현재 세그먼트 색상 또는 기본 색상) */}
       {showCursor && (
         <Text style={[
-          styles.terminalText,
-          styles.typewriterCursor,
+          terminalHeaderStyles.terminalText,
+          terminalHeaderStyles.typewriterCursor,
           { color: currentPhrase.baseColor }
         ]}>
           _
@@ -360,27 +360,27 @@ const TerminalHeader: React.FC<TerminalHeaderProps> = ({
 
   return (
     <View style={[
-      styles.headerContainer,
+      terminalHeaderStyles.headerContainer,
       { paddingTop: statusBarHeight },
-      showShadow && styles.headerContainerWithShadow
+      showShadow && terminalHeaderStyles.headerContainerWithShadow
     ]}>
-      <View style={styles.headerContentContainer}>
-        <View style={styles.terminalHeader}>
+      <View style={terminalHeaderStyles.headerContentContainer}>
+        <View style={terminalHeaderStyles.terminalHeader}>
           <AdvancedTypewriterCycle
             speed={200}
             startDelay={300}
             pauseDuration={5000}
           />
         </View>
-        <View style={styles.headerButtons}>
+        <View style={terminalHeaderStyles.headerButtons}>
           <TouchableOpacity
-            style={styles.headerButton}
+            style={terminalHeaderStyles.headerButton}
             onPress={onAlarmPress || (() => console.log('Alarm pressed'))}
           >
             <BellIcon />
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.headerButton}
+            style={terminalHeaderStyles.headerButton}
             onPress={onSettingsPress || (() => console.log('Settings pressed'))}
           >
             <SettingsIcon />
