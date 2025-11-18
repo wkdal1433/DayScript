@@ -27,7 +27,8 @@
       "Bash(find:*)",
       "Bash(npm start:*)",
       "Bash(node:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(git stash:*)"
     ],
     "deny": [],
     "ask": []
