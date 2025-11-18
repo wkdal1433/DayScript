@@ -14,7 +14,7 @@ import type { UserProfile } from '../../screens/Profile/UserPageScreen.types';
 // 더미 데이터
 const MOCK_USER_DATA: UserProfile = {
   id: 'user_001',
-  name: '코딩왕자',
+  name: 'wkdal1433',
   level: 42,
   currentExp: 3750,
   maxExp: 5000,

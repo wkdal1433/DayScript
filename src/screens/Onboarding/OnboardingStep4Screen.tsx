@@ -70,7 +70,7 @@ export const OnboardingStep4Screen: React.FC<OnboardingStepScreenProps> = ({
         <View style={styles.actionButtonContainer}>
           <EnhancedNextButton
             onPress={onNext}
-            title="시작하기 →"
+            title="바로 가입하고 시작하기 →"
             variant="primary"
             style={styles.startButton}
             textStyle={styles.startButtonText}

@@ -30,12 +30,15 @@ import Lv1OXProblemScreen from '../screens/Practice/Lv1OXProblemScreen';
 // Onboarding Flow
 import { OnboardingFlow } from '../screens/Onboarding';
 
+// Auth screens
+import { LoginScreen } from '../screens/Auth';
+
 // Navigation bridge for smooth integration
 import { resolveNavigation, transformNavigationParams } from './ModuleNavigationBridge';
 
 // 네비게이션 타입 정의
 export type TabName = 'Home' | 'Practice' | 'Community' | 'Profile';
-export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem' | 'ProblemDiscussion' | 'CreatePost' | 'PostDetail' | 'Onboarding';
+export type ScreenName = TabName | 'OXProblem' | 'MultipleChoiceProblem' | 'FillInBlankProblem' | 'DebuggingProblem' | 'VibeSession' | 'PRInbox' | 'CodeReviewDiff' | 'Lv1OXProblem' | 'ProblemDiscussion' | 'CreatePost' | 'PostDetail' | 'Onboarding' | 'Login';
 
 interface AppNavigatorProps {}
 
@@ -117,9 +120,34 @@ const AppNavigator: React.FC<AppNavigatorProps> = () => {
           <OnboardingFlow
             navigation={mockNavigation}
             onComplete={() => {
+              setCurrentScreen('Login');
+            }}
+          />
+        );
+      case 'Login':
+        return (
+          <LoginScreen
+            onLogin={(formData) => {
+              console.log('Login attempt:', formData);
+              // 로그인 성공 후 홈 화면으로 이동
               setCurrentScreen('Home');
               setActiveTab('Home');
             }}
+            onForgotPassword={() => {
+              console.log('Forgot password pressed');
+              // 향후 비밀번호 찾기 화면 추가 가능
+            }}
+            onSignUp={() => {
+              console.log('Sign up pressed');
+              // 향후 회원가입 화면 추가 가능
+            }}
+            onSocialLogin={(provider) => {
+              console.log('Social login:', provider);
+              // 소셜 로그인 후 홈 화면으로 이동
+              setCurrentScreen('Home');
+              setActiveTab('Home');
+            }}
+            isLoading={false}
           />
         );
       case 'Home':

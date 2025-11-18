@@ -21,12 +21,12 @@ export const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FCE7F3', // HomeScreen과 동일한 배경색
-    minHeight: screenHeight,
+    minHeight: screenHeight*0.8,
   },
 
   // 스크롤 컨테이너 (HomeScreen과 동일한 패딩 시스템)
   scrollContainer: {
-    paddingTop: scaleSize(SIZES.figma.terminalHeight) + SIZES.figma.terminalTopMargin + 47,
+    paddingTop: scaleSize(SIZES.figma.terminalHeight) + SIZES.figma.terminalTopMargin + 30,
     paddingBottom: SIZES.figma.bottomNavHeight + SIZES.spacing.xl + 30,
     flexGrow: 1,
   },

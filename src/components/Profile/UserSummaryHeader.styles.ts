@@ -11,8 +11,8 @@ export const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.white,
     paddingHorizontal: 26,
-    paddingVertical: 20,
-    marginTop: 16,
+    paddingVertical: 12,
+    marginTop: 5,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: '#FDCEDF', // HomeScreen과 동일한 핑크 보더
@@ -25,6 +25,7 @@ export const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 4,
   },
+  
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',

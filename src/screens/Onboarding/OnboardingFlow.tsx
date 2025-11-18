@@ -30,14 +30,14 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
         animated: true,
       });
     } else {
-      // Navigate to main app (Home screen)
+      // Navigate to Login screen instead of Home
       if (onComplete) {
         onComplete();
       } else {
-        // Reset navigation stack to Home
+        // Reset navigation stack to Login
         navigation.reset({
           index: 0,
-          routes: [{ name: 'Home' }],
+          routes: [{ name: 'Login' }],
         });
       }
     }
@@ -65,13 +65,13 @@ export const OnboardingFlow: React.FC<OnboardingFlowProps> = ({
   };
 
   const handleSkip = () => {
-    // Skip to main app immediately
+    // Skip to Login screen immediately
     if (onComplete) {
       onComplete();
     } else {
       navigation.reset({
         index: 0,
-        routes: [{ name: 'Home' }],
+        routes: [{ name: 'Login' }],
       });
     }
   };
