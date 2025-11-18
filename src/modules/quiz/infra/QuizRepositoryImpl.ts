@@ -261,52 +261,248 @@ export class QuizRepositoryImpl implements IQuizRepository {
     const mockData = {
       'LV1': [
         {
-          id: 'mock_ox_001',
+          id: 'ox_001',
           type: 'OX',
-          title: 'Python에서 리스트는',
-          subtitle: '가변(mutable) 자료형이다.',
-          correctAnswer: 'O',
-          explanation: '리스트는 생성 후에도 요소를 추가, 삭제, 수정할 수 있는 가변 자료형입니다.',
+          question: 'CPU는 한 번에 여러 개의 프로세스를 동시에 실행할 수 있다.',
+          correctAnswer: false,
+          explanation: 'CPU는 실제로는 한 번에 하나의 프로세스만 실행할 수 있습니다. 멀티태스킹은 CPU가 매우 빠른 속도로 여러 프로세스 간에 전환하면서 동시에 실행되는 것처럼 보이게 하는 것입니다.',
+          category: '컴퓨터 시스템',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['cpu', 'process', 'system'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: '멀티태스킹과 실제 동시 실행의 차이를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: 'CPU 코어가 하나일 때를 가정해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_002',
+          type: 'OX',
+          question: 'RAM은 휘발성 메모리로, 전원이 꺼지면 저장된 데이터가 사라진다.',
+          correctAnswer: true,
+          explanation: 'RAM(Random Access Memory)은 휘발성 메모리입니다. 전원이 공급되지 않으면 저장된 모든 데이터가 사라지므로, 중요한 데이터는 하드디스크 같은 비휘발성 저장장치에 저장해야 합니다.',
+          category: '컴퓨터 하드웨어',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['memory', 'ram', 'hardware'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: '휘발성과 비휘발성 메모리의 차이를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '컴퓨터를 껐다 켤 때 어떤 일이 일어나는지 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_003',
+          type: 'OX',
+          question: 'HTTP는 보안 프로토콜로 데이터를 암호화하여 전송한다.',
+          correctAnswer: false,
+          explanation: 'HTTP(HyperText Transfer Protocol)는 암호화되지 않은 프로토콜입니다. 데이터 보안을 위해서는 HTTPS(HTTP Secure)를 사용해야 하며, 이는 SSL/TLS를 통해 데이터를 암호화합니다.',
+          category: '네트워크',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['http', 'security', 'network'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: 'HTTP와 HTTPS의 차이점을 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: 'SSL/TLS가 필요한 이유를 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_004',
+          type: 'OX',
+          question: 'Python에서 리스트는 가변(mutable) 자료형이다.',
+          correctAnswer: true,
+          explanation: 'Python의 리스트는 가변 자료형입니다. 리스트를 생성한 후에도 요소를 추가(append), 삭제(remove), 수정할 수 있습니다. 반면 튜플은 불변(immutable) 자료형입니다.',
           category: 'Python 기초',
           level: 'LV1',
-          difficulty: 'easy',
-          tags: ['python', 'basic'],
-          timeLimit: 30000,
+          difficulty: 'BEGINNER',
+          tags: ['python', 'list', 'mutable'],
+          timeLimit: 30,
           points: 10,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          hints: [
+            { id: 'h1', content: '가변과 불변 자료형의 차이를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '리스트와 튜플의 차이점을 비교해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
         },
         {
-          id: 'mock_ox_002',
+          id: 'ox_005',
           type: 'OX',
-          title: 'JavaScript에서 var 키워드는',
-          subtitle: '블록 스코프를 갖는다.',
-          correctAnswer: 'X',
-          explanation: 'var 키워드는 함수 스코프를 가지며, let과 const가 블록 스코프를 갖습니다.',
+          question: 'JavaScript에서 var 키워드는 블록 스코프를 갖는다.',
+          correctAnswer: false,
+          explanation: 'JavaScript의 var 키워드는 함수 스코프를 가집니다. 블록 스코프를 가지는 것은 ES6에서 도입된 let과 const 키워드입니다. var는 블록 내에서 선언되어도 해당 함수 전체에서 접근 가능합니다.',
           category: 'JavaScript 기초',
           level: 'LV1',
-          difficulty: 'easy',
-          tags: ['javascript', 'basic'],
-          timeLimit: 30000,
+          difficulty: 'BEGINNER',
+          tags: ['javascript', 'scope', 'var'],
+          timeLimit: 30,
           points: 10,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          hints: [
+            { id: 'h1', content: '함수 스코프와 블록 스코프의 차이를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: 'ES6의 let, const와 var의 차이점을 비교해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
         },
         {
-          id: 'mock_ox_003',
+          id: 'ox_006',
           type: 'OX',
-          title: 'HTML에서 <div> 태그는',
-          subtitle: '인라인 요소이다.',
-          correctAnswer: 'X',
-          explanation: '<div> 태그는 블록 레벨 요소로, 전체 너비를 차지하고 새 줄에서 시작합니다.',
+          question: 'HTML에서 <div> 태그는 인라인 요소이다.',
+          correctAnswer: false,
+          explanation: '<div> 태그는 블록 레벨 요소입니다. 블록 레벨 요소는 전체 너비를 차지하고 새로운 줄에서 시작합니다. 인라인 요소의 예로는 <span>, <a>, <strong> 등이 있습니다.',
           category: 'HTML 기초',
           level: 'LV1',
-          difficulty: 'easy',
-          tags: ['html', 'basic'],
-          timeLimit: 30000,
+          difficulty: 'BEGINNER',
+          tags: ['html', 'element', 'block'],
+          timeLimit: 30,
           points: 10,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          hints: [
+            { id: 'h1', content: '블록 레벨 요소와 인라인 요소의 차이를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '<span> 태그와 <div> 태그의 차이점을 비교해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_007',
+          type: 'OX',
+          question: 'SQL에서 PRIMARY KEY는 중복된 값을 가질 수 있다.',
+          correctAnswer: false,
+          explanation: 'PRIMARY KEY는 테이블에서 각 행을 고유하게 식별하는 키입니다. 따라서 중복된 값을 가질 수 없으며, NULL 값도 허용하지 않습니다. 이를 통해 데이터의 무결성을 보장합니다.',
+          category: '데이터베이스',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['sql', 'primary-key', 'database'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: 'PRIMARY KEY의 기본 특성을 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '데이터 무결성과 고유성의 관계를 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_008',
+          type: 'OX',
+          question: 'Git에서 commit은 로컬 저장소에만 변경사항을 저장한다.',
+          correctAnswer: true,
+          explanation: 'Git의 commit 명령은 변경사항을 로컬 저장소에만 저장합니다. 원격 저장소에 변경사항을 업로드하려면 push 명령을 별도로 실행해야 합니다. 이는 Git의 분산 버전 관리 시스템의 특징입니다.',
+          category: '버전 관리',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['git', 'commit', 'version-control'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: 'commit과 push의 차이점을 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '로컬 저장소와 원격 저장소의 관계를 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_009',
+          type: 'OX',
+          question: 'CSS에서 margin과 padding은 동일한 역할을 한다.',
+          correctAnswer: false,
+          explanation: 'margin과 padding은 서로 다른 역할을 합니다. padding은 요소의 내용과 테두리 사이의 공간을 의미하고, margin은 요소와 다른 요소들 사이의 공간을 의미합니다. 즉, padding은 내부 여백, margin은 외부 여백입니다.',
+          category: 'CSS 기초',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['css', 'margin', 'padding'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: '내부 여백과 외부 여백의 차이를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: 'CSS Box Model을 떠올려보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_010',
+          type: 'OX',
+          question: '객체지향 프로그래밍에서 상속은 코드 재사용성을 높이는 방법이다.',
+          correctAnswer: true,
+          explanation: '상속은 객체지향 프로그래밍의 핵심 개념으로, 부모 클래스의 속성과 메서드를 자식 클래스가 물려받아 사용할 수 있게 합니다. 이를 통해 중복 코드를 줄이고 코드 재사용성을 높일 수 있습니다.',
+          category: '객체지향 프로그래밍',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['oop', 'inheritance', 'programming'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: '부모 클래스와 자식 클래스의 관계를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '코드 중복을 줄이는 방법을 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_011',
+          type: 'OX',
+          question: '알고리즘의 시간복잡도 O(1)은 상수 시간 복잡도를 의미한다.',
+          correctAnswer: true,
+          explanation: 'O(1)은 Big O 표기법에서 상수 시간 복잡도를 나타냅니다. 이는 입력 크기에 관계없이 항상 일정한 시간이 걸리는 알고리즘을 의미합니다. 예를 들어, 배열에서 특정 인덱스의 값에 접근하는 것은 O(1)입니다.',
+          category: '알고리즘',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['algorithm', 'time-complexity', 'big-o'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: 'Big O 표기법의 의미를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '입력 크기와 실행 시간의 관계를 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_012',
+          type: 'OX',
+          question: 'REST API에서 GET 메서드는 서버의 데이터를 수정할 수 있다.',
+          correctAnswer: false,
+          explanation: 'REST API의 GET 메서드는 idempotent(멱등)하며, 서버의 상태를 변경하지 않는 안전한 메서드입니다. 데이터를 조회하는 용도로만 사용해야 하며, 데이터 수정은 PUT, PATCH, POST 등의 메서드를 사용해야 합니다.',
+          category: 'API',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['rest-api', 'http-methods', 'web'],
+          timeLimit: 30,
+          points: 10,
+          hints: [
+            { id: 'h1', content: 'HTTP 메서드의 용도를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '안전한 메서드와 그렇지 않은 메서드를 구분해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_011',
+          type: 'OX',
+          title: '알고리즘의 시간복잡도 O(1)은',
+          subtitle: '상수 시간 복잡도를 의미한다.',
+          question: '알고리즘의 시간복잡도 O(1)은 상수 시간 복잡도를 의미한다.',
+          correctAnswer: true,
+          explanation: 'O(1)은 Big O 표기법에서 상수 시간 복잡도를 나타냅니다. 이는 입력 크기에 관계없이 항상 일정한 시간이 걸리는 알고리즘을 의미합니다. 예를 들어, 배열에서 특정 인덱스의 값에 접근하는 것은 O(1)입니다.',
+          category: '알고리즘',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['algorithm', 'time-complexity', 'big-o'],
+          timeLimit: 30,
+          points: 10,
+          emoji: '⏱️',
+          hints: [
+            { id: 'h1', content: 'Big O 표기법의 의미를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '입력 크기와 실행 시간의 관계를 생각해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
+        },
+        {
+          id: 'ox_012',
+          type: 'OX',
+          title: 'REST API에서 GET 메서드는',
+          subtitle: '서버의 데이터를 수정할 수 있다.',
+          question: 'REST API에서 GET 메서드는 서버의 데이터를 수정할 수 있다.',
+          correctAnswer: false,
+          explanation: 'REST API의 GET 메서드는 idempotent(멱등)하며, 서버의 상태를 변경하지 않는 안전한 메서드입니다. 데이터를 조회하는 용도로만 사용해야 하며, 데이터 수정은 PUT, PATCH, POST 등의 메서드를 사용해야 합니다.',
+          category: 'API',
+          level: 'LV1',
+          difficulty: 'BEGINNER',
+          tags: ['rest-api', 'http-methods', 'web'],
+          timeLimit: 30,
+          points: 10,
+          emoji: '🔗',
+          hints: [
+            { id: 'h1', content: 'HTTP 메서드의 용도를 생각해보세요.', level: 'BASIC', pointsPenalty: 2 },
+            { id: 'h2', content: '안전한 메서드와 그렇지 않은 메서드를 구분해보세요.', level: 'INTERMEDIATE', pointsPenalty: 3 }
+          ]
         }
       ],
       'LV2': [

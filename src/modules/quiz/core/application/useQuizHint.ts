@@ -42,10 +42,35 @@ export function useQuizHint({
   // 퀴즈가 변경될 때 힌트 상태 초기화
   useEffect(() => {
     if (quiz) {
-      const hints = quiz.getHints();
+      try {
+        const hints = quiz.getHints() || []; // null 체크 추가
+        setState(prev => ({
+          ...prev,
+          availableHints: hints,
+          usedHints: [],
+          currentHint: null,
+          hintUsageCount: 0,
+          totalPointsPenalty: 0,
+          isHintModalVisible: false,
+        }));
+      } catch (error) {
+        console.error('힌트 로드 실패:', error);
+        // 오류 발생 시 빈 배열로 초기화
+        setState(prev => ({
+          ...prev,
+          availableHints: [],
+          usedHints: [],
+          currentHint: null,
+          hintUsageCount: 0,
+          totalPointsPenalty: 0,
+          isHintModalVisible: false,
+        }));
+      }
+    } else {
+      // quiz가 null이면 힌트 상태도 초기화
       setState(prev => ({
         ...prev,
-        availableHints: hints,
+        availableHints: [],
         usedHints: [],
         currentHint: null,
         hintUsageCount: 0,
@@ -57,24 +82,38 @@ export function useQuizHint({
 
   // 힌트 사용 가능 여부 확인
   const canUseHint = useCallback((hintLevel?: HintLevel): boolean => {
-    if (!quiz || state.hintUsageCount >= state.maxHintsAllowed) {
+    // Null safety 가드 추가
+    if (!quiz || !state.availableHints || state.availableHints.length === 0) {
       return false;
     }
 
+    if (state.hintUsageCount >= state.maxHintsAllowed) {
+      return false;
+    }
+
+    // usedHints 배열도 안전하게 처리
+    const safeUsedHints = state.usedHints || [];
+
     if (hintLevel) {
       const hint = state.availableHints.find(h =>
-        h.level === hintLevel && !state.usedHints.find(used => used.id === h.id)
+        h.level === hintLevel && !safeUsedHints.find(used => used.id === h.id)
       );
       return !!hint;
     }
 
-    return state.availableHints.length > state.usedHints.length;
+    return state.availableHints.length > safeUsedHints.length;
   }, [quiz, state.hintUsageCount, state.maxHintsAllowed, state.availableHints, state.usedHints]);
 
   // 사용 가능한 다음 힌트 가져오기
   const getNextAvailableHint = useCallback((): QuizHint | null => {
+    // 배열 안전성 검사
+    if (!state.availableHints || state.availableHints.length === 0) {
+      return null;
+    }
+
+    const safeUsedHints = state.usedHints || [];
     const unusedHints = state.availableHints.filter(hint =>
-      !state.usedHints.find(used => used.id === hint.id)
+      !safeUsedHints.find(used => used.id === hint.id)
     );
 
     if (unusedHints.length === 0) {
@@ -96,8 +135,14 @@ export function useQuizHint({
 
   // 특정 레벨의 힌트 가져오기
   const getHintByLevel = useCallback((level: HintLevel): QuizHint | null => {
+    // 배열 안전성 검사
+    if (!state.availableHints || state.availableHints.length === 0) {
+      return null;
+    }
+
+    const safeUsedHints = state.usedHints || [];
     const hint = state.availableHints.find(h =>
-      h.level === level && !state.usedHints.find(used => used.id === h.id)
+      h.level === level && !safeUsedHints.find(used => used.id === h.id)
     );
     return hint || null;
   }, [state.availableHints, state.usedHints]);
@@ -105,6 +150,13 @@ export function useQuizHint({
   // 힌트 사용
   const useHint = useCallback((hintId?: string) => {
     let hintToUse: QuizHint | null = null;
+
+    // 배열 안전성 검사
+    if (!state.availableHints || state.availableHints.length === 0) {
+      return false;
+    }
+
+    const safeUsedHints = state.usedHints || [];
 
     if (hintId) {
       // 특정 힌트 ID로 힌트 찾기
@@ -119,7 +171,7 @@ export function useQuizHint({
     }
 
     // 이미 사용한 힌트인지 확인
-    if (state.usedHints.find(used => used.id === hintToUse!.id)) {
+    if (safeUsedHints.find(used => used.id === hintToUse!.id)) {
       return false;
     }
 
@@ -127,7 +179,7 @@ export function useQuizHint({
 
     setState(prev => ({
       ...prev,
-      usedHints: [...prev.usedHints, hintToUse!],
+      usedHints: [...(prev.usedHints || []), hintToUse!],
       currentHint: hintToUse,
       hintUsageCount: prev.hintUsageCount + 1,
       totalPointsPenalty: prev.totalPointsPenalty + pointsPenalty,
@@ -183,27 +235,31 @@ export function useQuizHint({
 
   // 힌트 통계 가져오기
   const getHintStatistics = useCallback(() => {
+    // 배열 안전성 검사
+    const safeAvailableHints = state.availableHints || [];
+    const safeUsedHints = state.usedHints || [];
+
     const stats = {
-      totalHints: state.availableHints.length,
-      usedHints: state.usedHints.length,
+      totalHints: safeAvailableHints.length,
+      usedHints: safeUsedHints.length,
       remainingHints: Math.max(0, state.maxHintsAllowed - state.hintUsageCount),
       totalPointsPenalty: state.totalPointsPenalty,
       hintsByLevel: {
         [HintLevel.BASIC]: {
-          available: state.availableHints.filter(h => h.level === HintLevel.BASIC).length,
-          used: state.usedHints.filter(h => h.level === HintLevel.BASIC).length,
+          available: safeAvailableHints.filter(h => h.level === HintLevel.BASIC).length,
+          used: safeUsedHints.filter(h => h.level === HintLevel.BASIC).length,
         },
         [HintLevel.INTERMEDIATE]: {
-          available: state.availableHints.filter(h => h.level === HintLevel.INTERMEDIATE).length,
-          used: state.usedHints.filter(h => h.level === HintLevel.INTERMEDIATE).length,
+          available: safeAvailableHints.filter(h => h.level === HintLevel.INTERMEDIATE).length,
+          used: safeUsedHints.filter(h => h.level === HintLevel.INTERMEDIATE).length,
         },
         [HintLevel.ADVANCED]: {
-          available: state.availableHints.filter(h => h.level === HintLevel.ADVANCED).length,
-          used: state.usedHints.filter(h => h.level === HintLevel.ADVANCED).length,
+          available: safeAvailableHints.filter(h => h.level === HintLevel.ADVANCED).length,
+          used: safeUsedHints.filter(h => h.level === HintLevel.ADVANCED).length,
         },
         [HintLevel.SOLUTION]: {
-          available: state.availableHints.filter(h => h.level === HintLevel.SOLUTION).length,
-          used: state.usedHints.filter(h => h.level === HintLevel.SOLUTION).length,
+          available: safeAvailableHints.filter(h => h.level === HintLevel.SOLUTION).length,
+          used: safeUsedHints.filter(h => h.level === HintLevel.SOLUTION).length,
         },
       },
     };
@@ -227,8 +283,8 @@ export function useQuizHint({
     // State
     ...state,
 
-    // Computed values
-    canUseHint: canUseHint(),
+    // Computed values - 안전한 기본값 제공
+    canUseHint: quiz && state.availableHints ? canUseHint() : false,
     nextAvailableHint: getNextAvailableHint(),
     hintStatistics: getHintStatistics(),
     nextHintPreview: getNextHintPreview(),

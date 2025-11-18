@@ -5,7 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { View, Text, Animated } from 'react-native';
-import { timerStyles } from '../styles/QuizTimer.styles';
+import { quizTimerStyles as timerStyles } from '../styles/QuizTimer.styles';
 
 export interface QuizTimerProps {
   timeRemaining: number; // seconds

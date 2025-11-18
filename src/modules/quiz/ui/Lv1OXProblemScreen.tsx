@@ -1,308 +1,470 @@
-/**
- * LV1 O/X 문제 화면 - 새로운 SOLID 기반 구조
- * SOLID 원칙 중 SRP(단일 책임) 적용 - UI 렌더링만 담당
- */
-
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   SafeAreaView,
-  ActivityIndicator,
-  Alert,
+  Animated,
 } from 'react-native';
-import { useQuizSession } from '../core/application/useQuizSession';
-import { useQuizHint } from '../core/application/useQuizHint';
-import { QuizRepositoryImpl } from '../infra/QuizRepositoryImpl';
-import { QuizLevel } from '../core/domain/QuizBase';
-import { OXQuiz } from '../core/domain/QuizTypes';
-import { SimpleCache } from '../../common/infra/SimpleCache';
-import { MockAnalytics } from '../../common/infra/MockAnalytics';
-import { ProblemCard } from './components/ProblemCard';
-import { HintModal } from './components/HintModal';
+import { styles } from './styles/Lv1OXProblemScreen.styles';
+import { Lv1OXProblemScreenProps, OXAnswer, ProblemData, ResultState, ResultData } from './types/Lv1OXProblemScreen.types';
 import { ResultModal } from './components/ResultModal';
-import { QuizProgressBar } from './components/QuizProgressBar';
-import { QuizTimer } from './components/QuizTimer';
-import { lv1Styles } from './styles/Lv1OXProblemScreen.styles';
+import {
+  sessionManager,
+  createNewSession,
+  getCurrentProblem,
+  submitAnswer,
+  goToNextProblem,
+  getSessionProgress,
+  isSessionCompleted,
+  clearCurrentSession,
+  isCurrentProblemLast
+} from '../../../data/sessionManager';
 
-interface Lv1OXProblemScreenProps {
-  navigation: any;
-  route: {
-    params: {
-      difficulty?: any;
-      language?: string;
-    };
-  };
-}
+const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
+  onAnswerSelect = (answer) => console.log('Answer selected:', answer),
+  onClose = () => console.log('Screen closed'),
+  onNext = () => console.log('Next problem'),
+  onSessionComplete = () => console.log('Session completed'),
+  timeRemaining = 30,
+  navigation,
+  route,
+}) => {
+  const [selectedAnswer, setSelectedAnswer] = useState<OXAnswer | null>(null);
+  const [resultState, setResultState] = useState<ResultState>('ANSWERING');
+  const [resultData, setResultData] = useState<ResultData | null>(null);
+  const [progressAnimation] = useState(new Animated.Value(0));
+  const [currentProblemData, setCurrentProblemData] = useState<ProblemData | null>(null);
+  const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
 
-export default function Lv1OXProblemScreen({ navigation, route }: Lv1OXProblemScreenProps) {
-  const [showResultModal, setShowResultModal] = useState(false);
-  const [selectedAnswer, setSelectedAnswer] = useState<boolean | null>(null);
-
-  // 의존성 주입 - Repository 인스턴스 생성
-  const repository = new QuizRepositoryImpl(
-    new SimpleCache(),
-    new MockAnalytics(),
-    '/api'
-  );
-
-  // 커스텀 훅 사용 - 비즈니스 로직 분리
-  const quizSession = useQuizSession({
-    repository,
-    userId: 'current_user', // 실제로는 인증 시스템에서 가져와야 함
-    autoSubmitOnTimeout: true,
-    shuffleQuizzes: true,
-  });
-
-  const hintSystem = useQuizHint({
-    quiz: quizSession.currentQuiz,
-    maxHintsAllowed: 3,
-    onHintUsed: (hint) => {
-      quizSession.useHint(hint.id);
-    },
-    onPointsPenalty: (penalty) => {
-      Alert.alert('힌트 사용', `${penalty}점이 차감됩니다.`);
-    },
-  });
-
-  // 컴포넌트 마운트 시 퀴즈 로드
+  // Initialize session and get current problem
   useEffect(() => {
-    quizSession.loadQuizzes(QuizLevel.LV1);
+    let currentSession = sessionManager.getCurrentSession();
+
+    // Create new session if none exists
+    if (!currentSession) {
+      currentSession = createNewSession('OX', 10);
+    }
+
+    // Load current problem
+    const problem = getCurrentProblem() as ProblemData;
+    if (problem) {
+      setCurrentProblemData(problem);
+    }
+
+    // Update progress
+    const progress = getSessionProgress();
+    setSessionProgress(progress);
   }, []);
 
-  // 답안 선택 핸들러
-  const handleAnswerSelect = (answer: boolean) => {
+  // REMOVED: Unreliable session completion monitoring effect
+  // Now using direct modal trigger in handleAnswerPress for better reliability
+
+  useEffect(() => {
+    // Calculate progress percentage based on session progress
+    const progressPercentage = sessionProgress.percentage;
+    Animated.timing(progressAnimation, {
+      toValue: progressPercentage,
+      duration: 500,
+      useNativeDriver: false,
+    }).start();
+  }, [sessionProgress, progressAnimation]);
+
+  const handleAnswerPress = (answer: OXAnswer) => {
+    if (selectedAnswer || resultState !== 'ANSWERING' || !currentProblemData) return;
+
     setSelectedAnswer(answer);
-    quizSession.setUserAnswer(answer);
+    onAnswerSelect(answer);
+
+    // Determine if answer is correct
+    const isCorrect = answer === currentProblemData.correctAnswer;
+    const newResultState: ResultState = isCorrect ? 'CORRECT' : 'INCORRECT';
+
+    // Submit answer to session manager
+    submitAnswer(answer, isCorrect);
+
+    // Get current session stats for result data
+    const progress = getSessionProgress();
+    const sessionStats = sessionManager.getSessionStats();
+
+    // Create result data
+    const result: ResultData = {
+      isCorrect,
+      userAnswer: answer,
+      correctAnswer: currentProblemData.correctAnswer,
+      explanation: currentProblemData.explanation,
+      pointsEarned: isCorrect ? 10 : 0,
+      streakCount: isCorrect ? 4 : 0, // Mock streak count
+      currentScore: sessionStats?.correctAnswers.toString() || '0',
+      totalScore: progress.total.toString(),
+      experiencePoints: {
+        current: isCorrect ? 660 : 650, // Mock XP gain
+        required: 1000
+      },
+      achievements: isCorrect ? ['🏆 연속 정답 배지 획득!'] : undefined
+    };
+
+    setResultData(result);
+    setResultState(newResultState);
+
+    // REMOVED: Automatic timeout-based completion modal trigger
+    // Now using button-driven completion flow for better UX
   };
 
-  // 답안 제출 핸들러
-  const handleSubmitAnswer = async () => {
-    if (selectedAnswer === null) {
-      Alert.alert('답안 선택', '답을 선택해주세요.');
+  const handleNextProblem = () => {
+    // CRITICAL FIX: Simplified logic matching LV2/LV3 pattern
+    // Check if session is completed
+    if (isSessionCompleted()) {
+      // Session completed, trigger completion callback
+      if (onSessionComplete) {
+        onSessionComplete();
+      }
       return;
     }
 
-    await quizSession.submitAnswer();
-    setShowResultModal(true);
-  };
+    // Move to next problem in session
+    const hasNextProblem = goToNextProblem();
 
-  // 다음 문제로 이동
-  const handleNextQuiz = () => {
-    setShowResultModal(false);
-    setSelectedAnswer(null);
+    if (hasNextProblem) {
+      // Reset states for next problem
+      setSelectedAnswer(null);
+      setResultState('ANSWERING');
+      setResultData(null);
 
-    if (quizSession.isLastQuiz) {
-      // 세션 완료
-      Alert.alert(
-        '축하합니다!',
-        `모든 문제를 완료했습니다.\n총 점수: ${quizSession.totalScore}점\n연속 정답: ${quizSession.streak}개`,
-        [
-          {
-            text: '확인',
-            onPress: () => navigation.goBack(),
-          },
-        ]
-      );
+      // Load next problem
+      const nextProblem = getCurrentProblem() as ProblemData;
+      if (nextProblem) {
+        setCurrentProblemData(nextProblem);
+      }
+
+      // Update progress
+      const progress = getSessionProgress();
+      setSessionProgress(progress);
+
+      onNext();
     } else {
-      quizSession.goToNextQuiz();
+      // No more problems, complete session
+      if (onSessionComplete) {
+        onSessionComplete();
+      }
     }
   };
 
-  // 로딩 상태 렌더링
-  if (quizSession.isLoading) {
+  const handleRetryProblem = () => {
+    // Reset to problem view
+    setSelectedAnswer(null);
+    setResultState('ANSWERING');
+    setResultData(null);
+  };
+
+  const handleClose = () => {
+    // Clear session when closing
+    clearCurrentSession();
+    if (navigation) {
+      navigation.goBack();
+    } else {
+      onClose();
+    }
+  };
+
+  const handleCompletionModalClose = () => {
+    setShowCompletionModal(false);
+    // Trigger session completion callback or navigate away
+    if (onSessionComplete) {
+      onSessionComplete();
+    } else {
+      handleClose();
+    }
+  };
+
+  const getCompletionModalData = () => {
+    const sessionStats = sessionManager.getSessionStats();
+    const finalScore = sessionStats?.correctAnswers || 0;
+    const totalProblems = sessionStats?.totalAnswers || sessionProgress.total;
+    const accuracy = sessionStats?.accuracy || 0;
+
+    return {
+      isCorrect: accuracy >= 70, // Consider 70%+ as "success"
+      explanation: `퀴즈를 완료했습니다! 총 ${totalProblems}문제 중 ${finalScore}문제를 맞혔습니다. 정확도: ${accuracy}%`,
+      correctAnswer: `${finalScore}/${totalProblems} 정답`,
+      userAnswer: `정확도 ${accuracy}%`,
+      points: finalScore * 10,
+      hintsUsed: 0,
+      timeSpent: Math.round((sessionStats?.totalTimeSpent || 0) / 1000),
+      bonusPoints: accuracy >= 90 ? 50 : accuracy >= 80 ? 30 : accuracy >= 70 ? 10 : 0
+    };
+  };
+
+  const formatTime = (seconds: number): string => {
+    return `${seconds}s`;
+  };
+
+  // CRITICAL FIX: Apply LV2/LV3 completion flow pattern
+  const handleCompletionButtonPress = () => {
+    // Direct completion modal trigger - same as LV2/LV3 pattern
+    setShowCompletionModal(true);
+  };
+
+  // Render Result View based on Figma design
+  const renderResultView = () => {
+    if (!resultData) return null;
+
+    const { isCorrect, explanation, pointsEarned, streakCount, currentScore, totalScore, experiencePoints, achievements } = resultData;
+
     return (
-      <SafeAreaView style={lv1Styles.safeArea}>
-        <View style={lv1Styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3563e9" />
-          <Text style={lv1Styles.loadingText}>문제를 불러오는 중...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // 에러 상태 렌더링
-  if (quizSession.error) {
-    return (
-      <SafeAreaView style={lv1Styles.safeArea}>
-        <View style={lv1Styles.errorContainer}>
-          <Text style={lv1Styles.errorText}>{quizSession.error}</Text>
-          <TouchableOpacity
-            style={lv1Styles.retryButton}
-            onPress={() => quizSession.loadQuizzes(QuizLevel.LV1)}
-          >
-            <Text style={lv1Styles.retryButtonText}>다시 시도</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  // 현재 퀴즈가 없는 경우
-  if (!quizSession.currentQuiz) {
-    return (
-      <SafeAreaView style={lv1Styles.safeArea}>
-        <View style={lv1Styles.errorContainer}>
-          <Text style={lv1Styles.errorText}>문제를 찾을 수 없습니다.</Text>
-          <TouchableOpacity
-            style={lv1Styles.retryButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={lv1Styles.retryButtonText}>뒤로가기</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
-
-  const currentQuiz = quizSession.currentQuiz as OXQuiz;
-
-  return (
-    <SafeAreaView style={lv1Styles.safeArea}>
-      <View style={lv1Styles.container}>
-        {/* 헤더 */}
-        <View style={lv1Styles.header}>
-          <TouchableOpacity
-            style={lv1Styles.backButton}
-            onPress={() => navigation.goBack()}
-          >
-            <Text style={lv1Styles.backButtonText}>←</Text>
+      <SafeAreaView style={styles.container}>
+        {/* Header Section - Same as problem view */}
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.backButton} onPress={handleClose}>
+            <Text style={styles.backButtonText}>←</Text>
           </TouchableOpacity>
 
-          <View style={lv1Styles.headerCenter}>
-            <Text style={lv1Styles.headerTitle}>LV1 O/X 문제</Text>
-            <Text style={lv1Styles.headerSubtitle}>
-              {quizSession.currentIndex + 1} / {quizSession.quizzes.length}
+          <View style={styles.headerCenter}>
+            <Text style={styles.problemCounter}>문제 {sessionProgress.current} / {sessionProgress.total}</Text>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>{currentProblemData?.category || ''}</Text>
+            </View>
+          </View>
+
+          <View style={styles.timerContainer}>
+            <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
+          </View>
+        </View>
+
+        {/* Progress Bar - Same as problem view */}
+        <View style={styles.progressContainer}>
+          <View style={styles.progressBarBg}>
+            <Animated.View
+              style={[
+                styles.progressBarFill,
+                {
+                  width: progressAnimation.interpolate({
+                    inputRange: [0, 100],
+                    outputRange: ['0%', '100%'],
+                    extrapolate: 'clamp',
+                  }),
+                },
+              ]}
+            />
+          </View>
+        </View>
+
+        {/* Result Content */}
+        <View style={styles.resultContentContainer}>
+          {/* Achievement Badge (only for correct answers) */}
+          {isCorrect && achievements && achievements.length > 0 && (
+            <View style={styles.achievementBadge}>
+              <Text style={styles.achievementText}>{achievements[0]}</Text>
+            </View>
+          )}
+
+          {/* Result Status */}
+          <View style={styles.resultStatusContainer}>
+            <Text style={[styles.resultStatusText, isCorrect ? styles.correctText : styles.incorrectText]}>
+              {isCorrect ? '정답입니다!' : '오답입니다!'}
             </Text>
           </View>
 
-          <TouchableOpacity
-            style={lv1Styles.hintButton}
-            onPress={() => hintSystem.useHint()}
-            disabled={!hintSystem.canUseHint}
-          >
-            <Text style={[
-              lv1Styles.hintButtonText,
-              !hintSystem.canUseHint && lv1Styles.hintButtonDisabled
-            ]}>
-              💡 힌트 ({hintSystem.hintStatistics.remainingHints})
+          {/* Celebration Message and Explanation */}
+          <View style={styles.explanationContainer}>
+            <Text style={styles.celebrationText}>
+              {isCorrect ? '🎉 훌륭해요!' : '💪 다시 한번!'}
             </Text>
-          </TouchableOpacity>
+            <Text style={styles.explanationText}>{explanation}</Text>
+          </View>
         </View>
 
-        {/* 진행률 바 */}
-        <QuizProgressBar
-          current={quizSession.currentIndex + 1}
-          total={quizSession.quizzes.length}
-          score={quizSession.totalScore}
-          streak={quizSession.streak}
-        />
+        {/* Bottom Stats Section */}
+        <View style={styles.resultBottomSection}>
+          {/* Score and Points */}
+          <View style={styles.statsContainer}>
+            <View style={styles.statRow}>
+              <Text style={styles.statLabel}>정답: {currentScore} / {totalScore}</Text>
+              {pointsEarned > 0 && (
+                <View style={styles.pointsContainer}>
+                  <Text style={styles.pointsText}>✨ +{pointsEarned} 포인트</Text>
+                </View>
+              )}
+            </View>
 
-        {/* 타이머 (시간 제한이 있는 경우) */}
-        {currentQuiz.timeLimit && (
-          <QuizTimer
-            timeRemaining={quizSession.timeRemaining || 0}
-            totalTime={currentQuiz.timeLimit}
-            onTimeUp={() => handleSubmitAnswer()}
-          />
-        )}
-
-        {/* 문제 카드 */}
-        <View style={lv1Styles.content}>
-          <ProblemCard
-            question={currentQuiz.question}
-            category={currentQuiz.category}
-            tags={currentQuiz.tags}
-            difficulty={currentQuiz.difficulty}
-            points={currentQuiz.points}
-          />
-
-          {/* O/X 선택 버튼 */}
-          <View style={lv1Styles.answerContainer}>
-            <TouchableOpacity
-              style={[
-                lv1Styles.answerButton,
-                lv1Styles.trueButton,
-                selectedAnswer === true && lv1Styles.selectedButton,
-              ]}
-              onPress={() => handleAnswerSelect(true)}
-              disabled={quizSession.isAnswered}
-            >
-              <Text style={[
-                lv1Styles.answerButtonText,
-                selectedAnswer === true && lv1Styles.selectedButtonText,
-              ]}>
-                O (참)
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                lv1Styles.answerButton,
-                lv1Styles.falseButton,
-                selectedAnswer === false && lv1Styles.selectedButton,
-              ]}
-              onPress={() => handleAnswerSelect(false)}
-              disabled={quizSession.isAnswered}
-            >
-              <Text style={[
-                lv1Styles.answerButtonText,
-                selectedAnswer === false && lv1Styles.selectedButtonText,
-              ]}>
-                X (거짓)
-              </Text>
-            </TouchableOpacity>
+            {/* Experience Points */}
+            <View style={styles.expContainer}>
+              <Text style={styles.expLabel}>🌟 학습 경험치</Text>
+              <Text style={styles.expText}>{experiencePoints.current} / {experiencePoints.required} XP</Text>
+            </View>
+            <View style={styles.expBarContainer}>
+              <View style={styles.expBarBg}>
+                <View
+                  style={[
+                    styles.expBarFill,
+                    { width: `${(experiencePoints.current / experiencePoints.required) * 100}%` }
+                  ]}
+                />
+              </View>
+            </View>
           </View>
 
-          {/* 제출 버튼 */}
-          {!quizSession.isAnswered && (
-            <TouchableOpacity
-              style={[
-                lv1Styles.submitButton,
-                selectedAnswer === null && lv1Styles.submitButtonDisabled,
-              ]}
-              onPress={handleSubmitAnswer}
-              disabled={selectedAnswer === null}
-            >
-              <Text style={lv1Styles.submitButtonText}>답안 제출</Text>
-            </TouchableOpacity>
-          )}
+          {/* Action Buttons */}
+          <View style={styles.resultActionButtons}>
+            {(sessionProgress.current >= sessionProgress.total) ? (
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={handleCompletionButtonPress}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.nextButtonText}>문제 풀이 완료</Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                style={styles.nextButton}
+                onPress={handleNextProblem}
+                activeOpacity={0.8}
+              >
+                <Text style={styles.nextButtonText}>다음 문제로 이동 →</Text>
+              </TouchableOpacity>
+            )}
 
-          {/* 다음 문제 버튼 */}
-          {quizSession.isAnswered && (
             <TouchableOpacity
-              style={lv1Styles.nextButton}
-              onPress={handleNextQuiz}
+              style={styles.retryButton}
+              onPress={handleRetryProblem}
+              activeOpacity={0.8}
             >
-              <Text style={lv1Styles.nextButtonText}>
-                {quizSession.isLastQuiz ? '완료' : '다음 문제'}
-              </Text>
+              <Text style={styles.retryButtonText}>📖 문제 다시 보기</Text>
             </TouchableOpacity>
-          )}
+          </View>
+        </View>
+      </SafeAreaView>
+    );
+  };
+
+  // Render Problem View
+  const renderProblemView = () => (
+    <SafeAreaView style={styles.container}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.backButton} onPress={handleClose}>
+          <Text style={styles.backButtonText}>←</Text>
+        </TouchableOpacity>
+
+        <View style={styles.headerCenter}>
+          <Text style={styles.problemCounter}>문제 {sessionProgress.current} / {sessionProgress.total}</Text>
+          <View style={styles.categoryBadge}>
+            <Text style={styles.categoryText}>{currentProblemData?.category || ''}</Text>
+          </View>
         </View>
 
-        {/* 힌트 모달 */}
-        <HintModal
-          isVisible={hintSystem.isHintModalVisible}
-          hint={hintSystem.currentHint}
-          onClose={hintSystem.closeHintModal}
-          usedHintsCount={hintSystem.hintUsageCount}
-          maxHints={hintSystem.maxHintsAllowed}
-        />
+        <View style={styles.timerContainer}>
+          <Text style={styles.timerText}>{formatTime(timeRemaining)}</Text>
+        </View>
+      </View>
 
-        {/* 결과 모달 */}
-        <ResultModal
-          isVisible={showResultModal}
-          isCorrect={quizSession.isCorrect || false}
-          explanation={currentQuiz.explanation}
-          correctAnswer={currentQuiz.correctAnswer}
-          userAnswer={selectedAnswer}
-          points={currentQuiz.points}
-          hintsUsed={hintSystem.hintUsageCount}
-          onContinue={handleNextQuiz}
-        />
+      {/* Progress Bar */}
+      <View style={styles.progressContainer}>
+        <View style={styles.progressBarBg}>
+          <Animated.View
+            style={[
+              styles.progressBarFill,
+              {
+                width: progressAnimation.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: ['0%', '100%'],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ]}
+          />
+        </View>
+      </View>
+
+      {/* Problem Content */}
+      <View style={styles.problemContainer}>
+        <View style={styles.emojiContainer}>
+          <Text style={styles.emoji}>{currentProblemData?.emoji || '🤔'}</Text>
+        </View>
+
+        <Text style={styles.problemTitle}>{currentProblemData?.title || ''}</Text>
+        <Text style={styles.problemSubtitle}>{currentProblemData?.subtitle || ''}</Text>
+
+        <View style={styles.hintContainer}>
+          <Text style={styles.hintText}>힌트</Text>
+        </View>
+      </View>
+
+      {/* Answer Buttons */}
+      <View style={styles.answerSection}>
+        <TouchableOpacity
+          style={[
+            styles.answerButton,
+            styles.answerButtonX,
+            selectedAnswer === 'X' && styles.answerButtonSelected,
+          ]}
+          onPress={() => handleAnswerPress('X')}
+          disabled={selectedAnswer !== null}
+          activeOpacity={0.8}
+        >
+          <View style={styles.answerIconContainer}>
+            <Text style={styles.answerIconX}>✕</Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.answerButton,
+            styles.answerButtonO,
+            selectedAnswer === 'O' && styles.answerButtonSelected,
+          ]}
+          onPress={() => handleAnswerPress('O')}
+          disabled={selectedAnswer !== null}
+          activeOpacity={0.8}
+        >
+          <View style={styles.answerIconContainer}>
+            <Text style={styles.answerIconO}>○</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Bottom Progress Section */}
+      <View style={styles.bottomSection}>
+        <View style={styles.bottomProgressBar}>
+          <Animated.View
+            style={[
+              styles.bottomProgressFill,
+              {
+                width: progressAnimation.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: ['0%', '100%'],
+                  extrapolate: 'clamp',
+                }),
+              },
+            ]}
+          />
+        </View>
+        <View style={styles.progressLabels}>
+          <Text style={styles.progressLabel}>진행률</Text>
+          <Text style={styles.progressPercentage}>{sessionProgress.percentage}%</Text>
+        </View>
       </View>
     </SafeAreaView>
   );
-}
+
+  // Main render based on current state
+  if (resultState === 'CORRECT' || resultState === 'INCORRECT') {
+    return renderResultView();
+  }
+
+  return (
+    <>
+      {renderProblemView()}
+      {showCompletionModal && (
+        <ResultModal
+          isVisible={showCompletionModal}
+          {...getCompletionModalData()}
+          onContinue={handleCompletionModalClose}
+        />
+      )}
+    </>
+  );
+};
+
+export default Lv1OXProblemScreen;

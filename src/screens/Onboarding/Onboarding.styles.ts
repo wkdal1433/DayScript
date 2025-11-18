@@ -32,12 +32,16 @@ export const onboardingStyles = StyleSheet.create({
     borderWidth: 2,
     borderColor: COLORS.primaryBorder,
     borderStyle: 'dashed',
+    ...SIZES.shadow.small,
   },
 
   imagePlaceholder: {
-    fontSize: FONTS.sizes.emoji,
+    fontSize: 48,
     color: COLORS.primary,
     fontWeight: FONTS.weights.medium as any,
+    textShadowColor: 'rgba(242, 190, 209, 0.3)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 4,
   },
 
   // Text Content
@@ -47,21 +51,23 @@ export const onboardingStyles = StyleSheet.create({
   },
 
   title: {
-    fontSize: FONTS.sizes.heading + 4, // 22px for onboarding
+    fontSize: FONTS.sizes.heading + 6, // 24px for better hierarchy
     fontWeight: FONTS.weights.bold as any,
     color: COLORS.textPrimary,
     textAlign: 'center',
     marginBottom: SIZES.spacing.lg,
-    lineHeight: FONTS.lineHeights.tight * (FONTS.sizes.heading + 4),
+    lineHeight: FONTS.lineHeights.tight * (FONTS.sizes.heading + 6),
+    letterSpacing: -0.5,
   },
 
   description: {
-    fontSize: FONTS.sizes.body,
+    fontSize: FONTS.sizes.body + 1, // 15px for better readability
     fontWeight: FONTS.weights.regular as any,
     color: COLORS.textSecondary,
     textAlign: 'center',
-    lineHeight: FONTS.lineHeights.relaxed * FONTS.sizes.body,
+    lineHeight: FONTS.lineHeights.relaxed * (FONTS.sizes.body + 1),
     marginBottom: SIZES.spacing.xxl,
+    opacity: 0.9,
   },
 
   // Terminal Style Elements
@@ -88,6 +94,7 @@ export const onboardingStyles = StyleSheet.create({
     paddingBottom: 40,
     borderTopWidth: 1,
     borderTopColor: COLORS.borderLight,
+    ...SIZES.shadow.medium,
   },
 
   // Step Indicators
@@ -120,18 +127,21 @@ export const onboardingStyles = StyleSheet.create({
 
   primaryButton: {
     backgroundColor: COLORS.primary,
-    paddingVertical: SIZES.spacing.lg,
+    paddingVertical: SIZES.spacing.lg + 2, // 18px for better touch target
     borderRadius: SIZES.figma.cardBorderRadius,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: SIZES.spacing.md,
     ...SIZES.shadow.small,
+    borderWidth: 1,
+    borderColor: COLORS.primaryBorder,
   },
 
   primaryButtonText: {
-    fontSize: FONTS.sizes.body,
+    fontSize: FONTS.sizes.body + 1, // 15px for better visibility
     fontWeight: FONTS.weights.semiBold as any,
-    color: COLORS.white,
+    color: COLORS.textPrimary, // Changed from white to primary text for better contrast
+    letterSpacing: 0.2,
   },
 
   secondaryButton: {
@@ -142,9 +152,10 @@ export const onboardingStyles = StyleSheet.create({
   },
 
   secondaryButtonText: {
-    fontSize: FONTS.sizes.caption,
+    fontSize: FONTS.sizes.caption + 2, // 12px for better visibility
     fontWeight: FONTS.weights.medium as any,
     color: COLORS.textMuted,
+    opacity: 0.8,
   },
 
   // Animation Elements
@@ -161,10 +172,13 @@ export const onboardingStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.black,
-    paddingHorizontal: SIZES.spacing.md,
-    paddingVertical: SIZES.spacing.sm,
-    borderRadius: SIZES.borderRadius.sm,
-    marginVertical: SIZES.spacing.sm,
+    paddingHorizontal: SIZES.spacing.md + 4, // 14px for better spacing
+    paddingVertical: SIZES.spacing.sm + 2, // 10px for better spacing
+    borderRadius: SIZES.borderRadius.md, // 8px for modern look
+    marginVertical: SIZES.spacing.md,
+    ...SIZES.shadow.small,
+    borderWidth: 1,
+    borderColor: COLORS.terminal,
   },
 
   cliPromptText: {

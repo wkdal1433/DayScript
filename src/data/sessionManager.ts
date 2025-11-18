@@ -181,6 +181,14 @@ class SessionManager {
     return this.currentSession?.isCompleted || false;
   }
 
+  // Check if current problem is the last one (without advancing index)
+  isCurrentProblemLast(): boolean {
+    if (!this.currentSession) {
+      return false;
+    }
+    return this.currentSession.currentProblemIndex >= this.currentSession.totalProblems - 1;
+  }
+
   // Reset/clear current session
   clearSession(): void {
     this.currentSession = null;
@@ -238,4 +246,8 @@ export const isSessionCompleted = () => {
 
 export const clearCurrentSession = () => {
   sessionManager.clearSession();
+};
+
+export const isCurrentProblemLast = () => {
+  return sessionManager.isCurrentProblemLast();
 };

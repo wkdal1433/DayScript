@@ -17,6 +17,92 @@ export const quizTimerStyles = StyleSheet.create({
     elevation: 3,
   },
 
+  // QuizTimer.tsx에서 사용되는 필수 스타일들 추가
+  timerContainer: {
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+
+  timerLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 4,
+    textAlign: 'center',
+  },
+
+  warningTimer: {
+    backgroundColor: '#FEF3C7',
+    borderWidth: 2,
+  },
+
+  warningText: {
+    fontWeight: 'bold',
+  },
+
+  progressContainer: {
+    alignItems: 'center',
+    marginTop: 8,
+  },
+
+  progressRing: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#E5E7EB',
+    position: 'relative',
+    overflow: 'hidden',
+  },
+
+  progressFill: {
+    position: 'absolute',
+    width: 30,
+    height: 60,
+    top: 0,
+    left: 30,
+    transformOrigin: '0 30px',
+    backgroundColor: '#10B981',
+  },
+
+  progressText: {
+    position: 'absolute',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#111827',
+    textAlign: 'center',
+  },
+
+  warningMessage: {
+    backgroundColor: '#FEF3C7',
+    borderColor: '#F59E0B',
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 8,
+    marginTop: 8,
+  },
+
+  warningMessageText: {
+    fontSize: 12,
+    color: '#92400E',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
+
+  timeUpMessage: {
+    backgroundColor: '#FEE2E2',
+    borderColor: '#EF4444',
+    borderWidth: 1,
+    borderRadius: 6,
+    padding: 8,
+    marginTop: 8,
+  },
+
+  timeUpText: {
+    fontSize: 14,
+    color: '#DC2626',
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+
   // 기본 타이머 디스플레이
   timerDisplay: {
     flexDirection: 'row',

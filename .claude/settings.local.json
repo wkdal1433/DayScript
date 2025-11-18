@@ -23,7 +23,9 @@
       "Bash(claude mcp:*)",
       "Bash(mkdir:*)",
       "Bash(find:*)",
-      "Bash(npm start:*)"
+      "Bash(npm start:*)",
+      "Bash(node:*)",
+      "Bash(npx eslint:*)"
     ],
     "deny": [],
     "ask": []
