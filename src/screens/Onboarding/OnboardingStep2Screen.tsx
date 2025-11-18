@@ -15,33 +15,31 @@ export const OnboardingStep2Screen: React.FC<OnboardingStepScreenProps> = ({
   return (
     <SafeAreaView style={[styles.container, style]}>
       {/* Step Indicator - Top Center */}
-      <View style={styles.stepIndicatorContainer}>
-        <Text style={styles.stepIndicatorText}>2 / 4</Text>
-      </View>
+      <Text style={styles.stepIndicatorText}>2 / 4</Text>
 
-      {/* Decorative Elements - Exact Figma Positions */}
-      <View style={styles.decorativeElements}>
-        {/* Large Background Circle with Gradient */}
-        <View style={styles.backgroundCircle} />
+      {/* Main Content Container - Perfect Center Alignment */}
+      <View style={styles.mainContentContainer}>
+        {/* Central Illustration Area */}
+        <View style={styles.illustrationContainer}>
+          {/* Background Gradient Circle */}
+          <View style={styles.backgroundCircle} />
 
-        {/* Small Decorative Circles */}
-        <View style={[styles.smallCircle, styles.smallCircle1]} />
-        <View style={[styles.smallCircle, styles.smallCircle2]} />
-        <View style={[styles.smallCircle, styles.smallCircle3]} />
-        <View style={[styles.smallCircle, styles.smallCircle4]} />
+          {/* Small Decorative Circles */}
+          <View style={[styles.smallCircle, styles.smallCircle1]} />
+          <View style={[styles.smallCircle, styles.smallCircle2]} />
+          <View style={[styles.smallCircle, styles.smallCircle3]} />
+          <View style={[styles.smallCircle, styles.smallCircle4]} />
 
-        {/* Code Editor Visual Element */}
-        <View style={styles.codeEditorContainer}>
-          {/* Simulated code lines */}
-          <View style={styles.codeLine} />
-          <View style={[styles.codeLine, styles.codeLineShort]} />
-          <View style={styles.codeLine} />
-          <View style={[styles.codeLine, styles.codeLineShort]} />
+          {/* Code Editor Visual Element */}
+          <View style={styles.codeEditorContainer}>
+            {/* Simulated code lines */}
+            <View style={styles.codeLine} />
+            <View style={[styles.codeLine, styles.codeLineShort]} />
+            <View style={styles.codeLine} />
+            <View style={[styles.codeLine, styles.codeLineShort]} />
+          </View>
         </View>
-      </View>
 
-      {/* Main Content Area */}
-      <View style={styles.contentContainer}>
         {/* Main Heading - 2 Lines as per Figma */}
         <View style={styles.headingContainer}>
           <Text style={styles.mainHeading}>실제 면접처럼</Text>
@@ -83,25 +81,30 @@ export const OnboardingStep2Screen: React.FC<OnboardingStepScreenProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Main Container - 390x844 Frame
+  // Main Container - Perfect Center Alignment
   container: {
     flex: 1,
     backgroundColor: COLORS.background, // #F9F5F6 - Unified design system
-    width: '100%',
-    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
   },
 
-  // Step Indicator Container - Top Center
-  stepIndicatorContainer: {
-    position: 'absolute',
-    top: 48, // y: 48 from Figma
-    left: '50%',
-    transform: [{ translateX: -13 }], // Center the "2 / 4" text (26px width / 2)
-    zIndex: 10,
+  // Main Content Container - Perfect Center Alignment for all content
+  mainContentContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: -60, // Fine-tune vertical positioning
   },
 
-  // Step Indicator Text - Inter Bold 12px
+  // Step Indicator Text - Top Center Position
   stepIndicatorText: {
+    position: 'absolute',
+    top: 48,
+    left: '50%',
+    transform: [{ translateX: -13 }], // Center align "2 / 4" text
     fontFamily: 'Inter',
     fontSize: 12,
     fontWeight: '700',
@@ -110,20 +113,19 @@ const styles = StyleSheet.create({
     lineHeight: 15,
   },
 
-  // Decorative Elements Container
-  decorativeElements: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
+  // Central Illustration Container - Centered Layout
+  illustrationContainer: {
+    width: 200,
+    height: 200,
+    marginBottom: 40,
+    position: 'relative',
   },
 
-  // Large Background Circle - x: 95, y: 180, 200x200
+  // Large Background Circle - Centered
   backgroundCircle: {
     position: 'absolute',
-    left: 95,
-    top: 180,
+    left: 0,
+    top: 0,
     width: 200,
     height: 200,
     borderRadius: 100,
@@ -137,51 +139,51 @@ const styles = StyleSheet.create({
     borderRadius: 50,
   },
 
-  // Small Circle 1 - x: 80, y: 245, 10x10
+  // Small Circle 1 - Relative positioning
   smallCircle1: {
-    left: 80,
-    top: 245,
+    left: -15, // Adjusted for centered layout
+    top: 65,
     width: 10,
     height: 10,
     backgroundColor: '#FDCEDF',
     opacity: 0.4,
   },
 
-  // Small Circle 2 - x: 298, y: 263, 14x14
+  // Small Circle 2 - Relative positioning
   smallCircle2: {
-    left: 298,
-    top: 263,
+    left: 203, // Adjusted for centered layout
+    top: 83,
     width: 14,
     height: 14,
     backgroundColor: '#F2BED1',
     opacity: 0.4,
   },
 
-  // Small Circle 3 - x: 114, y: 314, 12x12
+  // Small Circle 3 - Relative positioning
   smallCircle3: {
-    left: 114,
-    top: 314,
+    left: 19, // Adjusted for centered layout
+    top: 134,
     width: 12,
     height: 12,
     backgroundColor: '#FF8FB3',
     opacity: 0.3,
   },
 
-  // Small Circle 4 - x: 265, y: 305, 10x10
+  // Small Circle 4 - Relative positioning
   smallCircle4: {
-    left: 265,
-    top: 305,
+    left: 170, // Adjusted for centered layout
+    top: 125,
     width: 10,
     height: 10,
     backgroundColor: '#F8E8EE',
     opacity: 0.5,
   },
 
-  // Code Editor Container - x: 170, y: 240, 50x103
+  // Code Editor Container - Centered positioning
   codeEditorContainer: {
     position: 'absolute',
-    left: 170,
-    top: 240,
+    left: 75, // Adjusted for centered layout
+    top: 60,
     width: 50,
     height: 103,
     paddingVertical: 8,
@@ -200,16 +202,7 @@ const styles = StyleSheet.create({
     width: '70%',
   },
 
-  // Content Container - Main Text Area
-  contentContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 32,
-    marginTop: -80, // Adjust for visual balance
-  },
-
-  // Heading Container
+  // Heading Container - Perfect Center Alignment
   headingContainer: {
     alignItems: 'center',
     marginBottom: 20,
@@ -225,7 +218,7 @@ const styles = StyleSheet.create({
     lineHeight: 29, // 1.21 line height from Figma
   },
 
-  // Description Container
+  // Description Container - Perfect Center Alignment
   descriptionContainer: {
     alignItems: 'center',
     marginBottom: 40,
@@ -242,11 +235,12 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
 
-  // Progress Dots Container - x: 159, y: 660, 72x8
+  // Progress Dots Container - Bottom Center Position
   progressDots: {
     position: 'absolute',
-    left: 159,
-    top: 660,
+    bottom: 120, // Above bottom buttons
+    left: '50%',
+    transform: [{ translateX: -36 }], // Center 72px width
     flexDirection: 'row',
     alignItems: 'center',
     width: 72,
@@ -266,22 +260,21 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border, // #E5E7EB - Border color
   },
 
-  // Active Dot - Pink Gradient Approximation
+  // Active Dot - Unified Primary Pink
   activeDot: {
-    backgroundColor: '#FF8FB3', // Gradient center color
+    backgroundColor: COLORS.primary, // #F2BED1 - Unified primary pink
     width: 24, // Active dot is wider
   },
 
-  // Bottom Navigation Container
+  // Bottom Navigation Container - Bottom Fixed Position
   bottomNavigation: {
     position: 'absolute',
     bottom: 40,
-    left: 0,
-    right: 0,
+    left: 40,
+    right: 40,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 40,
   },
 
   // Skip Button - Left Side
@@ -299,10 +292,12 @@ const styles = StyleSheet.create({
     lineHeight: 17,
   },
 
-  // Next Button - Right Side with Pink Gradient Background
+  // Next Button - Unified Size (92x40) with Enhanced Gradient
   nextButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    width: 92, // Unified width matching Step1
+    height: 40, // Unified height matching Step1
+    paddingVertical: 0, // Remove padding to control exact size
+    paddingHorizontal: 0,
     borderRadius: 20,
     shadowRadius: 12, // blur(12px) from Figma
   },

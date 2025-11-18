@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { OnboardingStepScreenProps } from './Onboarding.types';
+import { NextButton } from '../../components/ui/NextButton';
+import { COLORS } from '../../constants/colors';
 
 // Figma 216-193 - Step 1: 100% Pixel Perfect Implementation
 export const OnboardingStep1Screen: React.FC<OnboardingStepScreenProps> = ({
@@ -12,10 +14,11 @@ export const OnboardingStep1Screen: React.FC<OnboardingStepScreenProps> = ({
 }) => {
   return (
     <View style={[styles.container, style]}>
-      <View style={styles.contentWrapper}>
-        {/* Step Counter - Top */}
-        <Text style={styles.stepCounter}>1 / 4</Text>
+      {/* Step Counter - Top */}
+      <Text style={styles.stepCounter}>1 / 4</Text>
 
+      {/* Main Content Container - Perfect Center Alignment */}
+      <View style={styles.mainContentContainer}>
         {/* Central Illustration Area */}
         <View style={styles.illustrationContainer}>
           {/* Background Gradient Circle */}
@@ -45,58 +48,62 @@ export const OnboardingStep1Screen: React.FC<OnboardingStepScreenProps> = ({
           <Text style={styles.descriptionText}>실전 코딩테스트까지</Text>
           <Text style={styles.descriptionText}>체계적으로 학습하세요</Text>
         </View>
-
-        {/* Progress Indicator */}
-        <View style={styles.progressIndicator}>
-          <View style={styles.progressActive} />
-          <View style={styles.progressInactive} />
-          <View style={styles.progressInactive} />
-          <View style={styles.progressInactive} />
-        </View>
-
-        {/* Bottom Buttons */}
-        <View style={styles.bottomButtonsContainer}>
-          <TouchableOpacity onPress={onSkip} activeOpacity={0.7}>
-            <Text style={styles.skipButton}>건너뛰기</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onNext} activeOpacity={0.8}>
-            <View style={styles.nextButtonContainer}>
-              <View style={styles.nextButtonBackground} />
-              <Text style={styles.nextButtonText}>다음</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Side Decorative Element */}
-        <View style={styles.sideDecorativeElement} />
       </View>
+
+      {/* Progress Indicator */}
+      <View style={styles.progressIndicator}>
+        <View style={styles.progressActive} />
+        <View style={styles.progressInactive} />
+        <View style={styles.progressInactive} />
+        <View style={styles.progressInactive} />
+      </View>
+
+      {/* Bottom Buttons */}
+      <View style={styles.bottomButtonsContainer}>
+        <TouchableOpacity onPress={onSkip} activeOpacity={0.7}>
+          <Text style={styles.skipButton}>건너뛰기</Text>
+        </TouchableOpacity>
+
+        <NextButton
+          onPress={onNext}
+          title="다음"
+          variant="primary"
+          style={styles.nextButton}
+          textStyle={styles.nextText}
+        />
+      </View>
+
+      {/* Side Decorative Element */}
+      <View style={styles.sideDecorativeElement} />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  // Main Container - Full Screen with Center Alignment
+  // Main Container - Full Screen with Perfect Center Alignment
   container: {
     flex: 1,
-    backgroundColor: '#F9F5F6', // Exact Figma background fill_VRU1MS
+    backgroundColor: COLORS.background, // #F9F5F6 - Unified design system
     justifyContent: 'center',
     alignItems: 'center',
-  },
-
-  // Content Wrapper - Maintains original design dimensions and layout
-  contentWrapper: {
-    width: 390,
-    height: 844,
     position: 'relative',
   },
 
-  // Step Counter - Position: x:182.5, y:48
+  // Main Content Container - Perfect Center Alignment for all content
+  mainContentContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    flex: 1,
+    paddingHorizontal: 20,
+    marginTop: -60, // Fine-tune vertical positioning
+  },
+
+  // Step Counter - Top Center Position
   stepCounter: {
     position: 'absolute',
-    left: 182.5,
     top: 48,
-    width: 25,
-    height: 15,
+    left: '50%',
+    transform: [{ translateX: -12.5 }], // Center align "1 / 4" text
     fontFamily: 'Inter',
     fontWeight: '700', // Inter Bold
     fontSize: 12,
@@ -105,13 +112,12 @@ const styles = StyleSheet.create({
     color: '#9CA3AF', // fill_FYKQ1H
   },
 
-  // Central Illustration Container - Position: x:95, y:180, Size: 200x200
+  // Central Illustration Container - Centered Layout
   illustrationContainer: {
-    position: 'absolute',
-    left: 95,
-    top: 180,
     width: 200,
     height: 200,
+    marginBottom: 40,
+    position: 'relative',
   },
 
   // Gradient Background - Exact Figma gradient
@@ -211,13 +217,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
 
-  // Heading Section - "AI와 함께" at y:436, "단계별 문제 풀이!" at y:466
+  // Heading Section - Perfect Center Alignment
   headingSection: {
-    position: 'absolute',
-    left: 0,
-    top: 436,
-    width: 390,
     alignItems: 'center',
+    marginBottom: 20,
   },
 
   // Primary Heading - Inter Bold 24px, color: #393E46
@@ -231,13 +234,10 @@ const styles = StyleSheet.create({
     marginBottom: 1, // Tight spacing between lines
   },
 
-  // Description Section - Starting at y:515
+  // Description Section - Perfect Center Alignment
   descriptionSection: {
-    position: 'absolute',
-    left: 0,
-    top: 515,
-    width: 390,
     alignItems: 'center',
+    marginBottom: 40,
   },
 
   // Description Text - Inter Regular 15px, color: #6B7280
@@ -251,40 +251,41 @@ const styles = StyleSheet.create({
     marginBottom: 4, // 22px spacing between lines
   },
 
-  // Progress Indicator - x:183, y:660, Size: 60x8
+  // Progress Indicator - Bottom Center Position
   progressIndicator: {
     position: 'absolute',
-    left: 183,
-    top: 660,
+    bottom: 120, // Above bottom buttons
+    left: '50%',
+    transform: [{ translateX: -30 }], // Center 60px width
     width: 60,
     height: 8,
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  // Active Progress Element - 24x8
+  // Active Progress Element - Unified Design System
   progressActive: {
     width: 24,
     height: 8,
-    backgroundColor: '#F2BED1', // Gradient approximation
+    backgroundColor: COLORS.primary, // #F2BED1 - Unified primary pink
     borderRadius: 4,
     marginRight: 4,
   },
 
-  // Inactive Progress Elements - 8x8
+  // Inactive Progress Elements - Unified Design System
   progressInactive: {
     width: 8,
     height: 8,
-    backgroundColor: '#E5E7EB', // fill_NKBJAJ
+    backgroundColor: COLORS.border, // #E5E7EB - Unified border color
     borderRadius: 4,
     marginRight: 4,
   },
 
-  // Bottom Buttons Container - y:708-748
+  // Bottom Buttons Container - Bottom Fixed Position
   bottomButtonsContainer: {
     position: 'absolute',
+    bottom: 40,
     left: 40,
-    top: 708,
     right: 40,
     height: 40,
     flexDirection: 'row',
@@ -302,45 +303,20 @@ const styles = StyleSheet.create({
     color: '#9CA3AF', // fill_FYKQ1H
   },
 
-  // Next Button Container - x:258, y:708, Size: 92x40
-  nextButtonContainer: {
-    position: 'relative',
-    width: 92,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Next Button Background - Enhanced Gradient Border Effect
-  nextButtonBackground: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    width: 92,
-    height: 40,
-    backgroundColor: '#FF8FB3', // Enhanced gradient end color
+  // Next Button - Unified Size (92x40) with Enhanced Gradient
+  nextButton: {
+    width: 92, // Unified width matching other steps
+    height: 40, // Unified height matching other steps
+    paddingVertical: 0, // Remove padding to control exact size
+    paddingHorizontal: 0,
     borderRadius: 20,
-    // Enhanced gradient border glow effect
-    borderWidth: 2,
-    borderColor: 'rgba(242, 190, 209, 0.8)',
-    shadowColor: '#F2BED1',
-    shadowOffset: { width: 0, height: 0 }, // All-around glow
-    shadowOpacity: 0.8, // Increased opacity for stronger effect
-    shadowRadius: 18, // Larger blur radius
-    elevation: 12, // Higher elevation for Android
-    // Additional outer glow layer
-    // Note: Multiple shadow layers create stronger gradient border effect
+    shadowRadius: 12, // blur(12px) from Figma
   },
 
-  // Next Button Text - Center positioned
-  nextButtonText: {
-    fontFamily: 'Inter',
-    fontWeight: '700', // Inter Bold
+  // Next Text - Inter Bold 14px, White
+  nextText: {
     fontSize: 14,
-    lineHeight: 17, // 1.2102272851126534em
-    textAlign: 'center',
-    color: '#FFFFFF', // fill_KP7D9R (white)
-    zIndex: 1,
+    lineHeight: 17,
   },
 
   // Side Decorative Element - x:350, y:418, Size: 20x8
