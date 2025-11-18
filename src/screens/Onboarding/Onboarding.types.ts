@@ -11,6 +11,7 @@ export interface OnboardingStepScreenProps {
   onSkip?: () => void;
   currentStep: number;
   totalSteps: number;
+  style?: any; // For swipe navigation layout
 }
 
 export interface StepIndicatorProps {

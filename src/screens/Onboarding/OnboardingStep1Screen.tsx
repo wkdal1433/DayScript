@@ -8,9 +8,10 @@ export const OnboardingStep1Screen: React.FC<OnboardingStepScreenProps> = ({
   onSkip,
   currentStep: _currentStep = 1,
   totalSteps: _totalSteps = 4,
+  style,
 }) => {
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <View style={styles.contentWrapper}>
         {/* Step Counter - Top */}
         <Text style={styles.stepCounter}>1 / 4</Text>
@@ -310,21 +311,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
 
-  // Next Button Background - Gradient effect
+  // Next Button Background - Enhanced Gradient Border Effect
   nextButtonBackground: {
     position: 'absolute',
     left: 0,
     top: 0,
     width: 92,
     height: 40,
-    backgroundColor: '#F2BED1', // Gradient approximation
+    backgroundColor: '#FF8FB3', // Enhanced gradient end color
     borderRadius: 20,
-    // Note: blur effect is approximated with shadow
+    // Enhanced gradient border glow effect
+    borderWidth: 2,
+    borderColor: 'rgba(242, 190, 209, 0.8)',
     shadowColor: '#F2BED1',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 0 }, // All-around glow
+    shadowOpacity: 0.8, // Increased opacity for stronger effect
+    shadowRadius: 18, // Larger blur radius
+    elevation: 12, // Higher elevation for Android
+    // Additional outer glow layer
+    // Note: Multiple shadow layers create stronger gradient border effect
   },
 
   // Next Button Text - Center positioned
