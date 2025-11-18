@@ -24,8 +24,8 @@ import {
   PostDetailScreen
 } from '../modules/community';
 
-// New modular quiz screens
-import { Lv1OXProblemScreen } from '../modules/quiz';
+// Practice screens
+import Lv1OXProblemScreen from '../screens/Practice/Lv1OXProblemScreen';
 
 // Onboarding Flow
 import { OnboardingFlow } from '../screens/Onboarding';

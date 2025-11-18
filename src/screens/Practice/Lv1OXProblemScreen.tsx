@@ -10,6 +10,7 @@ import { useHint, HintStep } from '../../hooks/useHint';
 import { styles } from './Lv1OXProblemScreen.styles';
 import { Lv1OXProblemScreenProps, OXAnswer, ProblemData, ResultState, ResultData } from './Lv1OXProblemScreen.types';
 import ProblemReviewModal from '../../components/Modals/ProblemReviewModal';
+import GoalCompletionModal from '../../components/Modals/GoalCompletionModal';
 import {
   sessionManager,
   createNewSession,
@@ -23,6 +24,8 @@ import {
 import { useCommunityIntegration } from './hooks/useCommunityIntegration';
 
 const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
+  navigation,
+  route,
   onAnswerSelect = (answer) => console.log('Answer selected:', answer),
   onClose = () => console.log('Screen closed'),
   onNext = () => console.log('Next problem'),
@@ -37,6 +40,8 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   const [currentProblemData, setCurrentProblemData] = useState<ProblemData | null>(null);
   const [sessionProgress, setSessionProgress] = useState({ current: 1, total: 10, percentage: 10 });
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showGoalCompletionModal, setShowGoalCompletionModal] = useState(false);
+  const [sessionStats, setSessionStats] = useState<any>(null);
 
   // Community integration
   const {
@@ -328,7 +333,61 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
   const handleClose = () => {
     // Clear session when closing
     clearCurrentSession();
-    onClose();
+
+    // Use navigation.goBack() if available, fallback to onClose callback
+    if (navigation?.goBack) {
+      navigation.goBack();
+    } else {
+      onClose();
+    }
+  };
+
+  const handleGoalCompletion = async () => {
+    try {
+      // Get final session statistics
+      const currentSession = sessionManager.getCurrentSession();
+      const stats = sessionManager.getSessionStats();
+
+      if (stats) {
+        setSessionStats(stats);
+      }
+
+      // Mark session as completed
+      if (currentSession && !currentSession.isCompleted) {
+        currentSession.isCompleted = true;
+      }
+
+      // Show the goal completion modal with animation
+      setShowGoalCompletionModal(true);
+
+      // Trigger session completion callback
+      onSessionComplete();
+
+      // Call original goal modal callback as fallback
+      onShowGoalModal();
+
+      console.log('🎯 Goal completion flow triggered', { stats, sessionCompleted: true });
+    } catch (error) {
+      console.error('❌ Error in goal completion flow:', error);
+      // Fallback to original callback
+      onShowGoalModal();
+    }
+  };
+
+  const handleGoalModalClose = () => {
+    setShowGoalCompletionModal(false);
+  };
+
+  const handleGoalModalGoHome = () => {
+    setShowGoalCompletionModal(false);
+    // Clear session data
+    clearCurrentSession();
+    // Navigate back to home
+    if (navigation?.goBack) {
+      navigation.goBack();
+    } else {
+      onClose();
+    }
   };
 
   const formatTime = (seconds: number): string => {
@@ -462,7 +521,7 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
             {(sessionProgress.current >= sessionProgress.total) ? (
               <TouchableOpacity
                 style={styles.goalCompleteButton}
-                onPress={onShowGoalModal}
+                onPress={handleGoalCompletion}
                 activeOpacity={0.8}
               >
                 <Text style={styles.goalCompleteButtonText}>🎯 오늘의 목표 완료</Text>
@@ -686,6 +745,15 @@ const Lv1OXProblemScreen: React.FC<Lv1OXProblemScreenProps> = ({
         userAnswer={selectedAnswer || ''}
         isCorrect={resultData?.isCorrect || false}
         problemType="OX"
+      />
+
+      {/* Goal Completion Modal */}
+      <GoalCompletionModal
+        visible={showGoalCompletionModal}
+        onRequestClose={handleGoalModalClose}
+        onGoHome={handleGoalModalGoHome}
+        experiencePoints={sessionStats?.correctAnswers ? sessionStats.correctAnswers * 10 : 50}
+        animationDuration={1400}
       />
     </>
   );

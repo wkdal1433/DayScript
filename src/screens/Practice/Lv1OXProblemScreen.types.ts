@@ -31,6 +31,17 @@ export interface ProblemData {
 }
 
 export interface Lv1OXProblemScreenProps {
+  /** Navigation object for screen navigation */
+  navigation?: {
+    goBack: () => void;
+    navigate: (screen: string, params?: any) => void;
+  };
+
+  /** Route object with params */
+  route?: {
+    params?: any;
+  };
+
   /** Callback when user selects an answer */
   onAnswerSelect?: (answer: OXAnswer) => void;
 

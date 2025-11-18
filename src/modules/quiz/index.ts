@@ -15,8 +15,7 @@ export * from './core/application/useQuizHint';
 // Infrastructure
 export { QuizRepositoryImpl } from './infra/QuizRepositoryImpl';
 
-// UI Components
-export { default as Lv1OXProblemScreen } from './ui/Lv1OXProblemScreen';
+// UI Components (Lv1OXProblemScreen moved to screens/Practice)
 export * from './ui/components/ProblemCard';
 export * from './ui/components/HintModal';
 export * from './ui/components/ResultModal';
