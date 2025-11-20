@@ -23,16 +23,11 @@ export const styles = StyleSheet.create({
   },
 
   logoContainer: {
-    width: 80,
-    height: 80,
-    backgroundColor: COLORS.primaryLight,
-    borderRadius: 40,
+    width: 120,
+    height: 120,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SIZES.spacing.xl,
-    borderWidth: 2,
-    borderColor: COLORS.primaryBorder,
-    ...SIZES.shadow.small,
   },
 
   logoText: {

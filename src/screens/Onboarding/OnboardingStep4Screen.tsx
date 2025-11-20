@@ -3,6 +3,7 @@ import { View, Text, SafeAreaView, StyleSheet } from 'react-native';
 import { OnboardingStepScreenProps } from './Onboarding.types';
 import { COLORS } from '../../constants/colors';
 import { EnhancedNextButton } from '../../components/ui/NextButton';
+import { AppLogo } from '../../components/common/ui/AppLogo';
 
 // Figma 216-222 - Step 4: Final Get Started Screen - 100% Pixel Perfect
 export const OnboardingStep4Screen: React.FC<OnboardingStepScreenProps> = ({
@@ -21,8 +22,10 @@ export const OnboardingStep4Screen: React.FC<OnboardingStepScreenProps> = ({
       <View style={styles.mainContentContainer}>
         {/* Central Illustration Area */}
         <View style={styles.illustrationContainer}>
-          {/* Background Gradient Circle */}
-          <View style={styles.backgroundCircle} />
+          {/* DayScript Logo - Main Central Element */}
+          <View style={styles.logoContainer}>
+            <AppLogo size={200} />
+          </View>
 
           {/* Star Elements - ⭐ */}
           <View style={styles.starContainer}>
@@ -36,21 +39,6 @@ export const OnboardingStep4Screen: React.FC<OnboardingStepScreenProps> = ({
           <View style={[styles.smallCircle, styles.smallCircle1]} />
           <View style={[styles.smallCircle, styles.smallCircle2]} />
           <View style={[styles.smallCircle, styles.smallCircle3]} />
-
-          {/* Code Editor Visual Element */}
-          <View style={styles.codeEditorContainer}>
-            {/* Trophy/Achievement visual */}
-            <View style={styles.trophyContainer}>
-              <View style={styles.trophyBase} />
-              <View style={styles.trophyBody} />
-              <View style={styles.trophyTop} />
-            </View>
-            {/* Code lines */}
-            <View style={styles.codeLineContainer}>
-              <View style={styles.codeLine} />
-              <View style={[styles.codeLine, styles.codeLineShort]} />
-            </View>
-          </View>
         </View>
 
         {/* Main Heading - 2 Lines as per Figma */}
@@ -70,7 +58,7 @@ export const OnboardingStep4Screen: React.FC<OnboardingStepScreenProps> = ({
         <View style={styles.actionButtonContainer}>
           <EnhancedNextButton
             onPress={onNext}
-            title="바로 가입하고 시작하기 →"
+            title="카카오로 바로 시작하기"
             variant="primary"
             style={styles.startButton}
             textStyle={styles.startButtonText}
@@ -138,32 +126,33 @@ const styles = StyleSheet.create({
 
   // Central Illustration Container - Centered Layout
   illustrationContainer: {
-    width: 200,
-    height: 200,
+    width: 250,
+    height: 250,
     marginBottom: 40,
     position: 'relative',
   },
 
-  // Large Background Circle - Centered
-  backgroundCircle: {
+  // Logo Container - Centered positioning
+  logoContainer: {
     position: 'absolute',
-    left: 0,
-    top: 0,
+    left: 25, // Center the 200px logo within 250px container
+    top: 25,
     width: 200,
     height: 200,
-    borderRadius: 100,
-    backgroundColor: '#F8E8EE', // Pastel pink gradient approximation
-    opacity: 0.8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999, // Highest z-index to ensure logo is always on top
   },
 
   // Star Container - Relative positioning for centered layout
   starContainer: {
     position: 'absolute',
-    left: 5, // Adjusted for centered layout (100-95)
-    top: 20, // Adjusted for centered layout (180-160)
-    width: 196,
-    height: 132,
+    left: 0, // Adjusted for larger container
+    top: 25, // Adjusted for larger container
+    width: 246,
+    height: 162,
     opacity: 0.6,
+    zIndex: 1, // Below logo
   },
 
   // Base Star Style
@@ -180,24 +169,24 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  // Star 2 - x: 180, y: 24, 16px
+  // Star 2 - x: 230, y: 24, 16px
   star2: {
-    left: 180,
+    left: 230,
     top: 24,
     fontSize: 16,
   },
 
-  // Star 3 - x: 30, y: 116, 14px
+  // Star 3 - x: 30, y: 146, 14px
   star3: {
     left: 30,
-    top: 116,
+    top: 146,
     fontSize: 14,
   },
 
-  // Star 4 - x: 160, y: 102, 18px
+  // Star 4 - x: 210, y: 132, 18px
   star4: {
-    left: 160,
-    top: 102,
+    left: 210,
+    top: 132,
     fontSize: 18,
   },
 
@@ -209,8 +198,8 @@ const styles = StyleSheet.create({
 
   // Small Circle 1 - Relative positioning for centered layout
   smallCircle1: {
-    left: -15, // Adjusted for centered layout (80-95)
-    top: 75, // Adjusted for centered layout (235-160)
+    left: -10, // Adjusted for larger container
+    top: 95, // Adjusted for larger container
     width: 10,
     height: 10,
     backgroundColor: COLORS.primaryBorder, // #FDCEDF
@@ -219,8 +208,8 @@ const styles = StyleSheet.create({
 
   // Small Circle 2 - Relative positioning for centered layout
   smallCircle2: {
-    left: 204, // Adjusted for centered layout (299-95)
-    top: 94, // Adjusted for centered layout (254-160)
+    left: 254, // Adjusted for larger container
+    top: 114, // Adjusted for larger container
     width: 12,
     height: 12,
     backgroundColor: COLORS.primary, // #F2BED1
@@ -229,8 +218,8 @@ const styles = StyleSheet.create({
 
   // Small Circle 3 - Relative positioning for centered layout
   smallCircle3: {
-    left: 11, // Adjusted for centered layout (106-95)
-    top: 136, // Adjusted for centered layout (296-160)
+    left: 16, // Adjusted for larger container
+    top: 176, // Adjusted for larger container
     width: 8,
     height: 8,
     backgroundColor: '#FF8FB3', // Accent pink
@@ -339,7 +328,7 @@ const styles = StyleSheet.create({
   // Action Button Container - Centered in main content
   actionButtonContainer: {
     marginTop: 30,
-    width: 240,
+    width: 280, // Increased width to accommodate longer text
     height: 56,
     alignItems: 'center',
   },
@@ -357,11 +346,12 @@ const styles = StyleSheet.create({
     lineHeight: 22, // 1.21 line height from Figma
   },
 
-  // Progress Dots Container - x: 159, y: 696, 60x8
+  // Progress Dots Container - Consistent with Step 1-2 positioning
   progressDots: {
     position: 'absolute',
-    left: 159,
-    top: 696,
+    bottom: 120, // Match steps 1-2 positioning
+    left: '50%',
+    transform: [{ translateX: -30 }], // Center 60px width
     flexDirection: 'row',
     alignItems: 'center',
     width: 60,
@@ -388,13 +378,14 @@ const styles = StyleSheet.create({
     marginRight: 0,
   },
 
-  // Bottom Text Container - x: 89.5, y: 759, 211x13
+  // Bottom Text Container - Centered between progress dots and bottom
   bottomTextContainer: {
     position: 'absolute',
-    left: 89.5,
-    top: 759,
-    width: 211,
-    height: 13,
+    bottom: 60, // Positioned halfway between progress dots (120) and screen bottom (0)
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
 
   // Help Text - Inter Regular 11px

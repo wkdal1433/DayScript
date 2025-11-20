@@ -17,7 +17,7 @@ import {
   Animated,
 } from 'react-native';
 import { NextButton } from '../../components/ui/NextButton';
-import { LoginSuccessModal } from '../../components/common/ui';
+import { LoginSuccessModal, AppLogo } from '../../components/common/ui';
 import { styles } from './LoginScreen.styles';
 import { COLORS } from '../../constants';
 import type {
@@ -254,7 +254,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
         {/* Header Section */}
         <Animated.View style={[styles.headerContainer, { opacity: fadeAnim }]}>
           <View style={styles.logoContainer}>
-            <Text style={styles.logoText}>DS</Text>
+            <AppLogo size={120} />
           </View>
           <Text style={styles.title}>환영합니다!</Text>
           <Text style={styles.subtitle}>

@@ -326,8 +326,9 @@ const styles = StyleSheet.create({
   // Progress Dots Container - x: 159, y: 660, 60x8
   progressDots: {
     position: 'absolute',
-    left: 159,
-    top: 660,
+    bottom: 120, // Match steps 1-2 positioning
+    left: '50%',
+    transform: [{ translateX: -30 }], // Center 60px width
     flexDirection: 'row',
     alignItems: 'center',
     width: 60,

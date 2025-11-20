@@ -15,6 +15,8 @@ import {
   Easing,
 } from 'react-native';
 import { NextButton } from '../../ui/NextButton';
+import { AnimatedCheckmark } from './AnimatedCheckmark';
+import { CircularProgress } from './CircularProgress';
 import { styles } from './SuccessModal.styles';
 import { COLORS } from '../../../constants';
 import type { SuccessModalProps } from './SuccessModal.types';
@@ -106,18 +108,47 @@ export const SuccessModal: React.FC<SuccessModalProps> = ({
     onClose();
   };
 
-  // 아이콘 렌더링
+  // 아이콘 렌더링 - 프로그레스 바와 체크마크 조합
   const renderIcon = () => {
     if (!showIcon) return null;
 
+    // 체크마크 타입일 때는 원형 프로그레스 바 + 체크마크 조합 사용
+    if (iconType === 'checkmark') {
+      return (
+        <View style={styles.iconContainer}>
+          <View style={{ position: 'relative', alignItems: 'center', justifyContent: 'center' }}>
+            {/* 배경 원형 프로그레스 바 */}
+            <CircularProgress
+              size={80}
+              strokeWidth={6}
+              progress={100}
+              duration={600} // 기존 1200ms의 절반
+              delay={200} // 모달이 나타난 후 프로그레스 바 애니메이션 시작
+              color={COLORS.success}
+              backgroundColor={COLORS.border}
+              showBackground={true}
+            />
+
+            {/* 중앙 체크마크 */}
+            <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, justifyContent: 'center', alignItems: 'center' }}>
+              <AnimatedCheckmark
+                size={40}
+                color={COLORS.success}
+                strokeWidth={3}
+                duration={0}
+                delay={800} // 프로그레스 바 완료 후 나타남 (200ms delay + 600ms duration)
+              />
+            </View>
+          </View>
+        </View>
+      );
+    }
+
+    // 다른 아이콘 타입들은 기존 방식 유지
     let iconText = '✅';
     let iconStyle = styles.icon;
 
     switch (iconType) {
-      case 'checkmark':
-        iconText = '✓';
-        iconStyle = styles.checkmarkIcon;
-        break;
       case 'star':
         iconText = '⭐';
         iconStyle = styles.starIcon;
