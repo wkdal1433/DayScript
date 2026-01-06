@@ -1,11 +1,3 @@
-# 백엔드 데이터 모델 설계 (User Progression)
-
-## 1. 핵심 엔티티 설계
-
-### User Entity
-```typescript
-interface User {
-  id: string;
   email: string;
   username: string;
   createdAt: Date;

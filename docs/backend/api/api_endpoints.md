@@ -1,10 +1,3 @@
-# API 엔드포인트 사양 정의
-
-## 1. 사용자 진행 상태 관리 API
-
-### GET /api/users/{userId}/progression
-**목적**: 사용자의 현재 진행 상태 조회
-
 **Request**:
 ```typescript
 // Path Parameters

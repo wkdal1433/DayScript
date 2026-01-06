@@ -1,0 +1,775 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// ENUMS
+// ============================================================================
+
+enum ProblemType {
+  OX               // LV1: True/False
+  MULTIPLE_CHOICE  // LV2: Multiple Choice
+  FILL_IN_BLANK    // LV3: Fill in the Blank
+  DEBUGGING        // LV4: Code Debugging
+  CODE_REVIEW      // LV5: PR Review
+  VIBE_CODING      // LV6: AI-Powered Coding
+}
+
+enum ProblemDifficulty {
+  easy
+  medium
+  hard
+  expert
+}
+
+enum ProgrammingLanguage {
+  Python
+  JavaScript
+  Java
+  TypeScript
+  CPP      // C++
+  Go
+}
+
+enum PostCategory {
+  problems
+  questions
+  tips
+  showcase
+  general
+}
+
+enum VoteType {
+  like
+  dislike
+}
+
+
+
+enum NotificationType {
+  quest_complete
+  level_up
+  achievement_unlocked
+  comment_reply
+  post_like
+  new_follower
+  reminder_study
+  streak_milestone
+  community_mention
+  system_announcement
+}
+
+enum ReviewDecision {
+  approve
+  request_changes
+  reject
+  flag
+}
+
+enum ScenarioDifficulty {
+  easy
+  medium
+  hard
+  expert
+}
+
+// ============================================================================
+// USER MODULE
+// ============================================================================
+
+model User {
+  id                String    @id @default(uuid()) @map("user_id")
+  
+  // Authentication
+  email             String    @unique
+  passwordHash      String    @map("password_hash")
+  oauthProvider     String?   @map("oauth_provider") @db.VarChar(50)
+  oauthProviderId   String?   @map("oauth_provider_id")
+  
+  // Profile
+  username          String    @unique @db.VarChar(50)
+  displayName       String    @map("display_name") @db.VarChar(100)
+  avatarUrl         String?   @map("avatar_url")
+  bio               String?
+  
+  // Learning Stats (Denormalized)
+  currentLevel      Int       @default(1) @map("current_level")
+  totalExperience   Int       @default(0) @map("total_experience")
+  currentRank       Int?      @map("current_rank")
+  streakDays        Int       @default(0) @map("streak_days")
+  lastStudyDate     DateTime? @map("last_study_date") @db.Date
+  
+  // Status
+  isActive          Boolean   @default(true) @map("is_active")
+  isVerified        Boolean   @default(false) @map("is_verified")
+  emailVerifiedAt   DateTime? @map("email_verified_at")
+  
+  // Metadata
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @updatedAt @map("updated_at")
+  lastLoginAt       DateTime? @map("last_login_at")
+  deletedAt         DateTime? @map("deleted_at")
+  
+  // Relations
+  settings          UserSettings?
+  progress          UserProgress?
+  levelStats        UserLevelStatistics[]
+  problemAttempts   ProblemAttempt[]
+  mistakeNotes      MistakeNote[]
+  communityPosts    CommunityPost[]
+  postComments      PostComment[]
+  postVotes         PostVote[]
+  notifications     Notification[]
+  notificationPrefs NotificationPreferences?
+  codeReviews       CodeReview[]
+  vibeSessions      VibeSession[]
+  userAchievements  UserAchievement[]
+  userDailyQuests   UserDailyQuest[]
+  createdProblems   QuizProblem[]        @relation("ProblemCreator")
+  
+  @@map("users")
+}
+
+model UserSettings {
+  id                 String   @id @default(uuid()) @map("setting_id")
+  userId             String   @unique @map("user_id")
+  
+  // Learning Settings
+  dailyGoalMinutes   Int      @default(30) @map("daily_goal_minutes")
+  preferredLanguage  String   @default("Python") @db.VarChar(20)
+  difficultyLevel    Int      @default(1) @map("difficulty_level")
+  
+  // Notification Settings
+  pushEnabled        Boolean  @default(true) @map("push_enabled")
+  questReminder      Boolean  @default(true) @map("quest_reminder")
+  reminderTime       DateTime @default(dbgenerated("'20:00:00'::time")) @map("reminder_time") @db.Time
+  communityNotif     Boolean  @default(true) @map("community_notif")
+  achievementNotif   Boolean  @default(true) @map("achievement_notif")
+  
+  // App Settings
+  themeMode          String   @default("light") @db.VarChar(10)
+  fontSize           String   @default("medium") @db.VarChar(10)
+  language           String   @default("ko") @db.VarChar(10)
+  
+  // Privacy Settings
+  profilePublic      Boolean  @default(true) @map("profile_public")
+  showRank           Boolean  @default(true) @map("show_rank")
+  showStreak         Boolean  @default(true) @map("show_streak")
+  
+  // Metadata
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+  
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_settings")
+}
+
+model UserProgress {
+  id                       String   @id @default(uuid()) @map("progress_id")
+  userId                   String   @unique @map("user_id")
+  
+  // Level Progress
+  unlockedLevels           Int[]    @default([1]) @map("unlocked_levels")
+  completedLevels          Int[]    @default([]) @map("completed_levels")
+  currentLevel             Int      @default(1) @map("current_level")
+  
+  // Overall Statistics
+  totalProblemsAttempted   Int      @default(0) @map("total_problems_attempted")
+  totalProblemsSolved      Int      @default(0) @map("total_problems_solved")
+  totalHintsUsed           Int      @default(0) @map("total_hints_used")
+  totalStudyTimeMinutes    Int      @default(0) @map("total_study_time_minutes")
+  
+  // Metadata
+  createdAt                DateTime @default(now()) @map("created_at")
+  updatedAt                DateTime @updatedAt @map("updated_at")
+  
+  user                     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("user_progress")
+}
+
+model UserLevelStatistics {
+  id                 String    @id @default(uuid()) @map("stat_id")
+  userId             String    @map("user_id")
+  level              Int
+  
+  // Performance Metrics
+  accuracy           Decimal   @default(0.00) @db.Decimal(5, 2)
+  problemsAttempted  Int       @default(0) @map("problems_attempted")
+  problemsSolved     Int       @default(0) @map("problems_solved")
+  averageTimeSeconds Int       @default(0) @map("average_time_seconds")
+  
+  // Progress Tracking
+  bestScore          Decimal   @default(0.00) @map("best_score") @db.Decimal(5, 2)
+  lastAttemptAt      DateTime? @map("last_attempt_at")
+  
+  // Metadata
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+  
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, level])
+  @@index([userId, level])
+  @@index([userId, accuracy(sort: Desc)])
+  @@map("user_level_statistics")
+}
+
+// ============================================================================
+// PROBLEM ENGINE MODULE
+// ============================================================================
+
+model QuizProblem {
+  id                 String              @id @default(uuid()) @map("problem_id")
+  
+  // Problem Classification
+  level              Int
+  type               ProblemType
+  difficulty         ProblemDifficulty
+  language           ProgrammingLanguage
+  
+  // Content
+  title              String
+  description        String
+  question           String
+  
+  // Answer Data (JSON for flexibility)
+  correctAnswer      Json                @map("correct_answer")
+  options            Json?
+  codeSnippet        String?             @map("code_snippet")
+  testCases          Json?               @map("test_cases")
+  
+  // Hints
+  hint1              String?             @map("hint_1")
+  hint2              String?             @map("hint_2")
+  hint3              String?             @map("hint_3")
+  
+  // Metadata
+  tags               String[]
+  category           String?             @db.VarChar(50)
+  estimatedTimeMinutes Int              @default(5) @map("estimated_time_minutes")
+  
+  // Statistics (Denormalized)
+  attemptCount       Int                 @default(0) @map("attempt_count")
+  successCount       Int                 @default(0) @map("success_count")
+  averageAccuracy    Decimal             @default(0.00) @map("average_accuracy") @db.Decimal(5, 2)
+  
+  // Status
+  isPublished        Boolean             @default(false) @map("is_published")
+  isPremium          Boolean             @default(false) @map("is_premium")
+  
+  // Metadata
+  createdBy          String?             @map("created_by")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+  
+  // Relations
+  creator            User?               @relation("ProblemCreator", fields: [createdBy], references: [id])
+  attempts           ProblemAttempt[]
+  mistakeNotes       MistakeNote[]
+  communityPosts     CommunityPost[]
+  
+  @@index([level, type])
+  @@index([language])
+  @@index([difficulty])
+  @@index([tags])
+  @@index([isPublished])
+  @@index([level, language, isPublished])
+  @@map("quiz_problems")
+}
+
+model ProblemAttempt {
+  id                 String       @id @default(uuid()) @map("attempt_id")
+  userId             String       @map("user_id")
+  problemId          String       @map("problem_id")
+  
+  // Attempt Data
+  userAnswer         Json         @map("user_answer")
+  isCorrect          Boolean      @map("is_correct")
+  score              Decimal      @default(0.00) @db.Decimal(5, 2)
+  
+  // Performance Metrics
+  timeTakenSeconds   Int          @map("time_taken_seconds")
+  hintsUsedCount     Int          @default(0) @map("hints_used_count")
+  hintsUsed          Int[]        @default([]) @map("hints_used")
+  
+  // LV4 & LV6 Specific
+  codeQualityScore   Decimal?     @map("code_quality_score") @db.Decimal(5, 2)
+  tokenUsage         Int?         @map("token_usage")
+  testCasesPassed    Int?         @map("test_cases_passed")
+  testCasesTotal     Int?         @map("test_cases_total")
+  
+  // LV6 Specific
+  vibeSessionId      String?      @map("vibe_session_id")
+  
+  // Metadata
+  attemptedAt        DateTime     @default(now()) @map("attempted_at")
+  
+  // Relations
+  user               User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem            QuizProblem  @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  vibeSession        VibeSession? @relation(fields: [vibeSessionId], references: [id], onDelete: SetNull)
+  mistakeNotesAsFirst MistakeNote[] @relation("FirstAttempt")
+  mistakeNotesAsLast  MistakeNote[] @relation("LastAttempt")
+  
+  @@index([userId, problemId])
+  @@index([userId, attemptedAt(sort: Desc)])
+  @@index([problemId])
+  @@index([vibeSessionId])
+  @@map("problem_attempts")
+}
+
+model MistakeNote {
+  id                 String          @id @default(uuid()) @map("note_id")
+  userId             String          @map("user_id")
+  problemId          String          @map("problem_id")
+  
+  // Mistake Analysis
+  wrongCount         Int             @default(1) @map("wrong_count")
+  firstAttemptId     String?         @map("first_attempt_id")
+  lastAttemptId      String?         @map("last_attempt_id")
+  
+  // User Notes
+  userNote           String?         @map("user_note")
+  isBookmarked       Boolean         @default(false) @map("is_bookmarked")
+  
+  // Review Status
+  reviewStatus       String          @default("pending") @map("review_status") @db.VarChar(20)
+  nextReviewDate     DateTime?       @map("next_review_date") @db.Date
+  
+  // Spaced Repetition
+  reviewIntervalDays Int             @default(1) @map("review_interval_days")
+  reviewCount        Int             @default(0) @map("review_count")
+  lastReviewedAt     DateTime?       @map("last_reviewed_at")
+  
+  // Metadata
+  createdAt          DateTime        @default(now()) @map("created_at")
+  updatedAt          DateTime        @updatedAt @map("updated_at")
+  masteredAt         DateTime?       @map("mastered_at")
+  
+  // Relations
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  problem            QuizProblem     @relation(fields: [problemId], references: [id], onDelete: Cascade)
+  firstAttempt       ProblemAttempt? @relation("FirstAttempt", fields: [firstAttemptId], references: [id])
+  lastAttempt        ProblemAttempt? @relation("LastAttempt", fields: [lastAttemptId], references: [id])
+  
+  @@unique([userId, problemId])
+  @@index([userId, problemId])
+  @@index([userId, nextReviewDate])
+  @@index([nextReviewDate])
+  @@map("mistake_notes")
+}
+
+// ============================================================================
+// LV5: CHALLENGER MODE (PR REVIEW)
+// ============================================================================
+
+model PrScenario {
+  id                     String                   @id @default(uuid()) @map("scenario_id")
+  
+  // Scenario Info
+  title                  String                   @db.VarChar(200)
+  description            String
+  context                String?
+  difficulty             ScenarioDifficulty
+  estimatedTimeMinutes   Int                      @default(25) @map("estimated_time_minutes")
+  
+  // Requirements
+  requirements           Json?
+  tags                   String[]
+  
+  // Scenario Data
+  prData                 Json                     @map("pr_data")
+  
+  // Statistics
+  attemptCount           Int                      @default(0) @map("attempt_count")
+  successRate            Decimal                  @default(0.00) @map("success_rate") @db.Decimal(5, 2)
+  
+  // Status
+  isPublished            Boolean                  @default(false) @map("is_published")
+  
+  // Metadata
+  createdAt              DateTime                 @default(now()) @map("created_at")
+  updatedAt              DateTime                 @updatedAt @map("updated_at")
+  
+  // Relations
+  solutions              PrScenarioSolution[]
+  codeReviews            CodeReview[]
+  
+  @@index([difficulty, isPublished])
+  @@map("pr_scenarios")
+}
+
+model PrScenarioSolution {
+  id                 String         @id @default(uuid()) @map("solution_id")
+  scenarioId         String         @map("scenario_id")
+  
+  // Hunk/Commit Identification
+  hunkId             String         @map("hunk_id") @db.VarChar(100)
+  filePath           String?        @map("file_path") @db.VarChar(500)
+  lineNumber         Int?           @map("line_number")
+  
+  // Correct Decision
+  correctDecision    ReviewDecision @map("correct_decision")
+  explanation        String
+  severity           String?        @db.VarChar(20)
+  
+  // Metadata
+  createdAt          DateTime       @default(now()) @map("created_at")
+  updatedAt          DateTime       @updatedAt @map("updated_at")
+  
+  // Relations
+  scenario           PrScenario     @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  
+  @@unique([scenarioId, hunkId])
+  @@index([scenarioId])
+  @@map("pr_scenario_solutions")
+}
+
+model CodeReview {
+  id                 String     @id @default(uuid()) @map("review_id")
+  userId             String     @map("user_id")
+  scenarioId         String     @map("scenario_id")
+  
+  // Review Data
+  reviewActions      Json       @map("review_actions")
+  overallDecision    ReviewDecision @map("overall_decision")
+  comments           String?
+  
+  // Evaluation
+  correctActions     Int        @map("correct_actions")
+  totalActions       Int        @map("total_actions")
+  accuracy           Decimal    @db.Decimal(5, 2)
+  timeTakenSeconds   Int        @map("time_taken_seconds")
+  
+  // Metadata
+  submittedAt        DateTime   @default(now()) @map("submitted_at")
+  
+  // Relations
+  user               User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  scenario           PrScenario @relation(fields: [scenarioId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, submittedAt(sort: Desc)])
+  @@index([scenarioId])
+  @@map("code_reviews")
+}
+
+// ============================================================================
+// LV6: VIBE CODING (AI-POWERED)
+// ============================================================================
+
+model VibeSession {
+  id                   String           @id @default(uuid()) @map("session_id")
+  userId               String           @map("user_id")
+  problemId            String           @map("problem_id")
+  
+  // Session Data
+  initialPrompt        String           @map("initial_prompt")
+  finalCode            String?          @map("final_code")
+  
+  // Evaluation
+  tokenUsage           Int              @map("token_usage")
+  promptQualityScore   Decimal          @map("prompt_quality_score") @db.Decimal(5, 2)
+  codeQualityScore     Decimal?         @map("code_quality_score") @db.Decimal(5, 2)
+  testCasesPassed      Int?             @map("test_cases_passed")
+  testCasesTotal       Int?             @map("test_cases_total")
+  
+  // Status
+  isCompleted          Boolean          @default(false) @map("is_completed")
+  
+  // Metadata
+  startedAt            DateTime         @default(now()) @map("started_at")
+  completedAt          DateTime?        @map("completed_at")
+  
+  // Relations
+  user                 User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages             VibeMessage[]
+  problemAttempts      ProblemAttempt[]
+  
+  @@index([userId, startedAt(sort: Desc)])
+  @@map("vibe_sessions")
+}
+
+model VibeMessage {
+  id                 String      @id @default(uuid()) @map("message_id")
+  sessionId          String      @map("session_id")
+  
+  // Message Data
+  role               String      @db.VarChar(20)
+  content            String
+  tokenCount         Int         @map("token_count")
+  
+  // Metadata
+  createdAt          DateTime    @default(now()) @map("created_at")
+  
+  // Relations
+  session            VibeSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId, createdAt])
+  @@map("vibe_messages")
+}
+
+// ============================================================================
+// COMMUNITY MODULE
+// ============================================================================
+
+model CommunityPost {
+  id                 String        @id @default(uuid()) @map("post_id")
+  authorId           String        @map("author_id")
+  
+  // Content
+  category           PostCategory
+  title              String        @db.VarChar(200)
+  content            String
+  
+  // Associated Problem
+  relatedProblemId   String?       @map("related_problem_id")
+  isProblemQuestion  Boolean       @default(false) @map("is_problem_question")
+  
+  // Statistics
+  viewCount          Int           @default(0) @map("view_count")
+  likeCount          Int           @default(0) @map("like_count")
+  dislikeCount       Int           @default(0) @map("dislike_count")
+  commentCount       Int           @default(0) @map("comment_count")
+  
+  // Status
+  isPinned           Boolean       @default(false) @map("is_pinned")
+  isLocked           Boolean       @default(false) @map("is_locked")
+  isDeleted          Boolean       @default(false) @map("is_deleted")
+  
+  // Metadata
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+  deletedAt          DateTime?     @map("deleted_at")
+  
+  // Relations
+  author             User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  relatedProblem     QuizProblem?  @relation(fields: [relatedProblemId], references: [id], onDelete: SetNull)
+  comments           PostComment[]
+  votes              PostVote[]
+  
+  @@index([category, createdAt(sort: Desc)])
+  @@index([authorId])
+  @@index([relatedProblemId])
+  @@index([relatedProblemId, createdAt(sort: Desc)])
+  @@index([likeCount(sort: Desc), viewCount(sort: Desc)])
+  @@map("community_posts")
+}
+
+model PostComment {
+  id                 String        @id @default(uuid()) @map("comment_id")
+  postId             String        @map("post_id")
+  authorId           String        @map("author_id")
+  parentCommentId    String?       @map("parent_comment_id")
+  
+  // Content
+  content            String
+  
+  // Statistics
+  likeCount          Int           @default(0) @map("like_count")
+  
+  // Status
+  isDeleted          Boolean       @default(false) @map("is_deleted")
+  
+  // Metadata
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+  deletedAt          DateTime?     @map("deleted_at")
+  
+  // Relations
+  post               CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author             User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parentComment      PostComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id], onDelete: Cascade)
+  replies            PostComment[] @relation("CommentReplies")
+  votes              PostVote[]
+  
+  @@index([postId, createdAt])
+  @@index([authorId])
+  @@index([parentCommentId])
+  @@map("post_comments")
+}
+
+model PostVote {
+  id                 String        @id @default(uuid()) @map("vote_id")
+  userId             String        @map("user_id")
+  
+  // Target (Mutually Exclusive)
+  postId             String?       @map("post_id")
+  commentId          String?       @map("comment_id")
+  
+  // Vote Data
+  voteType           VoteType      @map("vote_type")
+  
+  // Metadata
+  createdAt          DateTime      @default(now()) @map("created_at")
+  
+  // Relations
+  user               User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post               CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment            PostComment?   @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, postId])
+  @@unique([userId, commentId])
+  @@index([userId])
+  @@map("post_votes")
+}
+
+// ============================================================================
+// NOTIFICATION MODULE
+// ============================================================================
+
+model Notification {
+  id                 String            @id @default(uuid()) @map("notification_id")
+  userId             String            @map("user_id")
+  
+  // Notification Content
+  type               NotificationType
+  title              String            @db.VarChar(100)
+  message            String
+  
+  // Action Data
+  actionUrl          String?           @map("action_url")
+  actionData         Json?             @map("action_data")
+  
+  // Status
+  isRead             Boolean           @default(false) @map("is_read")
+  isSent             Boolean           @default(false) @map("is_sent")
+  
+  // Metadata
+  createdAt          DateTime          @default(now()) @map("created_at")
+  readAt             DateTime?         @map("read_at")
+  sentAt             DateTime?         @map("sent_at")
+  
+  // Relations
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([isSent, createdAt])
+  @@map("notifications")
+}
+
+model NotificationPreferences {
+  id                     String   @id @default(uuid()) @map("pref_id")
+  userId                 String   @unique @map("user_id")
+  
+  // Push Notification Settings
+  pushQuestComplete      Boolean  @default(true) @map("push_quest_complete")
+  pushLevelUp            Boolean  @default(true) @map("push_level_up")
+  pushAchievement        Boolean  @default(true) @map("push_achievement")
+  pushCommentReply       Boolean  @default(true) @map("push_comment_reply")
+  pushPostLike           Boolean  @default(false) @map("push_post_like")
+  pushReminderStudy      Boolean  @default(true) @map("push_reminder_study")
+  
+  // In-App Notification Settings
+  inappAll               Boolean  @default(true) @map("inapp_all")
+  
+  // Metadata
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  user                   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("notification_preferences")
+}
+
+// ============================================================================
+// ACHIEVEMENT & QUEST MODULE
+// ============================================================================
+
+model Achievement {
+  id                 String            @id @default(uuid()) @map("achievement_id")
+  
+  // Achievement Info
+  name               String            @db.VarChar(100)
+  description        String
+  iconUrl            String?           @map("icon_url")
+  category           String            @db.VarChar(50)
+  
+  // Requirements
+  requirement        Json
+  points             Int               @default(0)
+  
+  // Metadata
+  createdAt          DateTime          @default(now()) @map("created_at")
+  
+  // Relations
+  userAchievements   UserAchievement[]
+  
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id                 String      @id @default(uuid()) @map("user_achievement_id")
+  userId             String      @map("user_id")
+  achievementId      String      @map("achievement_id")
+  
+  // Progress
+  progress           Int         @default(0)
+  isCompleted        Boolean     @default(false) @map("is_completed")
+  
+  // Metadata
+  unlockedAt         DateTime?   @map("unlocked_at")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  
+  // Relations
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement        Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@map("user_achievements")
+}
+
+model DailyQuest {
+  id                 String           @id @default(uuid()) @map("quest_id")
+  
+  // Quest Info
+  title              String           @db.VarChar(100)
+  description        String
+  questType          String           @map("quest_type") @db.VarChar(50)
+  
+  // Requirements
+  targetValue        Int              @map("target_value")
+  rewardXp           Int              @map("reward_xp")
+  
+  // Metadata
+  createdAt          DateTime         @default(now()) @map("created_at")
+  
+  // Relations
+  userQuests         UserDailyQuest[]
+  
+  @@map("daily_quests")
+}
+
+model UserDailyQuest {
+  id                 String      @id @default(uuid()) @map("user_quest_id")
+  userId             String      @map("user_id")
+  questId            String      @map("quest_id")
+  questDate          DateTime    @map("quest_date") @db.Date
+  
+  // Progress
+  currentValue       Int         @default(0) @map("current_value")
+  isCompleted        Boolean     @default(false) @map("is_completed")
+  
+  // Metadata
+  completedAt        DateTime?   @map("completed_at")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  
+  // Relations
+  user               User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  quest              DailyQuest  @relation(fields: [questId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, questId, questDate])
+  @@index([userId, questDate])
+  @@map("user_daily_quests")
+}

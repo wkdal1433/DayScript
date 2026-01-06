@@ -29,7 +29,13 @@
       "Bash(node:*)",
       "Bash(npx eslint:*)",
       "Bash(git stash:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(dir:*)",
+      "Bash(timeout /t 5 /nobreak)",
+      "Bash(ping:*)",
+      "Bash(npx react-native run-android)",
+      "Bash(gradlew.bat app:installDebug:*)",
+      "Bash(cmd /c gradlew.bat app:installDebug -PreactNativeDevServerPort=8081)"
     ],
     "deny": [],
     "ask": []
